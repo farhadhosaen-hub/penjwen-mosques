@@ -178,6 +178,31 @@
   <!-- ================= MAIN CONTENT ================= -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
     
+    <!-- PWA Installation Banner: داگرتنی ئەپ بۆ مۆبایل و کۆمپیوتەر -->
+    <div id="pwaTopBanner" class="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white p-3.5 sm:p-4 rounded-3xl mb-6 shadow-xl border border-emerald-500/40 flex flex-col sm:flex-row items-center justify-between gap-3 no-print animate-fade-in">
+      <div class="flex items-center gap-3.5 text-right w-full sm:w-auto">
+        <div class="w-11 h-11 rounded-2xl bg-white/15 text-amber-300 flex items-center justify-center text-xl shrink-0">
+          <i class="fa-solid fa-cloud-arrow-down"></i>
+        </div>
+        <div>
+          <h3 class="text-sm sm:text-base font-bold flex items-center gap-2">
+            <span>ئەپی فەرمی مزگەوتەکانی پێنجوێن بۆ مۆبایل و کۆمپیوتەر</span>
+            <span class="text-[10px] bg-amber-400 text-amber-950 font-black px-2 py-0.5 rounded-full">بێ ئینتەرنێت 100%</span>
+          </h3>
+          <p class="text-xs text-emerald-100/90 mt-0.5">دەتوانیت بە یەک کرتە ئەم بەرنامەیە بخەیتە سەر شاشەی مۆبایل یان کۆمپیوتەرەکەت بۆ بەکارهێنانی هەمیشەیی.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end shrink-0">
+        <button onclick="triggerPwaInstall()" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 font-black text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md transition-all cursor-pointer">
+          <i class="fa-solid fa-download"></i>
+          <span>داگرتنی ئەپ</span>
+        </button>
+        <button onclick="dismissPwaTopBanner()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer" title="داخستن">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+    </div>
+
     <!-- Hero & Action Section (دووگمەی مزگەوتەکانی پێنجوێن و ئامارەکان) -->
     <div id="actionHero" class="bg-gradient-to-br from-emerald-100/90 via-emerald-50 to-white border border-emerald-200/90 rounded-3xl p-6 sm:p-8 mb-8 shadow-xs relative overflow-hidden no-print">
       <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-emerald-300/15 rounded-full blur-2xl pointer-events-none"></div>
@@ -213,16 +238,10 @@
             <span>ناردن بۆ مامۆستایان</span>
           </button>
 
-          <!-- دووگمەی کردنەوە لەسەر مۆبایل (Mobile Access) -->
-          <button id="openMobileModalBtn" onclick="openShareModal()" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="کردنەوەی ئەپ لەسەر مۆبایل لە ڕێگەی وایفای و بارکۆد">
-            <i class="fa-solid fa-mobile-screen-button text-blue-200 text-base"></i>
-            <span>مۆبایل</span>
-          </button>
-
-          <!-- دووگمەی ئینستۆڵکردن لەسەر مۆبایل و کۆمپیوتەر (PWA Install Button) -->
-          <button id="pwaInstallBtn" class="hidden inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="دابەزاندن و خستنەسەر شاشە بەبێ ئینتەرنێت">
-            <i class="fa-solid fa-download text-white text-base"></i>
-            <span>ئینستۆڵکردنی ئەپ</span>
+          <!-- دووگمەی داگرتنی ئەپ لەسەر مۆبایل و کۆمپیوتەر (PWA Install Button) -->
+          <button id="pwaInstallBtn" onclick="triggerPwaInstall()" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="دابەزاندنی بەرنامەکە وەک ئەپێکی سەربەخۆ لەسەر مۆبایل و کۆمپیوتەر">
+            <i class="fa-solid fa-cloud-arrow-down text-emerald-200 text-base"></i>
+            <span>داگرتنی ئەپ</span>
           </button>
 
           <!-- خاڵی ٣: دووگمەی چاپکردن و PDF -->
@@ -642,76 +661,51 @@
       <!-- Modal Body -->
       <div class="p-6 overflow-y-auto space-y-5 flex-1 text-right">
         
-        <!-- بەشی مۆبایل و بارکۆد (QR Code) بۆ کردنەوە لەسەر مۆبایل دەستبەجێ -->
-        <div class="bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-2xl p-4.5 space-y-3">
-          <div class="flex items-center justify-between">
-            <h4 class="text-sm font-bold text-indigo-950 flex items-center gap-2">
-              <i class="fa-solid fa-mobile-screen-button text-indigo-700"></i>
-              <span>کردنەوەی ڕاستەوخۆ لەسەر مۆبایل (بە وایفای Wi-Fi)</span>
-            </h4>
-            <span class="text-[11px] bg-indigo-200 text-indigo-900 px-2.5 py-0.5 rounded-full font-bold">بۆ مۆبایل</span>
-          </div>
-          <p class="text-xs text-indigo-900/90 leading-relaxed">
-            مۆبایلەکەت (یان مۆبایلی مامۆستایان) ببەستەرەوە بە هەمان وایفای (Wi-Fi)، پاشان کامێرای مۆبایلەکەت ئاراستەی ئەم کۆدە (QR) بکە یان لینکەکە لە مۆبایلەکەت بکەرەوە:
-          </p>
-
-          <div class="flex flex-col sm:flex-row items-center gap-4 bg-white p-3.5 rounded-xl border border-indigo-200 shadow-2xs">
-            <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs shrink-0 text-center">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=http%3A%2F%2F192.168.1.2%3A8080" alt="QR Code" class="w-28 h-28 mx-auto" />
-              <div class="text-[10px] text-slate-500 font-bold mt-1">بە کامێرای مۆبایل سکانی بکە</div>
-            </div>
-            <div class="flex-1 space-y-2 w-full text-right">
-              <div class="text-xs font-bold text-slate-800">بەستەری مۆبایل لەسەر تۆڕی ناوخۆیی (وایفای):</div>
-              <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
-                <input type="text" readonly value="http://192.168.1.2:8080" class="w-full text-xs font-mono font-bold text-indigo-900 bg-transparent px-1 select-all" dir="ltr" id="mobileWifiUrlInput">
-                <button type="button" onclick="navigator.clipboard.writeText('http://192.168.1.2:8080'); showToast('لینکی مۆبایل کۆپی کرا', 'success');" class="shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1">
-                  <i class="fa-regular fa-copy"></i>
-                  <span>کۆپی</span>
-                </button>
-              </div>
-              <p class="text-[11px] text-slate-600 leading-normal">
-                ئەپەکە بە تەواوی بۆ شاشەی مۆبایل گونجێنراوە، کاتەکانی بانگ، وتارەکان، و دەنگەکان لە مۆبایلیش کاردەکەن.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- بەشی یەکەم: ناردنی ڕاستەوخۆ بە لینک و نامە (WhatsApp & Telegram) -->
-        <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4.5 space-y-3">
+        <!-- بەشی سەرەکی: بەستەری فەرمی و سەرەکی ئەپ بۆ مامۆستایان (سەرهێڵ و دابەزاندن) -->
+        <div class="bg-gradient-to-br from-emerald-50 via-teal-50 to-blue-50 border-2 border-emerald-400 rounded-2xl p-4.5 space-y-3.5 shadow-sm">
           <div class="flex items-center justify-between">
             <h4 class="text-sm font-bold text-emerald-950 flex items-center gap-2">
-              <i class="fa-solid fa-paper-plane text-emerald-700"></i>
-              <span>١. ناردنی ڕاستەوخۆ بە نامە و لینک بۆ مامۆستایان</span>
+              <i class="fa-solid fa-globe text-emerald-700"></i>
+              <span>١. بەستەری فەرمی و گشتی ئەپ (بۆ ناردن بۆ مامۆستایان)</span>
             </h4>
-            <span class="text-[11px] bg-emerald-200/80 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">ڕێگەی خێرا</span>
+            <span class="text-[11px] bg-emerald-600 text-white px-3 py-0.5 rounded-full font-bold shadow-2xs">فەرمی و ئۆنلاین</span>
           </div>
-          <p class="text-xs text-emerald-800/90 leading-relaxed">
-            دەتوانیت بە یەک کرتە ئەم پەیام و بەستەرە لە ڕێگەی واتسئاپ یان تێلێگرامەوە بنێریت بۆ مامۆستایانی پێنجوێن:
+          <p class="text-xs text-emerald-900 leading-relaxed font-medium">
+            ئەم بەستەرە لە هەر شوێنێک و لەسەر هەموو مۆبایل و کۆمپیوتەرێک ڕاستەوخۆ دەکرێتەوە و دەبێت بە ئەپێکی فەرمی:
           </p>
 
-          <div class="flex items-center gap-2 bg-white rounded-xl border border-emerald-300 p-2">
-            <input 
-              type="text" 
-              id="shareUrlInput" 
-              readonly 
-              class="w-full text-xs font-mono text-slate-700 bg-transparent px-2 focus:outline-none select-all"
-              value=""
-            >
-            <button id="copyShareUrlBtn" class="shrink-0 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer">
-              <i class="fa-regular fa-copy"></i>
-              <span>کۆپیکردن</span>
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-            <a id="shareWhatsAppBtn" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-xs transition-colors">
-              <i class="fa-brands fa-whatsapp text-lg"></i>
-              <span>ناردن لە WhatsApp</span>
-            </a>
-            <a id="shareTelegramBtn" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-xs transition-colors">
-              <i class="fa-brands fa-telegram text-lg"></i>
-              <span>ناردن لە Telegram</span>
-            </a>
+          <div class="flex flex-col sm:flex-row items-center gap-4 bg-white p-3.5 rounded-xl border border-emerald-200 shadow-2xs">
+            <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs shrink-0 text-center">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=https%3A%2F%2Ffarhadhosaen-hub.github.io%2Fpenjwen-mosques%2F" alt="QR Code" class="w-28 h-28 mx-auto" />
+              <div class="text-[10px] text-slate-500 font-bold mt-1">سکانی بکە بە کامێرای مۆبایل</div>
+            </div>
+            <div class="flex-1 space-y-2.5 w-full text-right">
+              <div class="text-xs font-bold text-slate-800">بەستەری فەرمی ئەپ لەسەر ئینتەرنێت:</div>
+              <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-emerald-300">
+                <input 
+                  type="text" 
+                  id="shareUrlInput" 
+                  readonly 
+                  class="w-full text-xs font-mono font-bold text-emerald-950 bg-transparent px-1 focus:outline-none select-all" 
+                  value="https://farhadhosaen-hub.github.io/penjwen-mosques/"
+                  dir="ltr"
+                >
+                <button id="copyShareUrlBtn" class="shrink-0 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <i class="fa-regular fa-copy"></i>
+                  <span>کۆپیکردن</span>
+                </button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <a id="shareWhatsAppBtn" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-xl text-xs shadow-xs transition-colors">
+                  <i class="fa-brands fa-whatsapp text-base"></i>
+                  <span>ناردن لە WhatsApp</span>
+                </a>
+                <a id="shareTelegramBtn" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs shadow-xs transition-colors">
+                  <i class="fa-brands fa-telegram text-base"></i>
+                  <span>ناردن لە Telegram</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -794,6 +788,80 @@
       <!-- Modal Footer -->
       <div class="border-t border-slate-100 p-4 bg-slate-50 flex items-center justify-end">
         <button id="closeShareModalFooterBtn" onclick="closeShareModal()" class="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors cursor-pointer">
+          داخستن
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ڕێنمایی داگرتن و ئینستۆڵکردنی ئەپ (PWA Guide Modal) ================= -->
+  <div id="pwaGuideModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl border-2 border-emerald-600 overflow-hidden transform scale-95 transition-all duration-300 max-h-[92vh] flex flex-col text-right">
+      
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-emerald-800 to-teal-800 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg text-emerald-200">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold">داگرتن و خستنەسەر شاشە وەک ئەپ</h3>
+            <p class="text-xs text-emerald-100">بۆ مۆبایل (ئایفۆن و ئەندرۆید) و کۆمپیوتەر</p>
+          </div>
+        </div>
+        <button onclick="closePwaGuideModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 overflow-y-auto space-y-4 flex-1 text-xs text-slate-700">
+        
+        <!-- بەشی ئایفۆن -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+            <i class="fa-brands fa-apple text-base text-slate-800"></i>
+            <span>بۆ مۆبایلی ئایفۆن (iPhone - Safari):</span>
+          </div>
+          <ol class="space-y-1.5 list-decimal list-inside pr-1 text-slate-600 leading-relaxed">
+            <li>لە وێبگەڕی سەفاری (Safari) لە خوارەوەی شاشە کلیک لە دوگمەی <strong>هاوبەشکردن (Share <i class="fa-solid fa-arrow-up-from-bracket"></i>)</strong> بکە.</li>
+            <li>بڕۆ خوارەوە و هەڵبژاردنی <strong>«Add to Home Screen / خستنەسەر شاشە»</strong> دابگرە.</li>
+            <li>لە سەرەوە کلیک لە <strong>Add</strong> بکە؛ دەستبەجێ بە لۆگۆی فەرمی دەچێتە سەر شاشەی مۆبایلەکەت.</li>
+          </ol>
+        </div>
+
+        <!-- بەشی ئەندرۆید -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+            <i class="fa-brands fa-android text-base text-green-600"></i>
+            <span>بۆ مۆبایلی ئەندرۆید (Samsung, Xiaomi, Chrome):</span>
+          </div>
+          <ol class="space-y-1.5 list-decimal list-inside pr-1 text-slate-600 leading-relaxed">
+            <li>کلیک لە دوگمەی سەرەکی <strong>«داگرتنی ئەپ»</strong> بکە.</li>
+            <li>یان لە کرۆم کلیک لە <strong>سێ خاڵەکەی سەرەوە (⋮)</strong> بکە.</li>
+            <li>هەڵبژاردنی <strong>«Install app / ئەپەکە دابەزێنە»</strong> یان <strong>«Add to Home screen»</strong> بکە.</li>
+          </ol>
+        </div>
+
+        <!-- بەشی کۆمپیوتەر -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+            <i class="fa-brands fa-windows text-base text-blue-600"></i>
+            <span>بۆ کۆمپیوتەر (Windows / Mac):</span>
+          </div>
+          <ol class="space-y-1.5 list-decimal list-inside pr-1 text-slate-600 leading-relaxed">
+            <li>لە کرۆم یان ئێج، لە بەشی سەرەوە لە لای ڕاستی ناونیشانەکە کلیک لە نیشانەی <strong>ئەپ (Install ⊕)</strong> بکە.</li>
+            <li>پاشان کلیک لە <strong>Install</strong> بکە. ئەپەکە دەچێتە سەر دیسکتۆپت و لە پەنجەرەیەکی سەربەخۆ دەکرێتەوە.</li>
+          </ol>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="border-t border-slate-100 p-4 bg-slate-50 flex items-center justify-between">
+        <span class="text-[11px] text-emerald-800 font-bold"><i class="fa-solid fa-circle-check text-emerald-600 ml-1"></i> پاش داگرتن بە تەواوی بەبێ ئینتەرنێت کاردەکات</span>
+        <button onclick="closePwaGuideModal()" class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors cursor-pointer">
           داخستن
         </button>
       </div>

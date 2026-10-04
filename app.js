@@ -1604,35 +1604,78 @@ function initNetworkStatusMonitor() {
   updateStatus();
 }
 
+const OFFICIAL_APP_URL = 'https://farhadhosaen-hub.github.io/penjwen-mosques/';
+
 let deferredPrompt = null;
+
+function checkStandaloneMode() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const banner = document.getElementById('pwaTopBanner');
+  const btn = document.getElementById('pwaInstallBtn');
+  if (isStandalone) {
+    if (banner) banner.style.display = 'none';
+    if (btn) btn.classList.add('hidden');
+  }
+}
+
+window.triggerPwaInstall = async function() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      showToast('دەستخۆش! ئەپەکە بە سەرکەوتوویی ئینستۆڵ کرا لەسەر ئامێرەکەت', 'success');
+      const banner = document.getElementById('pwaTopBanner');
+      if (banner) banner.style.display = 'none';
+      const btn = document.getElementById('pwaInstallBtn');
+      if (btn) btn.classList.add('hidden');
+    }
+    deferredPrompt = null;
+  } else {
+    // پیشاندانی پەنجەرەی ڕێنمایی هەنگاو بە هەنگاو بۆ هەردوو مۆبایل و کۆمپیوتەر
+    openPwaGuideModal();
+  }
+};
+
+window.dismissPwaTopBanner = function() {
+  const banner = document.getElementById('pwaTopBanner');
+  if (banner) {
+    banner.style.display = 'none';
+    try { sessionStorage.setItem('penjwen_pwa_banner_dismissed', '1'); } catch(e) {}
+  }
+};
+
+window.openPwaGuideModal = function() {
+  const modal = document.getElementById('pwaGuideModal');
+  if (modal) showModal(modal);
+};
+
+window.closePwaGuideModal = function() {
+  const modal = document.getElementById('pwaGuideModal');
+  if (modal) hideModal(modal);
+};
+
 function initPwaInstallPrompt() {
-  const pwaBtn = document.getElementById('pwaInstallBtn');
-  if (!pwaBtn) return;
+  checkStandaloneMode();
+
+  try {
+    if (sessionStorage.getItem('penjwen_pwa_banner_dismissed') === '1') {
+      const banner = document.getElementById('pwaTopBanner');
+      if (banner) banner.style.display = 'none';
+    }
+  } catch(e) {}
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    pwaBtn.classList.remove('hidden');
-  });
-
-  pwaBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) {
-      showToast('دەتوانیت لە ڕێگەی مینیۆی وێبگەڕەکەتەوە "Add to Home Screen" هەڵبژێریت', 'info');
-      return;
-    }
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      showToast('ئەپەکە بە سەرکەوتوویی ئینستۆڵ کرا لەسەر ئامێرەکەت', 'success');
-    }
-    deferredPrompt = null;
-    pwaBtn.classList.add('hidden');
   });
 
   window.addEventListener('appinstalled', () => {
-    pwaBtn.classList.add('hidden');
+    const banner = document.getElementById('pwaTopBanner');
+    if (banner) banner.style.display = 'none';
+    const btn = document.getElementById('pwaInstallBtn');
+    if (btn) btn.classList.add('hidden');
     deferredPrompt = null;
-    showToast('ئەپەکە ئێستا وەک بەرنامەیەکی فەرمی بەردەستە', 'success');
+    showToast('ئەپەکە ئێستا وەک بەرنامەیەکی فەرمی بەردەستە لەسەر شاشەکەت', 'success');
   });
 }
 
@@ -1640,31 +1683,25 @@ function setupShareLinks() {
   const shareUrlInput = document.getElementById('shareUrlInput');
   const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
   const shareTelegramBtn = document.getElementById('shareTelegramBtn');
-  const mobileWifiUrlInput = document.getElementById('mobileWifiUrlInput');
 
   let currentUrl = window.location.href;
-  let mobileUrl = 'http://192.168.1.2:8080';
-
-  // ئەگەر وەک فایلی ناوخۆیی یان لۆکاڵ هۆست کرابێتەوە
-  if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    currentUrl = mobileUrl;
+  // ئەگەر وەک فایلی ناوخۆیی یان لۆکاڵ هۆست کرابێتەوە، بەستەری فەرمی ئۆنلاین بەکاربهێنە
+  if (!currentUrl.startsWith('http') || currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
+    currentUrl = OFFICIAL_APP_URL;
   }
 
   if (shareUrlInput) {
     shareUrlInput.value = currentUrl;
   }
-  if (mobileWifiUrlInput) {
-    mobileWifiUrlInput.value = mobileUrl;
-  }
 
-  const shareMsg = `سڵاو و ڕێز مامۆستای بەڕێز، ئەمە ئەپی فەرمی مزگەوتەکانی پێنجوێنە بۆ زانیاری مزگەوتەکان، وتاری هەینی و کاتەکانی بانگ بە شێوازی ئۆفلاین (بێ ئینتەرنێت) و ئۆنلاین:\n${currentUrl}`;
+  const shareMsg = `سڵاو و ڕێز مامۆستای بەڕێز،\nئەمە ئەپی فەرمی مزگەوتەکانی پێنجوێنە بۆ زانیاری مزگەوتەکان، کاتەکانی بانگی پێنجوێن، وتارەکانی هەینی و تۆمارکردنی دەنگی وتارەکان.\n\nدەتوانیت لە ڕێگەی ئەم بەستەرەوە بیکەیتەوە و بە یەک کرتە وەک ئەپێکی فەرمی دایبەزێنیتە سەر مۆبایل یان کۆمپیوتەرەکەت (بە ئۆفلاین و ئۆنلاین کاردەکات):\n${currentUrl}`;
 
   if (shareWhatsAppBtn) {
     shareWhatsAppBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMsg)}`;
   }
 
   if (shareTelegramBtn) {
-    shareTelegramBtn.href = `https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent('ئەپی فەرمی مزگەوتەکانی پێنجوێن (ئۆفلاین و ئۆنلاین)')}`;
+    shareTelegramBtn.href = `https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(shareMsg)}`;
   }
 }
 

@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ئەپی مزگەوتەکانی پێنجوێن | Penjwen Mosques</title>
+  <!-- PWA & Mobile Meta Tags (کارکردن بە ئۆفلاین و ئۆنلاین) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#15803d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="مزگەوتەکانی پێنجوێن">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Google Fonts: Vazirmatn for clean Kurdish UI & Amiri for Islamic Calligraphy -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              300: '#86efac',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            }
+          },
+          fontFamily: {
+            kurdish: ['Vazirmatn', 'sans-serif'],
+            quran: ['Amiri', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="font-kurdish bg-emerald-50/70 text-slate-800 min-h-screen flex flex-col selection:bg-brand-200 selection:text-brand-900">
+
+  <!-- ================= TOP HEADER (بەشی سەرەوە) ================= -->
+  <header class="w-full bg-white/85 backdrop-blur-md border-b border-emerald-100 shadow-xs sticky top-0 z-30 transition-all no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+      <div class="flex items-center justify-between gap-2 sm:gap-4">
+        
+        <!-- لای ڕاست: پلەی گەرما ڕاستەوخۆ (Top Right: Live Temperature) -->
+        <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200/80 rounded-2xl px-3.5 py-2 shadow-xs hover:border-emerald-300 transition-all">
+          <div id="weatherIcon" class="text-emerald-700 text-2xl animate-pulse">
+            <i class="fa-solid fa-cloud-sun"></i>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-1.5">
+              <span id="tempValue" class="text-lg sm:text-xl font-bold text-emerald-900">--°C</span>
+              <button id="refreshWeatherBtn" title="نوێکردنەوەی کەشوهەوا" class="text-xs text-emerald-600 hover:text-emerald-800 transition-transform active:rotate-180">
+                <i class="fa-solid fa-rotate-right"></i>
+              </button>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] sm:text-xs text-emerald-700/90 font-medium">
+              <i class="fa-solid fa-location-dot text-emerald-600 text-[10px]"></i>
+              <span id="locationName">پێنجوێن</span>
+              <span class="text-emerald-400">|</span>
+              <span id="weatherDesc">چاوەڕوانی...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ناوەڕاست: بسم الله الرحمن الرحیم (Center: Bismillah) -->
+        <div class="text-center px-2 flex-1 max-w-md">
+          <div class="inline-block relative group">
+            <h1 class="font-quran text-xl sm:text-2xl md:text-3xl text-emerald-900 tracking-wide font-bold select-none drop-shadow-xs">
+              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+            </h1>
+            <div class="h-0.5 w-16 sm:w-24 bg-gradient-to-r from-transparent via-emerald-500 to-transparent mx-auto mt-1 rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- لای چەپ: کات و بەروار (Top Left: Time & Date) -->
+        <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200/80 rounded-2xl px-3.5 py-2 shadow-xs text-left">
+          <div class="text-emerald-700 text-xl hidden sm:block">
+            <i class="fa-regular fa-clock"></i>
+          </div>
+          <div class="flex flex-col items-end sm:items-start text-right">
+            <div class="flex items-center gap-2">
+              <div id="liveClock" class="text-lg sm:text-xl font-bold text-emerald-900 tracking-wider font-mono">
+                00:00:00
+              </div>
+              <!-- دۆخی ئۆنلاین / ئۆفلاین (Offline & Online indicator) -->
+              <span id="networkStatusBadge" class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300" title="دۆخی پەیوەندی هێڵ">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="networkStatusText">سەرهێڵ</span>
+              </span>
+            </div>
+            <div class="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-700 font-medium">
+              <i class="fa-regular fa-calendar-days text-[10px] text-emerald-600"></i>
+              <span id="kurdishDate">-- / -- / ----</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= خاڵی ١: کاتەکانی بانگی پێنجوێن (PRAYER TIMES BAR) ================= -->
+  <section id="prayerBar" class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-900 text-white shadow-md border-b border-emerald-700 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-3">
+        
+        <!-- Next Prayer Countdown Banner -->
+        <div class="flex items-center gap-2.5 text-xs sm:text-sm">
+          <div class="w-7 h-7 rounded-lg bg-emerald-700/80 flex items-center justify-center text-emerald-200">
+            <i class="fa-solid fa-mosque text-xs"></i>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-emerald-200 font-medium">کاتەکانی بانگ لە پێنجوێن:</span>
+            <span id="nextPrayerBadge" class="bg-amber-400 text-amber-950 font-bold px-2.5 py-0.5 rounded-full text-xs animate-pulse">
+              چاوەڕوانی...
+            </span>
+            <!-- خاڵی ٢: دووگمەی دەستکاریکردنی کاتی بانگەکان -->
+            <button id="openPrayerEditBtn" class="bg-emerald-700/90 hover:bg-emerald-600 text-emerald-100 hover:text-white px-2.5 py-1 rounded-xl text-xs font-semibold border border-emerald-600 flex items-center gap-1.5 transition-colors cursor-pointer mr-1" title="دەستکاریکردنی کاتی بانگەکان ئەگەر درووست نەبوو">
+              <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+              <span>دەستکاری کاتەکان</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Prayer Times Grid (بەیانی، خۆرهەڵات، نیوەڕۆ، عەسر، مەغریب، عیشا) -->
+        <div class="grid grid-cols-6 gap-1.5 sm:gap-2.5 w-full lg:w-auto text-center" id="prayerTimesCards">
+          
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Fajr">
+            <div class="text-[10px] sm:text-xs text-emerald-200">بەیانی</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Fajr">--:--</div>
+          </div>
+
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60 opacity-80" id="card-Sunrise">
+            <div class="text-[10px] sm:text-xs text-emerald-200">خۆرهەڵات</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Sunrise">--:--</div>
+          </div>
+
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Dhuhr">
+            <div class="text-[10px] sm:text-xs text-emerald-200">نیوەڕۆ</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Dhuhr">--:--</div>
+          </div>
+
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Asr">
+            <div class="text-[10px] sm:text-xs text-emerald-200">عەسر</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Asr">--:--</div>
+          </div>
+
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Maghrib">
+            <div class="text-[10px] sm:text-xs text-emerald-200">مەغریب</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Maghrib">--:--</div>
+          </div>
+
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Isha">
+            <div class="text-[10px] sm:text-xs text-emerald-200">عیشا</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Isha">--:--</div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    
+    <!-- Hero & Action Section (دووگمەی مزگەوتەکانی پێنجوێن و ئامارەکان) -->
+    <div id="actionHero" class="bg-gradient-to-br from-emerald-100/90 via-emerald-50 to-white border border-emerald-200/90 rounded-3xl p-6 sm:p-8 mb-8 shadow-xs relative overflow-hidden no-print">
+      <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-emerald-300/15 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute -right-12 -top-12 w-48 h-48 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none"></div>
+      
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+        
+        <div class="text-center md:text-right space-y-2 max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-200/60 text-emerald-800 text-xs font-semibold">
+            <i class="fa-solid fa-mosque"></i>
+            <span>ڕێبەری فەرمی و تۆماری مزگەوتەکانی پێنجوێن</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-emerald-950">
+            سیستەمی مزگەوتەکان و وتاری هەینی
+          </h2>
+          <p class="text-sm sm:text-base text-emerald-800/80 leading-relaxed">
+            تۆمارکردن و ڕێکخستنی زانیاری مزگەوتەکان، وتاربێژان، پێشنوێژان، بانگبێژان، ناونیشانی وتاری هەینی و کاتەکانی بانگ.
+          </p>
+        </div>
+
+        <!-- دووگمەکانی کارپێکردن بە داواکاری بەکارهێنەر -->
+        <div class="flex flex-wrap sm:flex-nowrap gap-2.5 w-full md:w-auto">
+          <!-- دووگمەی سەرەکی داواکراو: مزگەوتەکانی پێنجوێن -->
+          <button id="openMosqueModalBtn" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold px-5 py-3.5 rounded-2xl shadow-lg shadow-emerald-600/25 transition-all transform hover:-translate-y-0.5 cursor-pointer text-sm sm:text-base">
+            <span class="text-base sm:text-lg"><i class="fa-solid fa-kaaba"></i></span>
+            <span>مزگەوتەکانی پێنجوێن</span>
+            <i class="fa-solid fa-plus text-xs bg-emerald-500/50 p-1.5 rounded-full mr-1"></i>
+          </button>
+
+          <!-- دووگمەی ناردن بۆ مامۆستایانی بەڕێز (Share & Offline Bundle) -->
+          <button id="openShareModalBtn" onclick="openShareModal()" class="inline-flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white font-bold px-4 py-3.5 rounded-2xl border border-emerald-700 shadow-md transition-all cursor-pointer text-sm" title="ناردنی لینک یان فایلی ئەپ بۆ مامۆستا بەڕێزەکانی پێنجوێن">
+            <i class="fa-solid fa-share-nodes text-emerald-300 text-base"></i>
+            <span>ناردن بۆ مامۆستایان</span>
+          </button>
+
+          <!-- دووگمەی کردنەوە لەسەر مۆبایل (Mobile Access) -->
+          <button id="openMobileModalBtn" onclick="openShareModal()" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="کردنەوەی ئەپ لەسەر مۆبایل لە ڕێگەی وایفای و بارکۆد">
+            <i class="fa-solid fa-mobile-screen-button text-blue-200 text-base"></i>
+            <span>مۆبایل</span>
+          </button>
+
+          <!-- دووگمەی ئینستۆڵکردن لەسەر مۆبایل و کۆمپیوتەر (PWA Install Button) -->
+          <button id="pwaInstallBtn" class="hidden inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="دابەزاندن و خستنەسەر شاشە بەبێ ئینتەرنێت">
+            <i class="fa-solid fa-download text-white text-base"></i>
+            <span>ئینستۆڵکردنی ئەپ</span>
+          </button>
+
+          <!-- خاڵی ٣: دووگمەی چاپکردن و PDF -->
+          <button id="printReportBtn" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-emerald-50 text-emerald-800 font-bold px-3.5 py-3.5 rounded-2xl border border-emerald-200 transition-all cursor-pointer text-sm shadow-xs" title="چاپکردن و هەناردەکردن بۆ PDF">
+            <i class="fa-solid fa-print text-emerald-600 text-base"></i>
+            <span>چاپکردن</span>
+          </button>
+
+          <!-- خاڵی ٢: وتارەکانی هەینی -->
+          <button id="filterKhutbahBtn" class="inline-flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold px-3.5 py-3.5 rounded-2xl border border-amber-200 transition-all cursor-pointer text-sm shadow-xs" title="پیشاندانی وتارەکانی ئەم هەفتەیە">
+            <i class="fa-solid fa-microphone-lines text-amber-600"></i>
+            <span>وتارەکان</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Summary Badges -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mt-6 pt-6 border-t border-emerald-200/60">
+        <div class="bg-white/80 rounded-xl p-3 border border-emerald-100 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-mosque"></i>
+          </div>
+          <div>
+            <div id="statTotalMosques" class="text-lg font-bold text-emerald-950">0</div>
+            <div class="text-xs text-slate-500 font-medium">سەرجەم مزگەوتەکان</div>
+          </div>
+        </div>
+
+        <div class="bg-white/80 rounded-xl p-3 border border-emerald-100 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-bullhorn"></i>
+          </div>
+          <div>
+            <div id="statKhateebs" class="text-lg font-bold text-emerald-950">0</div>
+            <div class="text-xs text-slate-500 font-medium">ووتاربێژان</div>
+          </div>
+        </div>
+
+        <div class="bg-white/80 rounded-xl p-3 border border-emerald-100 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-hands-praying"></i>
+          </div>
+          <div>
+            <div id="statImams" class="text-lg font-bold text-emerald-950">0</div>
+            <div class="text-xs text-slate-500 font-medium">پێش نوێژان</div>
+          </div>
+        </div>
+
+        <div class="bg-white/80 rounded-xl p-3 border border-emerald-100 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-microphone-lines"></i>
+          </div>
+          <div>
+            <div id="statMuezzins" class="text-lg font-bold text-emerald-950">0</div>
+            <div class="text-xs text-slate-500 font-medium">بانگ بێژان</div>
+          </div>
+        </div>
+
+        <div class="bg-white/80 rounded-xl p-3 border border-emerald-100 flex items-center gap-3 col-span-2 sm:col-span-1">
+          <div class="w-10 h-10 rounded-xl bg-[#ede0d4] text-[#4a2810] border border-[#d5bdaf] flex items-center justify-center text-lg">
+            <i class="fa-solid fa-user-gear"></i>
+          </div>
+          <div>
+            <div id="statKarguzars" class="text-lg font-bold text-emerald-950">0</div>
+            <div class="text-xs text-slate-500 font-medium">کارگووزاران</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Mosque Buttons & Details List (خاڵی ٢: هەر مزگەوتێک وەکو دووگمەیەک دەردەکەوێت) -->
+    <div id="mosquesContainer" class="space-y-4 max-w-4xl mx-auto no-print">
+      <!-- Mosque buttons will be dynamically rendered here via JS -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-emerald-200 p-8 no-print">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fa-solid fa-mosque"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-800 mb-1">هیچ مزگەوتێک نەدۆزرایەوە</h3>
+      <p class="text-sm text-slate-500 mb-4 max-w-sm mx-auto">هیچ تۆمارێک هاوتای ئەم گەڕانە نییە یان هێشتا مزگەوتت تۆمار نەکردووە.</p>
+      <button onclick="document.getElementById('openMosqueModalBtn').click()" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition-all shadow-xs">
+        <i class="fa-solid fa-plus"></i>
+        <span>تۆمارکردنی یەکەم مزگەوت</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ================= PRINT REPORT SECTION (خاڵی ٣: خشتەی تایبەت بە چاپکردن و PDF) ================= -->
+  <section id="printReportSection" class="hidden">
+    <div class="text-center border-b-2 border-emerald-800 pb-4 mb-5">
+      <h2 class="text-xl font-bold text-emerald-950 font-quran mb-1">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</h2>
+      <h1 class="text-2xl font-black text-slate-900">حکومەتی هەرێمی کوردستان - وەزارەتی ئەوقاف و کاروباری ئایینی</h1>
+      <h3 class="text-lg font-bold text-emerald-800">بەڕێوەبەرایەتی ئەوقافی پێنجوێن - خشتەی فەرمی مزگەوتەکان، مامۆستایان و وتارەکان</h3>
+      <div class="flex justify-between items-center text-xs text-slate-600 mt-3 pt-2 border-t border-slate-200">
+        <span id="printReportDate">بەرواری دەرچوون: --</span>
+        <span id="printReportCount">سەرجەم مزگەوتەکان: --</span>
+        <span>قەزای پێنجوێن</span>
+      </div>
+    </div>
+
+    <!-- Printable Table Container -->
+    <div id="printTableContainer">
+      <!-- Generated by JavaScript dynamically -->
+    </div>
+
+    <div class="mt-8 pt-4 border-t border-slate-300 flex justify-between text-xs text-slate-700">
+      <div>
+        <p class="font-bold">ئامادەکاری و وردبینی:</p>
+        <p class="text-slate-500 mt-1">ئەپی فەرمی مزگەوتەکانی پێنجوێن</p>
+      </div>
+      <div class="text-left">
+        <p class="font-bold">واژوو و پەسەندکردن:</p>
+        <p class="text-slate-400 mt-4">........................................</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODAL: زیادکردن و دەستکاری مزگەوت ================= -->
+  <div id="mosqueModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-emerald-100 overflow-hidden transform scale-95 transition-all duration-300 max-h-[92vh] flex flex-col">
+      
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-mosque"></i>
+          </div>
+          <div>
+            <h3 id="modalTitle" class="text-lg font-bold">تۆمارکردنی مزگەوتی نوێ</h3>
+            <p class="text-xs text-emerald-100">زانیارییەکانی مزگەوت، مامۆستایان و وتاری هەینی</p>
+          </div>
+        </div>
+        <button id="closeModalBtn" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable Form) -->
+      <form id="mosqueForm" class="p-6 overflow-y-auto space-y-5 flex-1">
+        <input type="hidden" id="editMosqueId" value="">
+
+        <!-- Basic Mosque Info -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">
+              ناوی مزگەوت <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400">
+                <i class="fa-solid fa-kaaba"></i>
+              </span>
+              <input 
+                type="text" 
+                id="mosqueName" 
+                required 
+                placeholder="نموونە: مزگەوتی گەورەی پێنجوێن" 
+                class="w-full pr-9 pl-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              >
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">
+              گەڕەک / شوێن لە پێنجوێن <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400">
+                <i class="fa-solid fa-location-dot"></i>
+              </span>
+              <input 
+                type="text" 
+                id="mosqueLocation" 
+                required 
+                placeholder="نموونە: ناوبازاڕ، دارەسوور، مامۆستایان" 
+                class="w-full pr-9 pl-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- خاڵی ٢: وتاری هەینی (Friday Khutbah Section) -->
+        <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-amber-200/60">
+            <div class="flex items-center gap-2 text-amber-900 font-bold text-xs sm:text-sm">
+              <i class="fa-solid fa-book-quran text-amber-600 text-base"></i>
+              <span>وتاری هەینی (دیاریکردنی بەروار و ناونیشان)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <label for="khutbahDate" class="text-[11px] font-bold text-amber-900 shrink-0">بەرواری هەینی:</label>
+              <input 
+                type="date" 
+                id="khutbahDate" 
+                class="px-2.5 py-1 bg-white rounded-xl border border-amber-300 text-xs font-semibold text-amber-950 focus:ring-2 focus:ring-amber-500 focus:outline-none shadow-2xs"
+              >
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">
+                ناونیشانی وتاری ئەو هەفتەیە
+              </label>
+              <input 
+                type="text" 
+                id="khutbahTopic" 
+                placeholder="نموونە: بەخشندەیی لە ئیسلامدا، برایەتی و تەبایی" 
+                class="w-full px-3 py-2 bg-white rounded-xl border border-amber-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+              >
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">
+                ناوی ئەو وتاربێژەی کە وتارەکەی داوە
+              </label>
+              <input 
+                type="text" 
+                id="khutbahSpeaker" 
+                placeholder="نموونە: مامۆستا مەلا عەبدوڵڵا ئەحمەد" 
+                class="w-full px-3 py-2 bg-white rounded-xl border border-amber-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+              >
+            </div>
+          </div>
+
+          <!-- خاڵی ٣: دووگمەی خەزنکردنی دەنگی وتار بە MP3 -->
+          <div class="pt-3 border-t border-amber-200/70">
+            <label class="block text-[11px] font-bold text-amber-950 mb-1.5 flex items-center gap-1.5">
+              <i class="fa-solid fa-file-audio text-amber-600"></i>
+              <span>خەزنکردنی دەنگی وتار بە شێوازی MP3:</span>
+            </label>
+            <div class="flex flex-wrap items-center gap-2.5 bg-white/70 p-2.5 rounded-xl border border-amber-200">
+              <label class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-xs cursor-pointer transition-colors">
+                <i class="fa-solid fa-upload"></i>
+                <span id="khutbahAudioBtnText">هەڵبژاردنی فایلی MP3</span>
+                <input type="file" id="khutbahAudioFile" accept="audio/mp3,audio/*" class="hidden">
+              </label>
+              <div id="khutbahAudioFileInfo" class="text-xs text-slate-600 font-medium truncate flex-1 min-w-[150px]">
+                هیچ دەنگێک هەڵنەبژێردراوە
+              </div>
+              <button type="button" id="removeKhutbahAudioBtn" class="hidden text-xs text-red-500 hover:text-red-700 font-bold px-2 py-1">
+                <i class="fa-solid fa-trash-can"></i> سڕینەوە
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">
+            تێبینی یان وەسفی مزگەوت (ئارەزوومەندانە)
+          </label>
+          <textarea 
+            id="mosqueNotes" 
+            rows="2" 
+            placeholder="زانیاری زیاتر دەربارەی مێژوو، چالاکی یان ژمارەی نوێژخوێنان..." 
+            class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          ></textarea>
+        </div>
+
+        <!-- Section: مامۆستایان و ستاف (Teachers & Roles) -->
+        <div class="border-t border-slate-100 pt-5">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h4 class="text-sm font-bold text-emerald-950 flex items-center gap-2">
+                <i class="fa-solid fa-users text-emerald-600"></i>
+                <span>مامۆستایان و خزمەتگوزارانی مزگەوت</span>
+              </h4>
+              <p class="text-xs text-slate-500">ناوی مامۆستایان زیاد بکە لەگەڵ پێگەکەیان (وتاربێژ، پێشنوێژ، بانگبێژ)</p>
+            </div>
+            <button 
+              type="button" 
+              id="addStaffRowBtn" 
+              class="inline-flex items-center gap-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+            >
+              <i class="fa-solid fa-plus text-[10px]"></i>
+              <span>زیادکردنی کەس</span>
+            </button>
+          </div>
+
+          <!-- Staff Dynamic List Container -->
+          <div id="staffListContainer" class="space-y-3">
+            <!-- Dynamic staff entries inserted here -->
+          </div>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="border-t border-slate-100 pt-4 flex items-center justify-end gap-3">
+          <button 
+            type="button" 
+            id="cancelModalBtn" 
+            class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold transition-colors cursor-pointer"
+          >
+            پەشیمانبوونەوە
+          </button>
+          <button 
+            type="submit" 
+            class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-sm font-bold shadow-md shadow-emerald-600/30 transition-all cursor-pointer flex items-center gap-2"
+          >
+            <i class="fa-solid fa-check"></i>
+            <span id="saveBtnText">تۆمارکردنی مزگەوت</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: وردەکاری مزگەوت (Details View / فایلی مزگەوت) ================= -->
+  <div id="viewModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl border-2 border-blue-400 overflow-hidden transform scale-95 transition-all duration-300 max-h-[90vh] flex flex-col">
+      <div id="viewModalHeader" class="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-800 text-white p-6 relative">
+        <button id="closeViewModalBtn" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <span class="inline-block bg-white/20 text-blue-100 text-xs px-2.5 py-0.5 rounded-full mb-2" id="viewLocationBadge">--</span>
+        <h3 id="viewMosqueTitle" class="text-2xl font-black">--</h3>
+      </div>
+      <div class="p-6 overflow-y-auto flex-1 space-y-5" id="viewModalBody">
+        <!-- Content filled dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: دەستکاریکردنی کاتی بانگەکان (Edit Prayer Times Modal) ================= -->
+  <div id="prayerTimesModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-emerald-500 overflow-hidden transform scale-95 transition-all duration-300 flex flex-col">
+      <div class="bg-gradient-to-r from-emerald-800 to-emerald-700 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold">دەستکاریکردنی کاتەکانی بانگ</h3>
+            <p class="text-xs text-emerald-100">ئەگەر کاتی بانگێک دروست نەبوو، لێرەدا دەتوانیت بە دڵی خۆت ڕێکی بخەیت</p>
+          </div>
+        </div>
+        <button id="closePrayerEditBtn" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="prayerTimesForm" class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-3.5">
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">بەیانی (Fajr):</label>
+            <input type="time" id="inputFajr" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">خۆرهەڵات (Sunrise):</label>
+            <input type="time" id="inputSunrise" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">نیوەڕۆ (Dhuhr):</label>
+            <input type="time" id="inputDhuhr" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">عەسر (Asr):</label>
+            <input type="time" id="inputAsr" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">مەغریب (Maghrib):</label>
+            <input type="time" id="inputMaghrib" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">عیشا (Isha):</label>
+            <input type="time" id="inputIsha" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+          <button type="button" id="resetPrayerTimesBtn" class="text-xs text-red-600 hover:text-red-800 font-bold px-3 py-2 rounded-xl hover:bg-red-50 transition-colors cursor-pointer">
+            <i class="fa-solid fa-rotate-left"></i> گەڕانەوە بۆ کاتی خودکار
+          </button>
+
+          <div class="flex items-center gap-2">
+            <button type="button" id="cancelPrayerEditBtn" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer">
+              داخستن
+            </button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/30 transition-all flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-check"></i>
+              <span>پاشەکەوتکردن</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ناردن بۆ مامۆستا بەڕێزەکان (Share & Offline Modal) ================= -->
+  <div id="shareModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border-2 border-emerald-600 overflow-hidden transform scale-95 transition-all duration-300 max-h-[92vh] flex flex-col">
+      
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-900 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-share-nodes text-emerald-200"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold">ناردنی ئەپ بۆ مامۆستا بەڕێزەکانی پێنجوێن</h3>
+            <p class="text-xs text-emerald-100">شێوازەکانی ناردن و بەکارهێنان بە هەردوو شێوازی ئۆفلاین (بێ ئینتەرنێت) و ئۆنلاین</p>
+          </div>
+        </div>
+        <button id="closeShareModalBtn" onclick="closeShareModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-5 flex-1 text-right">
+        
+        <!-- بەشی مۆبایل و بارکۆد (QR Code) بۆ کردنەوە لەسەر مۆبایل دەستبەجێ -->
+        <div class="bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-2xl p-4.5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-bold text-indigo-950 flex items-center gap-2">
+              <i class="fa-solid fa-mobile-screen-button text-indigo-700"></i>
+              <span>کردنەوەی ڕاستەوخۆ لەسەر مۆبایل (بە وایفای Wi-Fi)</span>
+            </h4>
+            <span class="text-[11px] bg-indigo-200 text-indigo-900 px-2.5 py-0.5 rounded-full font-bold">بۆ مۆبایل</span>
+          </div>
+          <p class="text-xs text-indigo-900/90 leading-relaxed">
+            مۆبایلەکەت (یان مۆبایلی مامۆستایان) ببەستەرەوە بە هەمان وایفای (Wi-Fi)، پاشان کامێرای مۆبایلەکەت ئاراستەی ئەم کۆدە (QR) بکە یان لینکەکە لە مۆبایلەکەت بکەرەوە:
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-center gap-4 bg-white p-3.5 rounded-xl border border-indigo-200 shadow-2xs">
+            <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs shrink-0 text-center">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=http%3A%2F%2F192.168.1.2%3A8080" alt="QR Code" class="w-28 h-28 mx-auto" />
+              <div class="text-[10px] text-slate-500 font-bold mt-1">بە کامێرای مۆبایل سکانی بکە</div>
+            </div>
+            <div class="flex-1 space-y-2 w-full text-right">
+              <div class="text-xs font-bold text-slate-800">بەستەری مۆبایل لەسەر تۆڕی ناوخۆیی (وایفای):</div>
+              <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                <input type="text" readonly value="http://192.168.1.2:8080" class="w-full text-xs font-mono font-bold text-indigo-900 bg-transparent px-1 select-all" dir="ltr" id="mobileWifiUrlInput">
+                <button type="button" onclick="navigator.clipboard.writeText('http://192.168.1.2:8080'); showToast('لینکی مۆبایل کۆپی کرا', 'success');" class="shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1">
+                  <i class="fa-regular fa-copy"></i>
+                  <span>کۆپی</span>
+                </button>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-normal">
+                ئەپەکە بە تەواوی بۆ شاشەی مۆبایل گونجێنراوە، کاتەکانی بانگ، وتارەکان، و دەنگەکان لە مۆبایلیش کاردەکەن.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- بەشی یەکەم: ناردنی ڕاستەوخۆ بە لینک و نامە (WhatsApp & Telegram) -->
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4.5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-bold text-emerald-950 flex items-center gap-2">
+              <i class="fa-solid fa-paper-plane text-emerald-700"></i>
+              <span>١. ناردنی ڕاستەوخۆ بە نامە و لینک بۆ مامۆستایان</span>
+            </h4>
+            <span class="text-[11px] bg-emerald-200/80 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">ڕێگەی خێرا</span>
+          </div>
+          <p class="text-xs text-emerald-800/90 leading-relaxed">
+            دەتوانیت بە یەک کرتە ئەم پەیام و بەستەرە لە ڕێگەی واتسئاپ یان تێلێگرامەوە بنێریت بۆ مامۆستایانی پێنجوێن:
+          </p>
+
+          <div class="flex items-center gap-2 bg-white rounded-xl border border-emerald-300 p-2">
+            <input 
+              type="text" 
+              id="shareUrlInput" 
+              readonly 
+              class="w-full text-xs font-mono text-slate-700 bg-transparent px-2 focus:outline-none select-all"
+              value=""
+            >
+            <button id="copyShareUrlBtn" class="shrink-0 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-regular fa-copy"></i>
+              <span>کۆپیکردن</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <a id="shareWhatsAppBtn" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-xs transition-colors">
+              <i class="fa-brands fa-whatsapp text-lg"></i>
+              <span>ناردن لە WhatsApp</span>
+            </a>
+            <a id="shareTelegramBtn" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-xs transition-colors">
+              <i class="fa-brands fa-telegram text-lg"></i>
+              <span>ناردن لە Telegram</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- بەشی دووەم: ناردنی فایلی ئۆفلاین (ZIP) بێ پێویستی بە ئینتەرنێت -->
+        <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-4.5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-bold text-blue-950 flex items-center gap-2">
+              <i class="fa-solid fa-file-zipper text-blue-700"></i>
+              <span>٢. ناردنی فایلی ئۆفلاین (Penjwen_Mosques_App.zip)</span>
+            </h4>
+            <span class="text-[11px] bg-blue-200/80 text-blue-900 px-2.5 py-0.5 rounded-full font-bold">بێ ئینتەرنێت 100%</span>
+          </div>
+          <p class="text-xs text-blue-900/90 leading-relaxed">
+            فایلی فەرمی و تەواوی ئەپەکە لەسەر دیسکتۆپت ئامادەکراوە بە ناوی <strong class="font-bold text-blue-950 font-mono">Penjwen_Mosques_App.zip</strong>:
+          </p>
+          <div class="bg-white/80 p-3.5 rounded-xl border border-blue-200 text-xs text-slate-700 space-y-2">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-circle-check text-blue-600 mt-0.5"></i>
+              <span>دەتوانیت ئەم فایلە وەک دۆکیومێنت لە تێلێگرام یان واتسئاپ ڕاستەوخۆ بنێریت بۆ هەر مامۆستایەک.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-circle-check text-blue-600 mt-0.5"></i>
+              <span>مامۆستای بەڕێز کاتێک فایلەکە دەکاتەوە و کلیک لەسەر <code class="bg-blue-100 text-blue-900 px-1.5 py-0.5 rounded font-mono font-bold">index.html</code> دەکات، ئەپەکە دەستبەجێ بە تەواوی تایبەتمەندییەکانەوە و بەبێ هیچ پێویستییەک بە ئینتەرنێت کاردەکات!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- بەشی سێیەم: دابەزاندن و خستنەسەر شاشە لەسەر مۆبایل (PWA Mobile) -->
+        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4.5 space-y-3">
+          <h4 class="text-sm font-bold text-amber-950 flex items-center gap-2">
+            <i class="fa-solid fa-mobile-screen text-amber-700"></i>
+            <span>٣. چۆن مامۆستایان ئەپەکە دەخەنە سەر شاشەی مۆبایلەکانیان؟</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700">
+            <div class="bg-white p-3 rounded-xl border border-amber-200 space-y-1.5">
+              <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                <i class="fa-brands fa-apple text-base"></i>
+                <span>بۆ ئایفۆن (iPhone - Safari):</span>
+              </div>
+              <p class="leading-relaxed">
+                ١. لینکەکە لە سەفاری بکەرەوە.<br>
+                ٢. کلیک لە دوگمەی <span class="font-bold">Share (هاوبەشکردن)</span> بکە.<br>
+                ٣. هەڵبژاردنی <span class="font-bold text-amber-900">Add to Home Screen</span>.<br>
+                ٤. دەبێتە ئەپێکی سەربەخۆ لەسەر شاشەی مۆبایل.
+              </p>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-amber-200 space-y-1.5">
+              <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                <i class="fa-brands fa-android text-base text-green-600"></i>
+                <span>بۆ ئەندرۆید (Samsung - Chrome):</span>
+              </div>
+              <p class="leading-relaxed">
+                ١. لینکەکە لە کرۆم بکەرەوە.<br>
+                ٢. کلیک لە سێ خاڵەکەی سەرەوە بکە.<br>
+                ٣. هەڵبژاردنی <span class="font-bold text-amber-900">Install app</span> یان <span class="font-bold text-amber-900">Add to Home screen</span>.<br>
+                ٤. بەرنامەکە بە ئۆفلاین کاردەکات.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- بەشی چوارەم: خستنەسەر ئینتەرنێت بێ بەرامبەر لە یەک خولەکدا (Netlify Drop) -->
+        <div class="bg-purple-50/70 border border-purple-200 rounded-2xl p-4.5 space-y-2">
+          <h4 class="text-sm font-bold text-purple-950 flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up text-purple-700"></i>
+            <span>٤. دانانی ئەپ لەسەر ئینتەرنێت بە لینکی هەمیشەیی بێ بەرامبەر</span>
+          </h4>
+          <p class="text-xs text-purple-900/90 leading-relaxed">
+            ئەگەر دەتەوێت لینکێکی فەرمی ئۆنلاین (وەک <code class="bg-purple-100 text-purple-900 px-1 rounded font-mono font-bold">penjwen-mosques.netlify.app</code>) بۆ هەمیشە هەبێت:
+          </p>
+          <ol class="text-xs text-slate-700 list-decimal list-inside space-y-1 bg-white p-3 rounded-xl border border-purple-200">
+            <li>بڕۆ بۆ ماڵپەڕی <strong>app.netlify.com/drop</strong></li>
+            <li>تەنها فۆڵدەری <strong>penjwen-mosques-app</strong> ڕابکێشە و فڕێی بدە ناوی.</li>
+            <li>دەستبەجێ لینکێکی هەمیشەیی و سەلامەتت پێدەدات بۆ ناردن بۆ مامۆستایان.</li>
+          </ol>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="border-t border-slate-100 p-4 bg-slate-50 flex items-center justify-end">
+        <button id="closeShareModalFooterBtn" onclick="closeShareModal()" class="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors cursor-pointer">
+          داخستن
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-auto py-5 bg-white/60 border-t border-emerald-100 text-center text-xs text-slate-500 no-print">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2 text-emerald-800 font-semibold">
+        <i class="fa-solid fa-mosque"></i>
+        <span>ئەپی فەرمی مزگەوتەکانی پێنجوێن</span>
+      </div>
+      <div>
+        <span>بەشەکان: کاتەکانی بانگ، وتاری هەینی، چاپکردن و باکئەپ</span>
+        <span class="mx-2">•</span>
+        <span id="footerYear">2026</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-6 left-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm no-print">
+    <span id="toastIcon" class="text-emerald-400 text-base"><i class="fa-solid fa-circle-check"></i></span>
+    <span id="toastMsg">کردارەکە سەرکەوتووبوو</span>
+  </div>
+
+  <script src="app.js?v=20261004_v8"></script>
+</body>
+</html>

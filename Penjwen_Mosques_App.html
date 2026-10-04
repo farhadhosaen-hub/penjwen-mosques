@@ -1,0 +1,2920 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ئەپی مزگەوتەکانی پێنجوێن | Penjwen Mosques</title>
+  <!-- PWA & Mobile Meta Tags (کارکردن بە ئۆفلاین و ئۆنلاین) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#15803d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="مزگەوتەکانی پێنجوێن">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Google Fonts: Vazirmatn for clean Kurdish UI & Amiri for Islamic Calligraphy -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              300: '#86efac',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            }
+          },
+          fontFamily: {
+            kurdish: ['Vazirmatn', 'sans-serif'],
+            quran: ['Amiri', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+/* Penjwen Mosques App Bundle Styles */
+/* Custom Styling for Penjwen Mosques App */
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --primary-green: #15803d;
+  --light-green-bg: #f2fbf5;
+}
+
+body {
+  background-color: var(--light-green-bg);
+  background-image: radial-gradient(#dcfce7 0.8px, transparent 0.8px), radial-gradient(#e2f8ec 0.8px, var(--light-green-bg) 0.8px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #86efac;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #22c55e;
+}
+
+/* Mosque Card / Button Styling: چوارگۆشەی شین و دووگمەی مزگەوت */
+.mosque-toggle-btn {
+  border: 2px solid #2563eb !important;
+  border-radius: 16px;
+  background-color: #ffffff;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mosque-toggle-btn:hover {
+  background-color: #eff6ff;
+  border-color: #1d4ed8 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.15);
+}
+
+.mosque-toggle-btn.btn-active {
+  background-color: #eff6ff;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.mosque-details-panel {
+  border: 2px solid #2563eb !important;
+  border-radius: 18px;
+  background-color: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15);
+}
+
+/* خانەی ڕەنگ قاوەیی کاڵ بۆ پێگەی مامۆستایان و ستاف (ووتاربێژ، پێش نوێژ، بانگ بێژ، کارگووزار) */
+.role-badge-brown {
+  background-color: #ede0d4 !important; /* قاوەیی کاڵ */
+  color: #4a2810 !important;           /* قاوەیی تۆخ */
+  border: 1px solid #d5bdaf !important; /* چوارچێوەی قاوەیی گونجاو */
+  font-weight: 800;
+  border-radius: 10px;
+  padding: 3px 10px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(74, 40, 16, 0.08);
+  letter-spacing: 0.2px;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Active Filter Pill */
+.active-filter {
+  background-color: #15803d !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(21, 128, 61, 0.25);
+}
+
+/* Prayer Time Cards */
+.prayer-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.prayer-card.active-prayer {
+  background: linear-gradient(135deg, #15803d, #166534);
+  color: #ffffff !important;
+  border-color: #15803d;
+  box-shadow: 0 4px 14px rgba(21, 128, 61, 0.35);
+  transform: translateY(-2px);
+}
+
+.prayer-card.active-prayer span,
+.prayer-card.active-prayer div {
+  color: #ffffff !important;
+}
+
+/* Quranic Calligraphy glow effect */
+.font-quran {
+  text-shadow: 0 1px 2px rgba(22, 101, 52, 0.12);
+}
+
+/* Modal Open Transitions */
+.modal-active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.modal-active > div {
+  transform: scale(1) !important;
+}
+
+/* Khutbah Banner Gradient & Date Selector */
+.khutbah-badge {
+  background: linear-gradient(135deg, #fef3c7, #fef9c3);
+  border: 1px solid #fde68a;
+}
+
+.sermon-date-picker {
+  border: 1px solid #d97706;
+  color: #78350f;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.sermon-date-picker:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25);
+  border-color: #b45309;
+}
+
+.sermon-update-flash {
+  animation: flashYellow 0.4s ease-out;
+}
+
+@keyframes flashYellow {
+  0% { background-color: rgba(254, 240, 138, 0.8); }
+  100% { background-color: transparent; }
+}
+
+/* خاڵی ٤: ژمارەی تەلەفۆنەکان بە ئینگلیزی (English Phone Numbers) */
+.phone-num, input[type="tel"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: isolate !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  letter-spacing: 0.5px;
+}
+
+/* Custom Audio Player Styling */
+audio {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.06));
+}
+
+/* ===================================================
+   PRINT STYLES (چاپکردن و دەرهێنان بۆ PDF بە شێوازی فەرمی)
+   =================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+    padding: 0;
+    margin: 0;
+  }
+
+  header, 
+  footer, 
+  #prayerBar, 
+  #actionHero, 
+  #searchFilterBar, 
+  #mosquesContainer, 
+  #emptyState, 
+  #toast, 
+  #mosqueModal, 
+  #viewModal,
+  .no-print {
+    display: none !important;
+  }
+
+  #printReportSection {
+    display: block !important;
+    width: 100% !important;
+    padding: 10mm 15mm !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid #333333 !important;
+    padding: 6px 8px !important;
+    text-align: right !important;
+  }
+
+  th {
+    background-color: #e2f8ec !important;
+    font-weight: bold !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f9fbf9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+}
+
+</style>
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAGVklEQVR4nO2cO3ITQRRFZZW3QLESQrZD6lZCERJSJDNO2RIr0SqgJnBhwPqM1NPvvnfPCSlsy9339LszGvnh3dePv3YApuyjXwBAJAgA1iAAWIMAYA0CgDUIANYgAFiDAGANAoA1CADWIABYgwBgDQKANQgA1iAAWIMAYA0CgDUIANY8Rr+A6hyenu7+HtPzc5fXAv/zwGeCNUJ+K8hxHwiQLPCXQIh1IECB0J8CGS6DAMVCfwpkeBsEKBz6UyDDHxBg4+DPn7/d/T3a9y+7LZi4u+QtQM/Q9wh6pBiTqQyWAvQIfkTgRwgxmYlgJcA9wVcM/JZCTCYi2AhwS/gzhr6nDJOBBOUFcA/+vyCCiQAE/zyIUFiAteGvfOL3FmEqVovKCbAm/M7Bv0eEqZAEZQQg+H1oZiKUEODa8HPi9xdhSi5BegGuCT/B31aEKbEEaQXg1B9HKzwNUn4mmPCPZb7yZkHGJ2nTTQAqTyytWCVKNQEIf45pcEg0CdIIQPh1mAtJkKICXVpM7vLoVqJJvA7JTwDCr818YRqoTwJpAQh/DubEEsgKQPhzMSeVQFIAwp+TOaEEkgKcgwtebeZkT9jK3QU6d0pkW9zXHH/8XP017z992FW8OzQJ3RmSEqBK+G8Je0UpWgIJZP48umI/VAj8pZ+VSYh/91tBghTXAKqn/xLGkeFXfQ3Z9k2uAmWqPqphU54KTbgKhQuQJfwZgq8sQhOVILQCZej9yhWjyms/BOZA9hpA4fTPEJ4sv8cssJ9SFUi5+igEpmotamJVSG4CEP7acs9ikyBEANXuHx0O99/zEJCL4RVIsfqoBqJyJWoiVUiuAo3GOfwL7r//3vn0d9/8yHU4t98jq5DtBCD8rMdQAZROf8KvsS6zwBSwmwCEn/WREmDk6U/49dZpDn5fYO983x+0GZGb0AnA6a/L0WQK7B1Of6pP3nU7bJyfsAkwynqFTczMcdD6RU2B8ItggEj2EeOL0z8Xx+ApsGUNelRf1Fsf1qL69OX44+fmexHxYB4VCKzZV6w/nP5513UeXIOYAGBNOQE4/VnfcAEU3vyCehw2yNXQCRD94BPkYB6Yk1IViPrDOlsLABAuQFT/5/T3WO9D53wNmwD0f1DMCxUIrEEAsKaEAPR/1t1aAIBbQQCwZl/pAzBQi3nAk6FMALAmvQBcALP+1gIA3AMCgDUIANYgAFiDAGANAoA1CADWIABYgwBgDQKANQgA1iAAWIMAYA0CgDVdBZien9/89/b9S88fAya0E7k5lbNbYAKANQgA1iAAWIMAYA0CgDXDBOBOECjmpbsAPW9RAWydLyoQWIMAYM1QAbgOALWcbCIA1wGQJVdUILAGAcCazQTgyVBQfQL0NUwAsOYx6ge///RB6vvAdijv0aYTgBoEyvVngQoE1oQJwJtioJCHzQXgTTFQzk9oBWIKQHQOhgjAFADV3IRfBDMFvGnBfzInXAAACwHOjbPoUwBiOLfvo2ozEwCsGSoAUwCUTv8FJgBYM1wApgA0kdM/bALwvgCo5EKuAnFHqDZN7I5fmABUIT+aUPWRnQCqJwXU3M9QAbgWgOgchE8AqlB9mmD1kRFgAQnq0oTDLyNA1v4I+fdNRgCF0wD89ltGgAWqUB2aePWRFGABCfLTkoRfUoAKvdKZlmx/JAW4dEpkW2QX2oV9UTv9ZQVYQIJctIThlxZgAQly0JKGX16ABSTQpiUO/8LDu68ff+0ScHh6uvh/5s/fhrwW2F11HaYe/hQTYM1icnE8hlYk/KkEWECCeFqh8KeqQGvr0AKVqB/tylvPmcKfbgKsXWQqUR9a0fCnnQCv4eJ4W1qxylNOgAUqUX9a4VO/nABrJFjg2qBPbZySh7+UAC8gwm00s+CXFWCtBO4Toa18sLBS+MsKcIsEbiLccodsKhb+0gK8gAh/Q/DNBHjBXQSCby7ArRJkluGeNwKngnVn5y5ADxGUhejxzvdkEnxrAXqKEClEz0c9JrPgv2AtwFYy9BZjq2eaJtPQvwYBBomgBMH/AwKYyEDo3wYBCstA6C+DAMVkIPTrQIDkQhD4+0CABHIQ8u1AALAm5WeCAXqBAGANAoA1CADWIABYgwBgDQKANQgA1iAAWIMAYA0CgDUIANYgAFiDAGANAoA1CADWIADsnPkNcwb0smar74UAAAAASUVORK5CYII=">
+  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAGVklEQVR4nO2cO3ITQRRFZZW3QLESQrZD6lZCERJSJDNO2RIr0SqgJnBhwPqM1NPvvnfPCSlsy9339LszGvnh3dePv3YApuyjXwBAJAgA1iAAWIMAYA0CgDUIANYgAFiDAGANAoA1CADWIABYgwBgDQKANQgA1iAAWIMAYA0CgDUIANY8Rr+A6hyenu7+HtPzc5fXAv/zwGeCNUJ+K8hxHwiQLPCXQIh1IECB0J8CGS6DAMVCfwpkeBsEKBz6UyDDHxBg4+DPn7/d/T3a9y+7LZi4u+QtQM/Q9wh6pBiTqQyWAvQIfkTgRwgxmYlgJcA9wVcM/JZCTCYi2AhwS/gzhr6nDJOBBOUFcA/+vyCCiQAE/zyIUFiAteGvfOL3FmEqVovKCbAm/M7Bv0eEqZAEZQQg+H1oZiKUEODa8HPi9xdhSi5BegGuCT/B31aEKbEEaQXg1B9HKzwNUn4mmPCPZb7yZkHGJ2nTTQAqTyytWCVKNQEIf45pcEg0CdIIQPh1mAtJkKICXVpM7vLoVqJJvA7JTwDCr818YRqoTwJpAQh/DubEEsgKQPhzMSeVQFIAwp+TOaEEkgKcgwtebeZkT9jK3QU6d0pkW9zXHH/8XP017z992FW8OzQJ3RmSEqBK+G8Je0UpWgIJZP48umI/VAj8pZ+VSYh/91tBghTXAKqn/xLGkeFXfQ3Z9k2uAmWqPqphU54KTbgKhQuQJfwZgq8sQhOVILQCZej9yhWjyms/BOZA9hpA4fTPEJ4sv8cssJ9SFUi5+igEpmotamJVSG4CEP7acs9ikyBEANXuHx0O99/zEJCL4RVIsfqoBqJyJWoiVUiuAo3GOfwL7r//3vn0d9/8yHU4t98jq5DtBCD8rMdQAZROf8KvsS6zwBSwmwCEn/WREmDk6U/49dZpDn5fYO983x+0GZGb0AnA6a/L0WQK7B1Of6pP3nU7bJyfsAkwynqFTczMcdD6RU2B8ItggEj2EeOL0z8Xx+ApsGUNelRf1Fsf1qL69OX44+fmexHxYB4VCKzZV6w/nP5513UeXIOYAGBNOQE4/VnfcAEU3vyCehw2yNXQCRD94BPkYB6Yk1IViPrDOlsLABAuQFT/5/T3WO9D53wNmwD0f1DMCxUIrEEAsKaEAPR/1t1aAIBbQQCwZl/pAzBQi3nAk6FMALAmvQBcALP+1gIA3AMCgDUIANYgAFiDAGANAoA1CADWIABYgwBgDQKANQgA1iAAWIMAYA0CgDVdBZien9/89/b9S88fAya0E7k5lbNbYAKANQgA1iAAWIMAYA0CgDXDBOBOECjmpbsAPW9RAWydLyoQWIMAYM1QAbgOALWcbCIA1wGQJVdUILAGAcCazQTgyVBQfQL0NUwAsOYx6ge///RB6vvAdijv0aYTgBoEyvVngQoE1oQJwJtioJCHzQXgTTFQzk9oBWIKQHQOhgjAFADV3IRfBDMFvGnBfzInXAAACwHOjbPoUwBiOLfvo2ozEwCsGSoAUwCUTv8FJgBYM1wApgA0kdM/bALwvgCo5EKuAnFHqDZN7I5fmABUIT+aUPWRnQCqJwXU3M9QAbgWgOgchE8AqlB9mmD1kRFgAQnq0oTDLyNA1v4I+fdNRgCF0wD89ltGgAWqUB2aePWRFGABCfLTkoRfUoAKvdKZlmx/JAW4dEpkW2QX2oV9UTv9ZQVYQIJctIThlxZgAQly0JKGX16ABSTQpiUO/8LDu68ff+0ScHh6uvh/5s/fhrwW2F11HaYe/hQTYM1icnE8hlYk/KkEWECCeFqh8KeqQGvr0AKVqB/tylvPmcKfbgKsXWQqUR9a0fCnnQCv4eJ4W1qxylNOgAUqUX9a4VO/nABrJFjg2qBPbZySh7+UAC8gwm00s+CXFWCtBO4Toa18sLBS+MsKcIsEbiLccodsKhb+0gK8gAh/Q/DNBHjBXQSCby7ArRJkluGeNwKngnVn5y5ADxGUhejxzvdkEnxrAXqKEClEz0c9JrPgv2AtwFYy9BZjq2eaJtPQvwYBBomgBMH/AwKYyEDo3wYBCstA6C+DAMVkIPTrQIDkQhD4+0CABHIQ8u1AALAm5WeCAXqBAGANAoA1CADWIABYgwBgDQKANQgA1iAAWIMAYA0CgDUIANYgAFiDAGANAoA1CADWIADsnPkNcwb0smar74UAAAAASUVORK5CYII=">
+</head>
+<body class="font-kurdish bg-emerald-50/70 text-slate-800 min-h-screen flex flex-col selection:bg-brand-200 selection:text-brand-900">
+
+  <!-- ================= TOP HEADER (بەشی سەرەوە) ================= -->
+  <header class="w-full bg-white/85 backdrop-blur-md border-b border-emerald-100 shadow-xs sticky top-0 z-30 transition-all no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+      <div class="flex items-center justify-between gap-2 sm:gap-4">
+        
+        <!-- لای ڕاست: پلەی گەرما ڕاستەوخۆ (Top Right: Live Temperature) -->
+        <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200/80 rounded-2xl px-3.5 py-2 shadow-xs hover:border-emerald-300 transition-all">
+          <div id="weatherIcon" class="text-emerald-700 text-2xl animate-pulse">
+            <i class="fa-solid fa-cloud-sun"></i>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-1.5">
+              <span id="tempValue" class="text-lg sm:text-xl font-bold text-emerald-900">--°C</span>
+              <button id="refreshWeatherBtn" title="نوێکردنەوەی کەشوهەوا" class="text-xs text-emerald-600 hover:text-emerald-800 transition-transform active:rotate-180">
+                <i class="fa-solid fa-rotate-right"></i>
+              </button>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] sm:text-xs text-emerald-700/90 font-medium">
+              <i class="fa-solid fa-location-dot text-emerald-600 text-[10px]"></i>
+              <span id="locationName">پێنجوێن</span>
+              <span class="text-emerald-400">|</span>
+              <span id="weatherDesc">چاوەڕوانی...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ناوەڕاست: بسم الله الرحمن الرحیم (Center: Bismillah) -->
+        <div class="text-center px-2 flex-1 max-w-md">
+          <div class="inline-block relative group">
+            <h1 class="font-quran text-xl sm:text-2xl md:text-3xl text-emerald-900 tracking-wide font-bold select-none drop-shadow-xs">
+              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+            </h1>
+            <div class="h-0.5 w-16 sm:w-24 bg-gradient-to-r from-transparent via-emerald-500 to-transparent mx-auto mt-1 rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- لای چەپ: کات و بەروار (Top Left: Time & Date) -->
+        <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200/80 rounded-2xl px-3.5 py-2 shadow-xs text-left">
+          <div class="text-emerald-700 text-xl hidden sm:block">
+            <i class="fa-regular fa-clock"></i>
+          </div>
+          <div class="flex flex-col items-end sm:items-start text-right">
+            <div class="flex items-center gap-2">
+              <div id="liveClock" class="text-lg sm:text-xl font-bold text-emerald-900 tracking-wider font-mono">
+                00:00:00
+              </div>
+              <!-- دۆخی ئۆنلاین / ئۆفلاین (Offline & Online indicator) -->
+              <span id="networkStatusBadge" class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300" title="دۆخی پەیوەندی هێڵ">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="networkStatusText">سەرهێڵ</span>
+              </span>
+            </div>
+            <div class="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-700 font-medium">
+              <i class="fa-regular fa-calendar-days text-[10px] text-emerald-600"></i>
+              <span id="kurdishDate">-- / -- / ----</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= خاڵی ١: کاتەکانی بانگی پێنجوێن (PRAYER TIMES BAR) ================= -->
+  <section id="prayerBar" class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-900 text-white shadow-md border-b border-emerald-700 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-3">
+        
+        <!-- Next Prayer Countdown Banner -->
+        <div class="flex items-center gap-2.5 text-xs sm:text-sm">
+          <div class="w-7 h-7 rounded-lg bg-emerald-700/80 flex items-center justify-center text-emerald-200">
+            <i class="fa-solid fa-mosque text-xs"></i>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-emerald-200 font-medium">کاتەکانی بانگ لە پێنجوێن:</span>
+            <span id="nextPrayerBadge" class="bg-amber-400 text-amber-950 font-bold px-2.5 py-0.5 rounded-full text-xs animate-pulse">
+              چاوەڕوانی...
+            </span>
+            <!-- خاڵی ٢: دووگمەی دەستکاریکردنی کاتی بانگەکان -->
+            <button id="openPrayerEditBtn" class="bg-emerald-700/90 hover:bg-emerald-600 text-emerald-100 hover:text-white px-2.5 py-1 rounded-xl text-xs font-semibold border border-emerald-600 flex items-center gap-1.5 transition-colors cursor-pointer mr-1" title="دەستکاریکردنی کاتی بانگەکان ئەگەر درووست نەبوو">
+              <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+              <span>دەستکاری کاتەکان</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Prayer Times Grid (بەیانی، خۆرهەڵات، نیوەڕۆ، عەسر، مەغریب، عیشا) -->
+        <div class="grid grid-cols-6 gap-1.5 sm:gap-2.5 w-full lg:w-auto text-center" id="prayerTimesCards">
+          
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Fajr">
+            <div class="text-[10px] sm:text-xs text-emerald-200">بەیانی</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Fajr">--:--</div>
+          </div>
+
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60 opacity-80" id="card-Sunrise">
+            <div class="text-[10px] sm:text-xs text-emerald-200">خۆرهەڵات</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Sunrise">--:--</div>
+          </div>
+
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Dhuhr">
+            <div class="text-[10px] sm:text-xs text-emerald-200">نیوەڕۆ</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Dhuhr">--:--</div>
+          </div>
+
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Asr">
+            <div class="text-[10px] sm:text-xs text-emerald-200">عەسر</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Asr">--:--</div>
+          </div>
+
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Maghrib">
+            <div class="text-[10px] sm:text-xs text-emerald-200">مەغریب</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Maghrib">--:--</div>
+          </div>
+
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Isha">
+            <div class="text-[10px] sm:text-xs text-emerald-200">عیشا</div>
+            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Isha">--:--</div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    
+    <!-- PWA Installation Banner: داگرتنی ئەپ بۆ مۆبایل و کۆمپیوتەر -->
+    <div id="pwaTopBanner" class="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white p-3.5 sm:p-4 rounded-3xl mb-6 shadow-xl border border-emerald-500/40 flex flex-col sm:flex-row items-center justify-between gap-3 no-print animate-fade-in">
+      <div class="flex items-center gap-3.5 text-right w-full sm:w-auto">
+        <div class="w-11 h-11 rounded-2xl bg-white/15 text-amber-300 flex items-center justify-center text-xl shrink-0">
+          <i class="fa-solid fa-cloud-arrow-down"></i>
+        </div>
+        <div>
+          <h3 class="text-sm sm:text-base font-bold flex items-center gap-2">
+            <span>ئەپی فەرمی مزگەوتەکانی پێنجوێن بۆ مۆبایل و کۆمپیوتەر</span>
+            <span class="text-[10px] bg-amber-400 text-amber-950 font-black px-2 py-0.5 rounded-full">بێ ئینتەرنێت 100%</span>
+          </h3>
+          <p class="text-xs text-emerald-100/90 mt-0.5">دەتوانیت بە یەک کرتە ئەم بەرنامەیە بخەیتە سەر شاشەی مۆبایل یان کۆمپیوتەرەکەت بۆ بەکارهێنانی هەمیشەیی.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end shrink-0">
+        <button onclick="triggerPwaInstall()" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 font-black text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md transition-all cursor-pointer">
+          <i class="fa-solid fa-download"></i>
+          <span>داگرتنی ئەپ</span>
+        </button>
+        <button onclick="dismissPwaTopBanner()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer" title="داخستن">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hero & Action Section (دووگمەی مزگەوتەکانی پێنجوێن و ئامارەکان) -->
+    <div id="actionHero" class="bg-gradient-to-br from-emerald-100/90 via-emerald-50 to-white border border-emerald-200/90 rounded-3xl p-6 sm:p-8 mb-8 shadow-xs relative overflow-hidden no-print">
+      <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-emerald-300/15 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute -right-12 -top-12 w-48 h-48 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none"></div>
+      
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+        
+        <div class="text-center md:text-right space-y-2 max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-200/60 text-emerald-800 text-xs font-semibold">
+            <i class="fa-solid fa-mosque"></i>
+            <span>ڕێبەری فەرمی و تۆماری مزگەوتەکانی پێنجوێن</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-emerald-950">
+            سیستەمی مزگەوتەکان و وتاری هەینی
+          </h2>
+          <p class="text-sm sm:text-base text-emerald-800/80 leading-relaxed">
+            تۆمارکردن و ڕێکخستنی زانیاری مزگەوتەکان، وتاربێژان، پێشنوێژان، بانگبێژان، ناونیشانی وتاری هەینی و کاتەکانی بانگ.
+          </p>
+        </div>
+
+        <!-- دووگمەکانی کارپێکردن بە داواکاری بەکارهێنەر -->
+        <div class="flex flex-wrap sm:flex-nowrap gap-2.5 w-full md:w-auto">
+          <!-- دووگمەی سەرەکی داواکراو: مزگەوتەکانی پێنجوێن -->
+          <button id="openMosqueModalBtn" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold px-5 py-3.5 rounded-2xl shadow-lg shadow-emerald-600/25 transition-all transform hover:-translate-y-0.5 cursor-pointer text-sm sm:text-base">
+            <span class="text-base sm:text-lg"><i class="fa-solid fa-kaaba"></i></span>
+            <span>مزگەوتەکانی پێنجوێن</span>
+            <i class="fa-solid fa-plus text-xs bg-emerald-500/50 p-1.5 rounded-full mr-1"></i>
+          </button>
+
+          <!-- دووگمەی ناردن بۆ مامۆستایانی بەڕێز (Share & Offline Bundle) -->
+          <button id="openShareModalBtn" onclick="openShareModal()" class="inline-flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white font-bold px-4 py-3.5 rounded-2xl border border-emerald-700 shadow-md transition-all cursor-pointer text-sm" title="ناردنی لینک یان فایلی ئەپ بۆ مامۆستا بەڕێزەکانی پێنجوێن">
+            <i class="fa-solid fa-share-nodes text-emerald-300 text-base"></i>
+            <span>ناردن بۆ مامۆستایان</span>
+          </button>
+
+          <!-- دووگمەی داگرتنی ئەپ لەسەر مۆبایل و کۆمپیوتەر (PWA Install Button) -->
+          <button id="pwaInstallBtn" onclick="triggerPwaInstall()" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="دابەزاندنی بەرنامەکە وەک ئەپێکی سەربەخۆ لەسەر مۆبایل و کۆمپیوتەر">
+            <i class="fa-solid fa-cloud-arrow-down text-emerald-200 text-base"></i>
+            <span>داگرتنی ئەپ</span>
+          </button>
+
+          <!-- خاڵی ٣: دووگمەی چاپکردن و PDF -->
+          <button id="printReportBtn" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-emerald-50 text-emerald-800 font-bold px-3.5 py-3.5 rounded-2xl border border-emerald-200 transition-all cursor-pointer text-sm shadow-xs" title="چاپکردن و هەناردەکردن بۆ PDF">
+            <i class="fa-solid fa-print text-emerald-600 text-base"></i>
+            <span>چاپکردن</span>
+          </button>
+
+          <!-- خاڵی ٢: وتارەکانی هەینی -->
+          <button id="filterKhutbahBtn" class="inline-flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold px-3.5 py-3.5 rounded-2xl border border-amber-200 transition-all cursor-pointer text-sm shadow-xs" title="پیشاندانی وتارەکانی ئەم هەفتەیە">
+            <i class="fa-solid fa-microphone-lines text-amber-600"></i>
+            <span>وتارەکان</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Summary Badges -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mt-6 pt-6 border-t border-emerald-200/60">
+        <div class="bg-white/80 rounded-xl p-3 border border-emerald-100 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-mosque"></i>
+          </div>
+          <div>
+            <div id="statTotalMosques" class="text-lg font-bold text-emerald-950">0</div>
+            <div class="text-xs text-slate-500 font-medium">سەرجەم مزگەوتەکان</div>
+          </div>
+        </div>
+
+        <div class="bg-white/80 rounded-xl p-3 border border-emerald-100 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-bullhorn"></i>
+          </div>
+          <div>
+            <div id="statKhateebs" class="text-lg font-bold text-emerald-950">0</div>
+            <div class="text-xs text-slate-500 font-medium">ووتاربێژان</div>
+          </div>
+        </div>
+
+        <div class="bg-white/80 rounded-xl p-3 border border-emerald-100 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-hands-praying"></i>
+          </div>
+          <div>
+            <div id="statImams" class="text-lg font-bold text-emerald-950">0</div>
+            <div class="text-xs text-slate-500 font-medium">پێش نوێژان</div>
+          </div>
+        </div>
+
+        <div class="bg-white/80 rounded-xl p-3 border border-emerald-100 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-microphone-lines"></i>
+          </div>
+          <div>
+            <div id="statMuezzins" class="text-lg font-bold text-emerald-950">0</div>
+            <div class="text-xs text-slate-500 font-medium">بانگ بێژان</div>
+          </div>
+        </div>
+
+        <div class="bg-white/80 rounded-xl p-3 border border-emerald-100 flex items-center gap-3 col-span-2 sm:col-span-1">
+          <div class="w-10 h-10 rounded-xl bg-[#ede0d4] text-[#4a2810] border border-[#d5bdaf] flex items-center justify-center text-lg">
+            <i class="fa-solid fa-user-gear"></i>
+          </div>
+          <div>
+            <div id="statKarguzars" class="text-lg font-bold text-emerald-950">0</div>
+            <div class="text-xs text-slate-500 font-medium">کارگووزاران</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Mosque Buttons & Details List (خاڵی ٢: هەر مزگەوتێک وەکو دووگمەیەک دەردەکەوێت) -->
+    <div id="mosquesContainer" class="space-y-4 max-w-4xl mx-auto no-print">
+      <!-- Mosque buttons will be dynamically rendered here via JS -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-emerald-200 p-8 no-print">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fa-solid fa-mosque"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-800 mb-1">هیچ مزگەوتێک نەدۆزرایەوە</h3>
+      <p class="text-sm text-slate-500 mb-4 max-w-sm mx-auto">هیچ تۆمارێک هاوتای ئەم گەڕانە نییە یان هێشتا مزگەوتت تۆمار نەکردووە.</p>
+      <button onclick="document.getElementById('openMosqueModalBtn').click()" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition-all shadow-xs">
+        <i class="fa-solid fa-plus"></i>
+        <span>تۆمارکردنی یەکەم مزگەوت</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ================= PRINT REPORT SECTION (خاڵی ٣: خشتەی تایبەت بە چاپکردن و PDF) ================= -->
+  <section id="printReportSection" class="hidden">
+    <div class="text-center border-b-2 border-emerald-800 pb-4 mb-5">
+      <h2 class="text-xl font-bold text-emerald-950 font-quran mb-1">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</h2>
+      <h1 class="text-2xl font-black text-slate-900">حکومەتی هەرێمی کوردستان - وەزارەتی ئەوقاف و کاروباری ئایینی</h1>
+      <h3 class="text-lg font-bold text-emerald-800">بەڕێوەبەرایەتی ئەوقافی پێنجوێن - خشتەی فەرمی مزگەوتەکان، مامۆستایان و وتارەکان</h3>
+      <div class="flex justify-between items-center text-xs text-slate-600 mt-3 pt-2 border-t border-slate-200">
+        <span id="printReportDate">بەرواری دەرچوون: --</span>
+        <span id="printReportCount">سەرجەم مزگەوتەکان: --</span>
+        <span>قەزای پێنجوێن</span>
+      </div>
+    </div>
+
+    <!-- Printable Table Container -->
+    <div id="printTableContainer">
+      <!-- Generated by JavaScript dynamically -->
+    </div>
+
+    <div class="mt-8 pt-4 border-t border-slate-300 flex justify-between text-xs text-slate-700">
+      <div>
+        <p class="font-bold">ئامادەکاری و وردبینی:</p>
+        <p class="text-slate-500 mt-1">ئەپی فەرمی مزگەوتەکانی پێنجوێن</p>
+      </div>
+      <div class="text-left">
+        <p class="font-bold">واژوو و پەسەندکردن:</p>
+        <p class="text-slate-400 mt-4">........................................</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODAL: زیادکردن و دەستکاری مزگەوت ================= -->
+  <div id="mosqueModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-emerald-100 overflow-hidden transform scale-95 transition-all duration-300 max-h-[92vh] flex flex-col">
+      
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-mosque"></i>
+          </div>
+          <div>
+            <h3 id="modalTitle" class="text-lg font-bold">تۆمارکردنی مزگەوتی نوێ</h3>
+            <p class="text-xs text-emerald-100">زانیارییەکانی مزگەوت، مامۆستایان و وتاری هەینی</p>
+          </div>
+        </div>
+        <button id="closeModalBtn" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable Form) -->
+      <form id="mosqueForm" class="p-6 overflow-y-auto space-y-5 flex-1">
+        <input type="hidden" id="editMosqueId" value="">
+
+        <!-- Basic Mosque Info -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">
+              ناوی مزگەوت <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400">
+                <i class="fa-solid fa-kaaba"></i>
+              </span>
+              <input 
+                type="text" 
+                id="mosqueName" 
+                required 
+                placeholder="نموونە: مزگەوتی گەورەی پێنجوێن" 
+                class="w-full pr-9 pl-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              >
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">
+              گەڕەک / شوێن لە پێنجوێن <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400">
+                <i class="fa-solid fa-location-dot"></i>
+              </span>
+              <input 
+                type="text" 
+                id="mosqueLocation" 
+                required 
+                placeholder="نموونە: ناوبازاڕ، دارەسوور، مامۆستایان" 
+                class="w-full pr-9 pl-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- خاڵی ٢: وتاری هەینی (Friday Khutbah Section) -->
+        <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-amber-200/60">
+            <div class="flex items-center gap-2 text-amber-900 font-bold text-xs sm:text-sm">
+              <i class="fa-solid fa-book-quran text-amber-600 text-base"></i>
+              <span>وتاری هەینی (دیاریکردنی بەروار و ناونیشان)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <label for="khutbahDate" class="text-[11px] font-bold text-amber-900 shrink-0">بەرواری هەینی:</label>
+              <input 
+                type="date" 
+                id="khutbahDate" 
+                class="px-2.5 py-1 bg-white rounded-xl border border-amber-300 text-xs font-semibold text-amber-950 focus:ring-2 focus:ring-amber-500 focus:outline-none shadow-2xs"
+              >
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">
+                ناونیشانی وتاری ئەو هەفتەیە
+              </label>
+              <input 
+                type="text" 
+                id="khutbahTopic" 
+                placeholder="نموونە: بەخشندەیی لە ئیسلامدا، برایەتی و تەبایی" 
+                class="w-full px-3 py-2 bg-white rounded-xl border border-amber-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+              >
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">
+                ناوی ئەو وتاربێژەی کە وتارەکەی داوە
+              </label>
+              <input 
+                type="text" 
+                id="khutbahSpeaker" 
+                placeholder="نموونە: مامۆستا مەلا عەبدوڵڵا ئەحمەد" 
+                class="w-full px-3 py-2 bg-white rounded-xl border border-amber-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+              >
+            </div>
+          </div>
+
+          <!-- خاڵی ٣: دووگمەی خەزنکردنی دەنگی وتار بە MP3 -->
+          <div class="pt-3 border-t border-amber-200/70">
+            <label class="block text-[11px] font-bold text-amber-950 mb-1.5 flex items-center gap-1.5">
+              <i class="fa-solid fa-file-audio text-amber-600"></i>
+              <span>خەزنکردنی دەنگی وتار بە شێوازی MP3:</span>
+            </label>
+            <div class="flex flex-wrap items-center gap-2.5 bg-white/70 p-2.5 rounded-xl border border-amber-200">
+              <label class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-xs cursor-pointer transition-colors">
+                <i class="fa-solid fa-upload"></i>
+                <span id="khutbahAudioBtnText">هەڵبژاردنی فایلی MP3</span>
+                <input type="file" id="khutbahAudioFile" accept="audio/mp3,audio/*" class="hidden">
+              </label>
+              <div id="khutbahAudioFileInfo" class="text-xs text-slate-600 font-medium truncate flex-1 min-w-[150px]">
+                هیچ دەنگێک هەڵنەبژێردراوە
+              </div>
+              <button type="button" id="removeKhutbahAudioBtn" class="hidden text-xs text-red-500 hover:text-red-700 font-bold px-2 py-1">
+                <i class="fa-solid fa-trash-can"></i> سڕینەوە
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">
+            تێبینی یان وەسفی مزگەوت (ئارەزوومەندانە)
+          </label>
+          <textarea 
+            id="mosqueNotes" 
+            rows="2" 
+            placeholder="زانیاری زیاتر دەربارەی مێژوو، چالاکی یان ژمارەی نوێژخوێنان..." 
+            class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          ></textarea>
+        </div>
+
+        <!-- Section: مامۆستایان و ستاف (Teachers & Roles) -->
+        <div class="border-t border-slate-100 pt-5">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h4 class="text-sm font-bold text-emerald-950 flex items-center gap-2">
+                <i class="fa-solid fa-users text-emerald-600"></i>
+                <span>مامۆستایان و خزمەتگوزارانی مزگەوت</span>
+              </h4>
+              <p class="text-xs text-slate-500">ناوی مامۆستایان زیاد بکە لەگەڵ پێگەکەیان (وتاربێژ، پێشنوێژ، بانگبێژ)</p>
+            </div>
+            <button 
+              type="button" 
+              id="addStaffRowBtn" 
+              class="inline-flex items-center gap-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+            >
+              <i class="fa-solid fa-plus text-[10px]"></i>
+              <span>زیادکردنی کەس</span>
+            </button>
+          </div>
+
+          <!-- Staff Dynamic List Container -->
+          <div id="staffListContainer" class="space-y-3">
+            <!-- Dynamic staff entries inserted here -->
+          </div>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="border-t border-slate-100 pt-4 flex items-center justify-end gap-3">
+          <button 
+            type="button" 
+            id="cancelModalBtn" 
+            class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold transition-colors cursor-pointer"
+          >
+            پەشیمانبوونەوە
+          </button>
+          <button 
+            type="submit" 
+            class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-sm font-bold shadow-md shadow-emerald-600/30 transition-all cursor-pointer flex items-center gap-2"
+          >
+            <i class="fa-solid fa-check"></i>
+            <span id="saveBtnText">تۆمارکردنی مزگەوت</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: وردەکاری مزگەوت (Details View / فایلی مزگەوت) ================= -->
+  <div id="viewModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl border-2 border-blue-400 overflow-hidden transform scale-95 transition-all duration-300 max-h-[90vh] flex flex-col">
+      <div id="viewModalHeader" class="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-800 text-white p-6 relative">
+        <button id="closeViewModalBtn" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <span class="inline-block bg-white/20 text-blue-100 text-xs px-2.5 py-0.5 rounded-full mb-2" id="viewLocationBadge">--</span>
+        <h3 id="viewMosqueTitle" class="text-2xl font-black">--</h3>
+      </div>
+      <div class="p-6 overflow-y-auto flex-1 space-y-5" id="viewModalBody">
+        <!-- Content filled dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: دەستکاریکردنی کاتی بانگەکان (Edit Prayer Times Modal) ================= -->
+  <div id="prayerTimesModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-emerald-500 overflow-hidden transform scale-95 transition-all duration-300 flex flex-col">
+      <div class="bg-gradient-to-r from-emerald-800 to-emerald-700 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold">دەستکاریکردنی کاتەکانی بانگ</h3>
+            <p class="text-xs text-emerald-100">ئەگەر کاتی بانگێک دروست نەبوو، لێرەدا دەتوانیت بە دڵی خۆت ڕێکی بخەیت</p>
+          </div>
+        </div>
+        <button id="closePrayerEditBtn" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="prayerTimesForm" class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-3.5">
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">بەیانی (Fajr):</label>
+            <input type="time" id="inputFajr" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">خۆرهەڵات (Sunrise):</label>
+            <input type="time" id="inputSunrise" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">نیوەڕۆ (Dhuhr):</label>
+            <input type="time" id="inputDhuhr" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">عەسر (Asr):</label>
+            <input type="time" id="inputAsr" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">مەغریب (Maghrib):</label>
+            <input type="time" id="inputMaghrib" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+
+          <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+            <label class="block text-xs font-bold text-emerald-950 mb-1">عیشا (Isha):</label>
+            <input type="time" id="inputIsha" required class="w-full bg-white px-3 py-1.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+          <button type="button" id="resetPrayerTimesBtn" class="text-xs text-red-600 hover:text-red-800 font-bold px-3 py-2 rounded-xl hover:bg-red-50 transition-colors cursor-pointer">
+            <i class="fa-solid fa-rotate-left"></i> گەڕانەوە بۆ کاتی خودکار
+          </button>
+
+          <div class="flex items-center gap-2">
+            <button type="button" id="cancelPrayerEditBtn" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer">
+              داخستن
+            </button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/30 transition-all flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-check"></i>
+              <span>پاشەکەوتکردن</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ناردن بۆ مامۆستا بەڕێزەکان (Share & Offline Modal) ================= -->
+  <div id="shareModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border-2 border-emerald-600 overflow-hidden transform scale-95 transition-all duration-300 max-h-[92vh] flex flex-col">
+      
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-900 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-share-nodes text-emerald-200"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold">ناردنی ئەپ بۆ مامۆستا بەڕێزەکانی پێنجوێن</h3>
+            <p class="text-xs text-emerald-100">شێوازەکانی ناردن و بەکارهێنان بە هەردوو شێوازی ئۆفلاین (بێ ئینتەرنێت) و ئۆنلاین</p>
+          </div>
+        </div>
+        <button id="closeShareModalBtn" onclick="closeShareModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-5 flex-1 text-right">
+        
+        <!-- بەشی سەرەکی: بەستەری فەرمی و سەرەکی ئەپ بۆ مامۆستایان (سەرهێڵ و دابەزاندن) -->
+        <div class="bg-gradient-to-br from-emerald-50 via-teal-50 to-blue-50 border-2 border-emerald-400 rounded-2xl p-4.5 space-y-3.5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-bold text-emerald-950 flex items-center gap-2">
+              <i class="fa-solid fa-globe text-emerald-700"></i>
+              <span>١. بەستەری فەرمی و گشتی ئەپ (بۆ ناردن بۆ مامۆستایان)</span>
+            </h4>
+            <span class="text-[11px] bg-emerald-600 text-white px-3 py-0.5 rounded-full font-bold shadow-2xs">فەرمی و ئۆنلاین</span>
+          </div>
+          <p class="text-xs text-emerald-900 leading-relaxed font-medium">
+            ئەم بەستەرە لە هەر شوێنێک و لەسەر هەموو مۆبایل و کۆمپیوتەرێک ڕاستەوخۆ دەکرێتەوە و دەبێت بە ئەپێکی فەرمی:
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-center gap-4 bg-white p-3.5 rounded-xl border border-emerald-200 shadow-2xs">
+            <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs shrink-0 text-center">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=https%3A%2F%2Ffarhadhosaen-hub.github.io%2Fpenjwen-mosques%2F" alt="QR Code" class="w-28 h-28 mx-auto" />
+              <div class="text-[10px] text-slate-500 font-bold mt-1">سکانی بکە بە کامێرای مۆبایل</div>
+            </div>
+            <div class="flex-1 space-y-2.5 w-full text-right">
+              <div class="text-xs font-bold text-slate-800">بەستەری فەرمی ئەپ لەسەر ئینتەرنێت:</div>
+              <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-emerald-300">
+                <input 
+                  type="text" 
+                  id="shareUrlInput" 
+                  readonly 
+                  class="w-full text-xs font-mono font-bold text-emerald-950 bg-transparent px-1 focus:outline-none select-all" 
+                  value="https://farhadhosaen-hub.github.io/penjwen-mosques/"
+                  dir="ltr"
+                >
+                <button id="copyShareUrlBtn" class="shrink-0 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <i class="fa-regular fa-copy"></i>
+                  <span>کۆپیکردن</span>
+                </button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <a id="shareWhatsAppBtn" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-xl text-xs shadow-xs transition-colors">
+                  <i class="fa-brands fa-whatsapp text-base"></i>
+                  <span>ناردن لە WhatsApp</span>
+                </a>
+                <a id="shareTelegramBtn" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs shadow-xs transition-colors">
+                  <i class="fa-brands fa-telegram text-base"></i>
+                  <span>ناردن لە Telegram</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- بەشی دووەم: ناردنی فایلی ئۆفلاین (ZIP) بێ پێویستی بە ئینتەرنێت -->
+        <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-4.5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-bold text-blue-950 flex items-center gap-2">
+              <i class="fa-solid fa-file-zipper text-blue-700"></i>
+              <span>٢. ناردنی فایلی ئۆفلاین (Penjwen_Mosques_App.zip)</span>
+            </h4>
+            <span class="text-[11px] bg-blue-200/80 text-blue-900 px-2.5 py-0.5 rounded-full font-bold">بێ ئینتەرنێت 100%</span>
+          </div>
+          <p class="text-xs text-blue-900/90 leading-relaxed">
+            فایلی فەرمی و تەواوی ئەپەکە لەسەر دیسکتۆپت ئامادەکراوە بە ناوی <strong class="font-bold text-blue-950 font-mono">Penjwen_Mosques_App.zip</strong>:
+          </p>
+          <div class="bg-white/80 p-3.5 rounded-xl border border-blue-200 text-xs text-slate-700 space-y-2">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-circle-check text-blue-600 mt-0.5"></i>
+              <span>دەتوانیت ئەم فایلە وەک دۆکیومێنت لە تێلێگرام یان واتسئاپ ڕاستەوخۆ بنێریت بۆ هەر مامۆستایەک.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-circle-check text-blue-600 mt-0.5"></i>
+              <span>مامۆستای بەڕێز کاتێک فایلەکە دەکاتەوە و کلیک لەسەر <code class="bg-blue-100 text-blue-900 px-1.5 py-0.5 rounded font-mono font-bold">index.html</code> دەکات، ئەپەکە دەستبەجێ بە تەواوی تایبەتمەندییەکانەوە و بەبێ هیچ پێویستییەک بە ئینتەرنێت کاردەکات!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- بەشی سێیەم: دابەزاندن و خستنەسەر شاشە لەسەر مۆبایل (PWA Mobile) -->
+        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4.5 space-y-3">
+          <h4 class="text-sm font-bold text-amber-950 flex items-center gap-2">
+            <i class="fa-solid fa-mobile-screen text-amber-700"></i>
+            <span>٣. چۆن مامۆستایان ئەپەکە دەخەنە سەر شاشەی مۆبایلەکانیان؟</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700">
+            <div class="bg-white p-3 rounded-xl border border-amber-200 space-y-1.5">
+              <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                <i class="fa-brands fa-apple text-base"></i>
+                <span>بۆ ئایفۆن (iPhone - Safari):</span>
+              </div>
+              <p class="leading-relaxed">
+                ١. لینکەکە لە سەفاری بکەرەوە.<br>
+                ٢. کلیک لە دوگمەی <span class="font-bold">Share (هاوبەشکردن)</span> بکە.<br>
+                ٣. هەڵبژاردنی <span class="font-bold text-amber-900">Add to Home Screen</span>.<br>
+                ٤. دەبێتە ئەپێکی سەربەخۆ لەسەر شاشەی مۆبایل.
+              </p>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-amber-200 space-y-1.5">
+              <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                <i class="fa-brands fa-android text-base text-green-600"></i>
+                <span>بۆ ئەندرۆید (Samsung - Chrome):</span>
+              </div>
+              <p class="leading-relaxed">
+                ١. لینکەکە لە کرۆم بکەرەوە.<br>
+                ٢. کلیک لە سێ خاڵەکەی سەرەوە بکە.<br>
+                ٣. هەڵبژاردنی <span class="font-bold text-amber-900">Install app</span> یان <span class="font-bold text-amber-900">Add to Home screen</span>.<br>
+                ٤. بەرنامەکە بە ئۆفلاین کاردەکات.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- بەشی چوارەم: خستنەسەر ئینتەرنێت بێ بەرامبەر لە یەک خولەکدا (Netlify Drop) -->
+        <div class="bg-purple-50/70 border border-purple-200 rounded-2xl p-4.5 space-y-2">
+          <h4 class="text-sm font-bold text-purple-950 flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up text-purple-700"></i>
+            <span>٤. دانانی ئەپ لەسەر ئینتەرنێت بە لینکی هەمیشەیی بێ بەرامبەر</span>
+          </h4>
+          <p class="text-xs text-purple-900/90 leading-relaxed">
+            ئەگەر دەتەوێت لینکێکی فەرمی ئۆنلاین (وەک <code class="bg-purple-100 text-purple-900 px-1 rounded font-mono font-bold">penjwen-mosques.netlify.app</code>) بۆ هەمیشە هەبێت:
+          </p>
+          <ol class="text-xs text-slate-700 list-decimal list-inside space-y-1 bg-white p-3 rounded-xl border border-purple-200">
+            <li>بڕۆ بۆ ماڵپەڕی <strong>app.netlify.com/drop</strong></li>
+            <li>تەنها فۆڵدەری <strong>penjwen-mosques-app</strong> ڕابکێشە و فڕێی بدە ناوی.</li>
+            <li>دەستبەجێ لینکێکی هەمیشەیی و سەلامەتت پێدەدات بۆ ناردن بۆ مامۆستایان.</li>
+          </ol>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="border-t border-slate-100 p-4 bg-slate-50 flex items-center justify-end">
+        <button id="closeShareModalFooterBtn" onclick="closeShareModal()" class="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors cursor-pointer">
+          داخستن
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ڕێنمایی داگرتن و ئینستۆڵکردنی ئەپ (PWA Guide Modal) ================= -->
+  <div id="pwaGuideModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl border-2 border-emerald-600 overflow-hidden transform scale-95 transition-all duration-300 max-h-[92vh] flex flex-col text-right">
+      
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-emerald-800 to-teal-800 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg text-emerald-200">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold">داگرتن و خستنەسەر شاشە وەک ئەپ</h3>
+            <p class="text-xs text-emerald-100">بۆ مۆبایل (ئایفۆن و ئەندرۆید) و کۆمپیوتەر</p>
+          </div>
+        </div>
+        <button onclick="closePwaGuideModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 overflow-y-auto space-y-4 flex-1 text-xs text-slate-700">
+        
+        <!-- بەشی ئایفۆن -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+            <i class="fa-brands fa-apple text-base text-slate-800"></i>
+            <span>بۆ مۆبایلی ئایفۆن (iPhone - Safari):</span>
+          </div>
+          <ol class="space-y-1.5 list-decimal list-inside pr-1 text-slate-600 leading-relaxed">
+            <li>لە وێبگەڕی سەفاری (Safari) لە خوارەوەی شاشە کلیک لە دوگمەی <strong>هاوبەشکردن (Share <i class="fa-solid fa-arrow-up-from-bracket"></i>)</strong> بکە.</li>
+            <li>بڕۆ خوارەوە و هەڵبژاردنی <strong>«Add to Home Screen / خستنەسەر شاشە»</strong> دابگرە.</li>
+            <li>لە سەرەوە کلیک لە <strong>Add</strong> بکە؛ دەستبەجێ بە لۆگۆی فەرمی دەچێتە سەر شاشەی مۆبایلەکەت.</li>
+          </ol>
+        </div>
+
+        <!-- بەشی ئەندرۆید -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+            <i class="fa-brands fa-android text-base text-green-600"></i>
+            <span>بۆ مۆبایلی ئەندرۆید (Samsung, Xiaomi, Chrome):</span>
+          </div>
+          <ol class="space-y-1.5 list-decimal list-inside pr-1 text-slate-600 leading-relaxed">
+            <li>کلیک لە دوگمەی سەرەکی <strong>«داگرتنی ئەپ»</strong> بکە.</li>
+            <li>یان لە کرۆم کلیک لە <strong>سێ خاڵەکەی سەرەوە (⋮)</strong> بکە.</li>
+            <li>هەڵبژاردنی <strong>«Install app / ئەپەکە دابەزێنە»</strong> یان <strong>«Add to Home screen»</strong> بکە.</li>
+          </ol>
+        </div>
+
+        <!-- بەشی کۆمپیوتەر -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+            <i class="fa-brands fa-windows text-base text-blue-600"></i>
+            <span>بۆ کۆمپیوتەر (Windows / Mac):</span>
+          </div>
+          <ol class="space-y-1.5 list-decimal list-inside pr-1 text-slate-600 leading-relaxed">
+            <li>لە کرۆم یان ئێج، لە بەشی سەرەوە لە لای ڕاستی ناونیشانەکە کلیک لە نیشانەی <strong>ئەپ (Install ⊕)</strong> بکە.</li>
+            <li>پاشان کلیک لە <strong>Install</strong> بکە. ئەپەکە دەچێتە سەر دیسکتۆپت و لە پەنجەرەیەکی سەربەخۆ دەکرێتەوە.</li>
+          </ol>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="border-t border-slate-100 p-4 bg-slate-50 flex items-center justify-between">
+        <span class="text-[11px] text-emerald-800 font-bold"><i class="fa-solid fa-circle-check text-emerald-600 ml-1"></i> پاش داگرتن بە تەواوی بەبێ ئینتەرنێت کاردەکات</span>
+        <button onclick="closePwaGuideModal()" class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors cursor-pointer">
+          داخستن
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-auto py-5 bg-white/60 border-t border-emerald-100 text-center text-xs text-slate-500 no-print">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2 text-emerald-800 font-semibold">
+        <i class="fa-solid fa-mosque"></i>
+        <span>ئەپی فەرمی مزگەوتەکانی پێنجوێن</span>
+      </div>
+      <div>
+        <span>بەشەکان: کاتەکانی بانگ، وتاری هەینی، چاپکردن و باکئەپ</span>
+        <span class="mx-2">•</span>
+        <span id="footerYear">2026</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-6 left-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm no-print">
+    <span id="toastIcon" class="text-emerald-400 text-base"><i class="fa-solid fa-circle-check"></i></span>
+    <span id="toastMsg">کردارەکە سەرکەوتووبوو</span>
+  </div>
+
+  <script>
+// Penjwen Mosques App Bundle Script
+// ==============================================================
+// ئەپی مزگەوتەکانی پێنجوێن - Penjwen Mosques & Prayer Times App
+// ==============================================================
+
+// داتای ئەو دوو مزگەوتەی تۆمار کرابوون (مزگەوتی گەیلانی پێنجوێن و مزگەوتی مەلا عباس)
+const DEFAULT_MOSQUES = [
+  {
+    id: "mosque_gaylani",
+    name: "مزگەوتی گەیلانی پێنجوێن",
+    location: "ناوبازاڕ",
+    notes: "مزگەوتی گەیلانی لە شارۆچکەی پێنجوێن، یەکێکە لە مزگەوتە دیار و سەرەکییەکان بۆ نوێژی هەینی، وانە و کۆڕە ئایینییەکان.",
+    sermons: [
+      {
+        id: "srm_g_1",
+        date: "2026-10-02",
+        topic: "گەورەیی پێغەمبەر (د.خ) و شوێنکەوتنی سوننەتەکانی",
+        speaker: "مامۆستا ملا محمدی گەیلانی",
+        hasAudio: false
+      },
+      {
+        id: "srm_g_2",
+        date: "2026-09-25",
+        topic: "برایەتی و دڵپاکی لەنێوان باوەڕداران",
+        speaker: "مامۆستا ملا محمدی گەیلانی",
+        hasAudio: false
+      },
+      {
+        id: "srm_g_3",
+        date: "2026-09-18",
+        topic: "ڕەوشتی بەرز و دەستپاکی لە مامەڵەی ڕۆژانەدا",
+        speaker: "مامۆستا ملا محمدی گەیلانی",
+        hasAudio: false
+      }
+    ],
+    khutbahDate: "2026-10-02",
+    khutbahTopic: "گەورەیی پێغەمبەر (د.خ) و شوێنکەوتنی سوننەتەکانی",
+    khutbahSpeaker: "مامۆستا ملا محمدی گەیلانی",
+    staff: [
+      { id: "s_gaylani_1", name: "مامۆستا ملا محمدی گەیلانی", role: "ووتاربێژ", phone: "0772 545 3179" },
+      { id: "s_gaylani_2", name: "مامۆستا محمد", role: "پێش نوێژ", phone: "0750 987 6543" },
+      { id: "s_gaylani_3", name: "کاک فاتح", role: "بانگ بێژ", phone: "0770 555 4433" },
+      { id: "s_gaylani_4", name: "کاک ئەحمەد سەعید", role: "کارگووزار", phone: "0770 222 1144" }
+    ],
+    createdAt: 1791099916289
+  },
+  {
+    id: "mosque_mala_abbas",
+    name: "مزگەوتی مەلا عباس",
+    location: "خوار مەلعەبەکە",
+    notes: "",
+    sermons: [
+      {
+        id: "srm_abbas_1",
+        date: "2026-10-02",
+        topic: "برایەتی",
+        speaker: "مامۆستا مەلا عباس",
+        hasAudio: false
+      },
+      {
+        id: "srm_abbas_2",
+        date: "2026-09-25",
+        topic: "گرنگی نوێژی بەکۆمەڵ و پاراستنی مافی مسوڵمانان",
+        speaker: "مامۆستا مەلا عباس",
+        hasAudio: false
+      }
+    ],
+    khutbahDate: "2026-10-02",
+    khutbahTopic: "برایەتی",
+    khutbahSpeaker: "مامۆستا مەلا عباس",
+    staff: [
+      { id: "s_abbas_1", name: "مامۆستا مەلا عباس", role: "ووتاربێژ", phone: "" },
+      { id: "s_abbas_2", name: "مامۆستا عبدالله", role: "پێش نوێژ", phone: "" },
+      { id: "s_abbas_3", name: "حاجی فرج", role: "بانگ بێژ", phone: "" },
+      { id: "s_abbas_4", name: "کاک کامەران", role: "کارگووزار", phone: "" }
+    ],
+    createdAt: 1791100239418
+  }
+];
+
+// App State
+let mosques = [];
+let currentPrayerTimes = null;
+
+// دڵنیابوونەوەی دەستبەجێ لە بوونی هەردوو مزگەوتەکە لە داتابەیسی لۆکاڵدا
+try {
+  const checkStored = localStorage.getItem('penjwen_mosques_data');
+  if (!checkStored || !checkStored.includes('مەلا عباس') || !checkStored.includes('گەیلانی')) {
+    localStorage.setItem('penjwen_mosques_data', JSON.stringify(DEFAULT_MOSQUES));
+  }
+} catch (e) {}
+
+// IndexedDB بۆ خەزنکردنی دەنگی وتار بە MP3 (Point 3)
+const DB_NAME = 'PenjwenAudioDB';
+const DB_STORE = 'sermons_audio';
+
+function openAudioDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(DB_STORE)) {
+        db.createObjectStore(DB_STORE);
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveSermonAudioBlob(key, blob) {
+  try {
+    const db = await openAudioDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).put(blob, key);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (e) {
+    console.error('Audio save error:', e);
+  }
+}
+
+async function getSermonAudioBlob(key) {
+  try {
+    const db = await openAudioDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readonly');
+      const req = tx.objectStore(DB_STORE).get(key);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (e) {
+    return null;
+  }
+}
+
+async function deleteSermonAudioBlob(key) {
+  try {
+    const db = await openAudioDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).delete(key);
+      tx.oncomplete = () => resolve(true);
+    });
+  } catch (e) {}
+}
+
+// DOM Elements
+const mosquesContainer = document.getElementById('mosquesContainer');
+const emptyState = document.getElementById('emptyState');
+
+// Modal Elements (Mosque Form)
+const mosqueModal = document.getElementById('mosqueModal');
+const openMosqueModalBtn = document.getElementById('openMosqueModalBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const cancelModalBtn = document.getElementById('cancelModalBtn');
+const mosqueForm = document.getElementById('mosqueForm');
+const modalTitle = document.getElementById('modalTitle');
+const saveBtnText = document.getElementById('saveBtnText');
+const editMosqueId = document.getElementById('editMosqueId');
+const mosqueNameInput = document.getElementById('mosqueName');
+const mosqueLocationInput = document.getElementById('mosqueLocation');
+const mosqueNotesInput = document.getElementById('mosqueNotes');
+const khutbahDateInput = document.getElementById('khutbahDate');
+const khutbahTopicInput = document.getElementById('khutbahTopic');
+const khutbahSpeakerInput = document.getElementById('khutbahSpeaker');
+const khutbahAudioFile = document.getElementById('khutbahAudioFile');
+const khutbahAudioFileInfo = document.getElementById('khutbahAudioFileInfo');
+const khutbahAudioBtnText = document.getElementById('khutbahAudioBtnText');
+const removeKhutbahAudioBtn = document.getElementById('removeKhutbahAudioBtn');
+let selectedAudioFile = null;
+
+const staffListContainer = document.getElementById('staffListContainer');
+const addStaffRowBtn = document.getElementById('addStaffRowBtn');
+
+// View Modal Elements
+const viewModal = document.getElementById('viewModal');
+const closeViewModalBtn = document.getElementById('closeViewModalBtn');
+const viewMosqueTitle = document.getElementById('viewMosqueTitle');
+const viewLocationBadge = document.getElementById('viewLocationBadge');
+const viewModalBody = document.getElementById('viewModalBody');
+
+// Prayer Times Edit Modal Elements (Point 2)
+const prayerTimesModal = document.getElementById('prayerTimesModal');
+const openPrayerEditBtn = document.getElementById('openPrayerEditBtn');
+const closePrayerEditBtn = document.getElementById('closePrayerEditBtn');
+const cancelPrayerEditBtn = document.getElementById('cancelPrayerEditBtn');
+const prayerTimesForm = document.getElementById('prayerTimesForm');
+const resetPrayerTimesBtn = document.getElementById('resetPrayerTimesBtn');
+
+const inputFajr = document.getElementById('inputFajr');
+const inputSunrise = document.getElementById('inputSunrise');
+const inputDhuhr = document.getElementById('inputDhuhr');
+const inputAsr = document.getElementById('inputAsr');
+const inputMaghrib = document.getElementById('inputMaghrib');
+const inputIsha = document.getElementById('inputIsha');
+
+// Weather & Clock
+const tempValueEl = document.getElementById('tempValue');
+const weatherDescEl = document.getElementById('weatherDesc');
+const weatherIconEl = document.getElementById('weatherIcon');
+const refreshWeatherBtn = document.getElementById('refreshWeatherBtn');
+const liveClockEl = document.getElementById('liveClock');
+const kurdishDateEl = document.getElementById('kurdishDate');
+
+// Stats Elements
+const statTotalMosques = document.getElementById('statTotalMosques');
+const statKhateebs = document.getElementById('statKhateebs');
+const statImams = document.getElementById('statImams');
+const statMuezzins = document.getElementById('statMuezzins');
+const printReportBtn = document.getElementById('printReportBtn');
+const toastEl = document.getElementById('toast');
+const toastMsg = document.getElementById('toastMsg');
+const toastIcon = document.getElementById('toastIcon');
+
+// Prayer Times Badge
+const nextPrayerBadge = document.getElementById('nextPrayerBadge');
+
+// Coordinates for Penjwen
+const PENJWEN_COORDS = { lat: 35.6186, lon: 45.9458 };
+
+// ==============================================================
+// ١. یارمەتیدەری وتارەکان و MP3 بەپێی بەروار (Sermon Date Helpers)
+// ==============================================================
+function findSermonByDate(mosque, targetDateStr) {
+  if (!mosque) return null;
+  const list = mosque.sermons || [];
+  
+  if (list.length === 0) {
+    if (mosque.khutbahTopic) {
+      return {
+        date: mosque.khutbahDate || "2026-10-02",
+        topic: mosque.khutbahTopic,
+        speaker: mosque.khutbahSpeaker || "مامۆستای وتاربێژ",
+        hasAudio: false
+      };
+    }
+    return null;
+  }
+
+  const exact = list.find(s => s.date === targetDateStr);
+  if (exact) return exact;
+
+  const targetTime = new Date(targetDateStr).getTime();
+  if (!isNaN(targetTime)) {
+    const weekMatch = list.find(s => {
+      const sTime = new Date(s.date).getTime();
+      return Math.abs(targetTime - sTime) <= 3.5 * 24 * 60 * 60 * 1000;
+    });
+    if (weekMatch) return weekMatch;
+  }
+
+  return null;
+}
+
+function getLatestSermonDate(mosque) {
+  if (mosque && mosque.sermons && mosque.sermons.length > 0) {
+    return mosque.sermons[0].date;
+  }
+  return mosque.khutbahDate || "2026-10-02";
+}
+
+function renderSermonContentHtml(mosque, sermon, dateValue) {
+  if (sermon) {
+    const audioKey = `${mosque.id}_${sermon.date}`;
+    const hasAudio = Boolean(sermon.hasAudio);
+
+    return `
+      <div class="space-y-2 animate-fade-in">
+        <div class="flex items-center justify-between text-[11px] text-amber-900 font-semibold">
+          <span>ناونیشانی وتاری ئەو هەفتەیە:</span>
+          <span class="bg-amber-200/90 text-amber-950 font-bold px-2 py-0.5 rounded-md text-[10px] shadow-2xs">
+            هەینی: ${escapeHtml(sermon.date)}
+          </span>
+        </div>
+        <div class="sermon-topic text-slate-900 font-bold text-xs sm:text-sm leading-relaxed bg-white/95 p-2.5 rounded-xl border border-amber-200/70 shadow-2xs">
+          «${escapeHtml(sermon.topic)}»
+        </div>
+        <div class="flex flex-wrap items-center gap-1.5 text-amber-950 text-xs pt-0.5 font-semibold">
+          <i class="fa-solid fa-microphone-lines text-amber-700 text-xs"></i>
+          <span class="text-amber-900">ناوی ئەو وتاربێژەی کە وتارەکەی داوە:</span>
+          <span class="sermon-speaker text-amber-950 font-bold bg-amber-100/90 px-2.5 py-0.5 rounded-lg border border-amber-200/60 shadow-2xs">
+            ${escapeHtml(sermon.speaker || 'دیاری نەکراوە')}
+          </span>
+        </div>
+
+        <!-- خاڵی ٣: خەزنکردن و پەخشکردنی دەنگی وتار بە MP3 -->
+        <div class="pt-2 border-t border-amber-200/60" id="audio-container-${mosque.id}">
+          ${hasAudio ? `
+            <div class="bg-amber-100/90 p-2.5 rounded-xl border border-amber-300 flex flex-col gap-1.5">
+              <div class="flex items-center justify-between text-[11px] font-bold text-amber-950">
+                <span class="flex items-center gap-1">
+                  <i class="fa-solid fa-file-audio text-amber-700"></i>
+                  <span>فایلی دەنگی وتارەکە (MP3 پاشەکەوتکراو):</span>
+                </span>
+                <button type="button" onclick="deleteCardAudio('${mosque.id}', '${sermon.date}')" class="text-[10px] text-red-600 hover:text-red-800 font-bold px-1.5 py-0.5 rounded bg-white/60 hover:bg-white transition-colors cursor-pointer" title="سڕینەوەی ئەم فایلی دەنگە">
+                  <i class="fa-solid fa-trash-can"></i> سڕینەوە
+                </button>
+              </div>
+              <audio controls id="player-${mosque.id}-${sermon.date.replace(/-/g, '')}" class="w-full h-8 mt-0.5 rounded-lg shadow-2xs"></audio>
+            </div>
+          ` : `
+            <div class="flex items-center gap-2">
+              <label class="inline-flex items-center gap-1.5 bg-amber-200/70 hover:bg-amber-200 text-amber-950 px-3 py-1.5 rounded-xl text-xs font-bold border border-amber-300 cursor-pointer transition-colors shadow-2xs">
+                <i class="fa-solid fa-cloud-arrow-up text-amber-700"></i>
+                <span>خەزنکردنی دەنگ بە MP3</span>
+                <input type="file" accept="audio/mp3,audio/*" class="hidden" onchange="handleDirectAudioUpload('${mosque.id}', '${sermon.date}', this)">
+              </label>
+              <span class="text-[11px] text-amber-800 font-medium">کلیک بکە بۆ خەزنکردنی فایلی دەنگی وتار (MP3)</span>
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  } else {
+    return `
+      <div class="space-y-1.5 p-3 bg-white/70 rounded-xl border border-dashed border-amber-300 text-center animate-fade-in">
+        <p class="text-xs text-amber-900 font-medium">
+          هیچ وتارێک بۆ بەرواری <span class="font-bold text-amber-950 underline decoration-amber-400">${escapeHtml(dateValue)}</span> تۆمار نەکراوە.
+        </p>
+        <button 
+          onclick="openAddSermonForDate('${mosque.id}', '${dateValue}')" 
+          class="inline-flex items-center gap-1.5 text-xs text-blue-700 hover:text-blue-900 font-bold bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer mt-1"
+        >
+          <i class="fa-solid fa-plus text-[10px]"></i>
+          <span>تۆمارکردنی وتار و وتاربێژ بۆ ئەم بەروارە</span>
+        </button>
+      </div>
+    `;
+  }
+}
+
+// بارکردنی خودکاری دەنگ بۆ پلەیەر لە دوای ڕێندەرکردن
+async function loadAudioIntoCardPlayer(mosqueId, dateStr) {
+  const cleanDate = dateStr.replace(/-/g, '');
+  const player = document.getElementById(`player-${mosqueId}-${cleanDate}`);
+  if (!player) return;
+
+  const key = `${mosqueId}_${dateStr}`;
+  const blob = await getSermonAudioBlob(key);
+  if (blob) {
+    player.src = URL.createObjectURL(blob);
+  }
+}
+
+window.handleDirectAudioUpload = async function(mosqueId, sermonDate, inputElem) {
+  if (!inputElem.files || !inputElem.files[0]) return;
+  const file = inputElem.files[0];
+  const key = `${mosqueId}_${sermonDate}`;
+
+  showToast('فایلی دەنگی MP3 خەزن دەکرێت...', 'success');
+  await saveSermonAudioBlob(key, file);
+
+  const mosque = mosques.find(m => m.id === mosqueId);
+  if (mosque && mosque.sermons) {
+    const s = mosque.sermons.find(x => x.date === sermonDate);
+    if (s) {
+      s.hasAudio = true;
+      s.audioFileName = file.name;
+    }
+  }
+  saveMosquesData();
+  showToast('فایلی دەنگی وتار بە سەرکەوتوویی بە MP3 خەزن کرا', 'success');
+
+  const container = document.getElementById(`sermon-display-${mosqueId}`);
+  if (container) {
+    const sermon = findSermonByDate(mosque, sermonDate);
+    container.innerHTML = renderSermonContentHtml(mosque, sermon, sermonDate);
+    setTimeout(() => loadAudioIntoCardPlayer(mosqueId, sermonDate), 50);
+  }
+};
+
+window.deleteCardAudio = async function(mosqueId, sermonDate) {
+  if (!confirm('ئایا دڵنیایت دەتەوێت فایلی دەنگی ئەم وتارە بسڕیتەوە؟')) return;
+  const key = `${mosqueId}_${sermonDate}`;
+  await deleteSermonAudioBlob(key);
+
+  const mosque = mosques.find(m => m.id === mosqueId);
+  if (mosque && mosque.sermons) {
+    const s = mosque.sermons.find(x => x.date === sermonDate);
+    if (s) {
+      s.hasAudio = false;
+      delete s.audioFileName;
+    }
+  }
+  saveMosquesData();
+  showToast('فایلی دەنگی وتار سڕایەوە', 'success');
+
+  const container = document.getElementById(`sermon-display-${mosqueId}`);
+  if (container) {
+    const sermon = findSermonByDate(mosque, sermonDate);
+    container.innerHTML = renderSermonContentHtml(mosque, sermon, sermonDate);
+  }
+};
+
+// Global handler when user selects a date on any mosque card
+window.handleSermonDateChange = function(mosqueId, dateValue) {
+  const mosque = mosques.find(m => m.id === mosqueId);
+  if (!mosque) return;
+
+  const container = document.getElementById(`sermon-display-${mosqueId}`);
+  if (!container) return;
+
+  const sermon = findSermonByDate(mosque, dateValue);
+  container.innerHTML = renderSermonContentHtml(mosque, sermon, dateValue);
+  
+  container.classList.remove('sermon-update-flash');
+  void container.offsetWidth;
+  container.classList.add('sermon-update-flash');
+
+  if (sermon && sermon.hasAudio) {
+    setTimeout(() => loadAudioIntoCardPlayer(mosqueId, sermon.date), 50);
+  }
+
+  if (sermon) {
+    showToast(`وتار و وتاربێژی هەفتەی (${sermon.date}) پیشاندرا`, 'success');
+  }
+};
+
+window.openAddSermonForDate = function(mosqueId, targetDate) {
+  const mosque = mosques.find(m => m.id === mosqueId);
+  if (!mosque) return;
+
+  window.editMosque(mosqueId);
+  if (khutbahDateInput) khutbahDateInput.value = targetDate;
+  if (khutbahTopicInput) {
+    khutbahTopicInput.value = '';
+    khutbahTopicInput.focus();
+  }
+};
+
+// ==============================================================
+// ٢. کاتەکانی بانگی پێنجوێن و دەستکاریکردنی (Point 2)
+// ==============================================================
+function getSavedCustomPrayerTimes() {
+  const custom = localStorage.getItem('penjwen_custom_prayer_times');
+  if (custom) {
+    try {
+      return JSON.parse(custom);
+    } catch(e) {}
+  }
+  return null;
+}
+
+async function fetchPenjwenPrayerTimes() {
+  // ئەگەر کاتی دەستکاریکراو هەبوو، ئەوە بەکاربهێنە
+  const custom = getSavedCustomPrayerTimes();
+  if (custom) {
+    currentPrayerTimes = custom;
+    updatePrayerTimesUI(currentPrayerTimes, true);
+    return;
+  }
+
+  try {
+    const today = new Date();
+    const url = `https://api.aladhan.com/v1/timings/${Math.floor(today.getTime() / 1000)}?latitude=${PENJWEN_COORDS.lat}&longitude=${PENJWEN_COORDS.lon}&method=3`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Prayer API response error');
+    
+    const data = await response.json();
+    if (data && data.data && data.data.timings) {
+      currentPrayerTimes = data.data.timings;
+      localStorage.setItem('penjwen_prayer_cache', JSON.stringify(currentPrayerTimes));
+      updatePrayerTimesUI(currentPrayerTimes, false);
+      return;
+    }
+  } catch (error) {
+    console.warn('Prayer times API failed, falling back to cache:', error);
+  }
+
+  const cached = localStorage.getItem('penjwen_prayer_cache');
+  if (cached) {
+    try {
+      currentPrayerTimes = JSON.parse(cached);
+      updatePrayerTimesUI(currentPrayerTimes, false);
+      return;
+    } catch(e){}
+  }
+
+  currentPrayerTimes = {
+    Fajr: "04:45",
+    Sunrise: "06:08",
+    Dhuhr: "12:02",
+    Asr: "15:25",
+    Maghrib: "17:58",
+    Isha: "19:18"
+  };
+  updatePrayerTimesUI(currentPrayerTimes, false);
+}
+
+function updatePrayerTimesUI(timings, isCustom = false) {
+  if (!timings) return;
+
+  const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+  prayers.forEach(p => {
+    const el = document.getElementById(`time-${p}`);
+    if (el && timings[p]) {
+      const cleanTime = timings[p].split(' ')[0];
+      el.textContent = cleanTime;
+    }
+  });
+
+  calculateNextPrayer(timings, isCustom);
+}
+
+function calculateNextPrayer(timings, isCustom = false) {
+  if (!timings) return;
+
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const prayerKeys = [
+    { key: 'Fajr', name: 'بەیانی' },
+    { key: 'Sunrise', name: 'خۆرهەڵات' },
+    { key: 'Dhuhr', name: 'نیوەڕۆ' },
+    { key: 'Asr', name: 'عەسر' },
+    { key: 'Maghrib', name: 'مەغریب' },
+    { key: 'Isha', name: 'عیشا' }
+  ];
+
+  let nextPrayer = null;
+  let minutesLeft = 0;
+
+  document.querySelectorAll('.prayer-card').forEach(c => c.classList.remove('active-prayer'));
+
+  for (const item of prayerKeys) {
+    const timeStr = (timings[item.key] || '').split(' ')[0];
+    if (!timeStr) continue;
+    const [h, m] = timeStr.split(':').map(Number);
+    const pMinutes = h * 60 + m;
+
+    if (pMinutes > currentMinutes) {
+      nextPrayer = item;
+      minutesLeft = pMinutes - currentMinutes;
+      break;
+    }
+  }
+
+  if (!nextPrayer) {
+    nextPrayer = prayerKeys[0];
+    const [h, m] = (timings['Fajr'] || '04:45').split(':').map(Number);
+    minutesLeft = (24 * 60 - currentMinutes) + (h * 60 + m);
+  }
+
+  const activeCard = document.getElementById(`card-${nextPrayer.key}`);
+  if (activeCard) {
+    activeCard.classList.add('active-prayer');
+  }
+
+  const hoursLeft = Math.floor(minutesLeft / 60);
+  const minsRemaining = minutesLeft % 60;
+  let remainingText = '';
+  if (hoursLeft > 0) {
+    remainingText = `${hoursLeft} کاتژمێر و ${minsRemaining} خولەک`;
+  } else {
+    remainingText = `${minsRemaining} خولەک`;
+  }
+
+  const customBadge = isCustom ? '<span class="text-[10px] bg-emerald-950/40 text-emerald-200 px-1.5 py-0.2 rounded font-normal mr-1">دەستکاریکراو</span>' : '';
+
+  if (nextPrayerBadge) {
+    nextPrayerBadge.innerHTML = `<i class="fa-solid fa-clock ml-1"></i> بانگی داهاتوو: ${nextPrayer.name} (ماوە: ${remainingText}) ${customBadge}`;
+  }
+}
+
+// Modal بۆ دەستکاریکردنی کاتی بانگەکان (Point 2)
+function openPrayerEditModal() {
+  if (!currentPrayerTimes) return;
+  const t = currentPrayerTimes;
+
+  const clean = (val) => (val || '12:00').split(' ')[0].padStart(5, '0');
+  inputFajr.value = clean(t.Fajr);
+  inputSunrise.value = clean(t.Sunrise);
+  inputDhuhr.value = clean(t.Dhuhr);
+  inputAsr.value = clean(t.Asr);
+  inputMaghrib.value = clean(t.Maghrib);
+  inputIsha.value = clean(t.Isha);
+
+  showModal(prayerTimesModal);
+}
+
+function handleSavePrayerTimes(e) {
+  e.preventDefault();
+
+  const customTimes = {
+    Fajr: inputFajr.value,
+    Sunrise: inputSunrise.value,
+    Dhuhr: inputDhuhr.value,
+    Asr: inputAsr.value,
+    Maghrib: inputMaghrib.value,
+    Isha: inputIsha.value
+  };
+
+  localStorage.setItem('penjwen_custom_prayer_times', JSON.stringify(customTimes));
+  currentPrayerTimes = customTimes;
+  updatePrayerTimesUI(currentPrayerTimes, true);
+  hideModal(prayerTimesModal);
+  showToast('کاتەکانی بانگ بە سەرکەوتوویی دەستکاری کران و پاشەکەوت کران', 'success');
+}
+
+function handleResetPrayerTimes() {
+  localStorage.removeItem('penjwen_custom_prayer_times');
+  hideModal(prayerTimesModal);
+  fetchPenjwenPrayerTimes();
+  showToast('کاتەکانی بانگ گەڕانەوە بۆ خودکار', 'success');
+}
+
+// ==============================================================
+// ٣. کات و بەروار (Realtime Clock & Date)
+// ==============================================================
+const KURDISH_MONTHS = [
+  'کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان', 'ئایار', 'حوزەیران',
+  'تەممووز', 'ئاب', 'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'
+];
+
+const KURDISH_DAYS = [
+  'یەکشەممە', 'دووشەممە', 'سێشەممە', 'چوارشەممە', 'پێنجشەممە', 'هەینی', 'شەممە'
+];
+
+function updateLiveClockAndDate() {
+  const now = new Date();
+  
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'د.ن' : 'پ.ن';
+  hours = hours % 12 || 12;
+  const formattedHours = String(hours).padStart(2, '0');
+
+  if (liveClockEl) {
+    liveClockEl.innerHTML = `${formattedHours}:${minutes}:${seconds} <span class="text-xs text-emerald-600 font-semibold">${ampm}</span>`;
+  }
+
+  const dayName = KURDISH_DAYS[now.getDay()];
+  const dayNum = now.getDate();
+  const monthName = KURDISH_MONTHS[now.getMonth()];
+  const year = now.getFullYear();
+
+  if (kurdishDateEl) {
+    kurdishDateEl.textContent = `${dayName}، ${dayNum}ی ${monthName}ی ${year}`;
+  }
+
+  const footerYear = document.getElementById('footerYear');
+  if (footerYear) footerYear.textContent = year;
+
+  if (currentPrayerTimes && now.getSeconds() === 0) {
+    const isCustom = Boolean(getSavedCustomPrayerTimes());
+    calculateNextPrayer(currentPrayerTimes, isCustom);
+  }
+}
+
+// ==============================================================
+// ٤. پلەی گەرمای ڕاستەوخۆ (Live Penjwen Weather)
+// ==============================================================
+const WEATHER_CODES = {
+  0: { desc: 'ئاسمانی ساماڵ', icon: 'fa-sun' },
+  1: { desc: 'ساماڵی کەم هەور', icon: 'fa-cloud-sun' },
+  2: { desc: 'نیمچە هەور', icon: 'fa-cloud-sun' },
+  3: { desc: 'هەوری تەواو', icon: 'fa-cloud' },
+  45: { desc: 'تەم و مژ', icon: 'fa-smog' },
+  48: { desc: 'تەمی بەستوو', icon: 'fa-smog' },
+  51: { desc: 'نمە بارانی کەم', icon: 'fa-cloud-rain' },
+  53: { desc: 'نمە باران', icon: 'fa-cloud-rain' },
+  55: { desc: 'نمە بارانی زۆر', icon: 'fa-cloud-rain' },
+  61: { desc: 'بارانی کەم', icon: 'fa-cloud-showers-heavy' },
+  63: { desc: 'باراناوی', icon: 'fa-cloud-showers-heavy' },
+  65: { desc: 'بارانی بەخوڕ', icon: 'fa-cloud-showers-heavy' },
+  71: { desc: 'بەفری کەم', icon: 'fa-snowflake' },
+  73: { desc: 'بەفراوی', icon: 'fa-snowflake' },
+  75: { desc: 'بەفری چڕ و زۆر', icon: 'fa-snowflake' },
+  77: { desc: 'تەرزە و بەفر', icon: 'fa-snowflake' },
+  80: { desc: 'تاوەبارانی کەم', icon: 'fa-cloud-rain' },
+  81: { desc: 'تاوەباران', icon: 'fa-cloud-rain' },
+  82: { desc: 'تاوەبارانی بەهێز', icon: 'fa-cloud-showers-water' },
+  85: { desc: 'تاوەبەفری کەم', icon: 'fa-snowflake' },
+  86: { desc: 'تاوەبەفری بەهێز', icon: 'fa-snowflake' },
+  95: { desc: 'هەورەبرووسکە', icon: 'fa-cloud-bolt' },
+  96: { desc: 'برووسکە و تەرزە', icon: 'fa-cloud-bolt' },
+  99: { desc: 'هەورەبرووسکەی توند', icon: 'fa-bolt' }
+};
+
+async function fetchPenjwenWeather() {
+  weatherDescEl.textContent = 'نوێدەبێتەوە...';
+  weatherIconEl.classList.add('animate-spin');
+
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${PENJWEN_COORDS.lat}&longitude=${PENJWEN_COORDS.lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Network error fetching weather');
+    
+    const data = await response.json();
+    const current = data.current;
+    const temp = Math.round(current.temperature_2m);
+    const code = current.weather_code;
+    const weatherInfo = WEATHER_CODES[code] || { desc: 'کەشێکی مامناوەند', icon: 'fa-cloud-sun' };
+
+    tempValueEl.textContent = `${temp}°C`;
+    weatherDescEl.textContent = weatherInfo.desc;
+    weatherIconEl.innerHTML = `<i class="fa-solid ${weatherInfo.icon}"></i>`;
+    
+    localStorage.setItem('penjwen_weather_cache', JSON.stringify({
+      temp: `${temp}°C`,
+      desc: weatherInfo.desc,
+      icon: weatherInfo.icon,
+      timestamp: Date.now()
+    }));
+  } catch (error) {
+    const cached = localStorage.getItem('penjwen_weather_cache');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      tempValueEl.textContent = parsed.temp;
+      weatherDescEl.textContent = parsed.desc + ' (پاشەکەوتکراو)';
+      weatherIconEl.innerHTML = `<i class="fa-solid ${parsed.icon}"></i>`;
+    } else {
+      tempValueEl.textContent = '19°C';
+      weatherDescEl.textContent = 'ساماڵ و لەبار';
+      weatherIconEl.innerHTML = `<i class="fa-solid fa-cloud-sun"></i>`;
+    }
+  } finally {
+    weatherIconEl.classList.remove('animate-spin');
+  }
+}
+
+// ==============================================================
+// ٥. بەڕێوەبردنی مزگەوتەکان (خاڵی ١: تەنها مزگەوتی گەیلانی پێنجوێن)
+// ==============================================================
+function loadMosquesData() {
+  const stored = localStorage.getItem('penjwen_mosques_data');
+  let loaded = null;
+  if (stored) {
+    try {
+      loaded = JSON.parse(stored);
+    } catch (e) {}
+  }
+
+  // دڵنیابوونەوە لەوەی هەردوو مزگەوتە تۆمارکراوەکە (گەیلانی و مەلا عباس) بە تەواوی لە داتابەیسدا هەبن
+  const hasAbbas = Array.isArray(loaded) && loaded.some(m => m.name && m.name.includes('مەلا عباس'));
+  const hasGaylani = Array.isArray(loaded) && loaded.some(m => m.name && m.name.includes('گەیلانی'));
+
+  if (hasAbbas && hasGaylani) {
+    mosques = loaded;
+    updateStats();
+    renderMosques();
+  } else {
+    // دەستبەجێ گێڕانەوەی ئەو دوو مزگەوتەی تۆمار کرابوون بۆ ناو داتابەیس
+    mosques = JSON.parse(JSON.stringify(DEFAULT_MOSQUES));
+    saveMosquesData();
+  }
+}
+
+function saveMosquesData() {
+  localStorage.setItem('penjwen_mosques_data', JSON.stringify(mosques));
+  updateStats();
+  renderMosques();
+}
+
+function updateStats() {
+  const total = mosques.length;
+  let khateebCount = 0;
+  let imamCount = 0;
+  let muezzinCount = 0;
+  let karguzarCount = 0;
+
+  mosques.forEach(m => {
+    (m.staff || []).forEach(s => {
+      const role = (s.role || '').toLowerCase();
+      if (role.includes('وتار') || role.includes('ووتار')) khateebCount++;
+      if (role.includes('پێش')) imamCount++;
+      if (role.includes('بانگ')) muezzinCount++;
+      if (role.includes('کارگ') || role.includes('کارگو') || role.includes('خزمەت')) karguzarCount++;
+    });
+  });
+
+  if (statTotalMosques) statTotalMosques.textContent = total;
+  if (statKhateebs) statKhateebs.textContent = khateebCount;
+  if (statImams) statImams.textContent = imamCount;
+  if (statMuezzins) statMuezzins.textContent = muezzinCount;
+  const statKarguzars = document.getElementById('statKarguzars');
+  if (statKarguzars) statKarguzars.textContent = karguzarCount;
+}
+
+// ==============================================================
+// ٦. پیشاندانی هەر مزگەوتێک وەک دووگمە بە چوارگۆشەی شین
+// ==============================================================
+window.toggleMosqueDetails = function(mosqueId) {
+  const panel = document.getElementById(`details-${mosqueId}`);
+  const btn = document.getElementById(`btn-${mosqueId}`);
+  const chevron = document.getElementById(`chevron-${mosqueId}`);
+  if (!panel) return;
+
+  const isHidden = panel.classList.contains('hidden');
+  if (isHidden) {
+    panel.classList.remove('hidden');
+    btn.classList.add('btn-active');
+    if (chevron) chevron.classList.add('rotate-180');
+
+    // ئەگەر دەنگ هەبوو، لە کاتی کردنەوە پلەیەرەکە باربکە
+    const mosque = mosques.find(m => m.id === mosqueId);
+    if (mosque) {
+      const dateVal = getLatestSermonDate(mosque);
+      const s = findSermonByDate(mosque, dateVal);
+      if (s && s.hasAudio) {
+        setTimeout(() => loadAudioIntoCardPlayer(mosqueId, s.date), 50);
+      }
+    }
+  } else {
+    panel.classList.add('hidden');
+    btn.classList.remove('btn-active');
+    if (chevron) chevron.classList.remove('rotate-180');
+  }
+};
+
+function renderMosques() {
+  mosquesContainer.innerHTML = '';
+
+  if (mosques.length === 0) {
+    emptyState.classList.remove('hidden');
+    return;
+  }
+  emptyState.classList.add('hidden');
+
+  mosques.forEach(mosque => {
+    const card = createMosqueCard(mosque);
+    mosquesContainer.appendChild(card);
+  });
+}
+
+function createMosqueCard(mosque) {
+  const container = document.createElement('div');
+  container.className = 'mosque-item w-full';
+
+  const initialDate = getLatestSermonDate(mosque);
+  const initialSermon = findSermonByDate(mosque, initialDate);
+
+  // خاڵی ٤: ژمارەی تەلەفۆنەکان بە ئینگلیزی، و خانەی ڕەنگ قاوەیی کاڵ بۆ پێگە لە سەرەتای لای ڕاست
+  const staffBadges = (mosque.staff && mosque.staff.length > 0) 
+    ? mosque.staff.map(staff => {
+        let roleName = 'کارمەند';
+        let icon = 'fa-user';
+        const r = (staff.role || '').toLowerCase();
+
+        if (r.includes('وتار') || r.includes('ووتار')) {
+          roleName = 'ووتاربێژ';
+          icon = 'fa-bullhorn';
+        } else if (r.includes('پێش')) {
+          roleName = 'پێش نوێژ';
+          icon = 'fa-hands-praying';
+        } else if (r.includes('بانگ')) {
+          roleName = 'بانگ بێژ';
+          icon = 'fa-microphone-lines';
+        } else if (r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت')) {
+          roleName = 'کارگووزار';
+          icon = 'fa-user-gear';
+        } else if (staff.role) {
+          roleName = staff.role;
+        }
+
+        return `
+          <div class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 p-2.5 rounded-xl text-xs bg-slate-50 border border-slate-200/80 hover:bg-slate-100/70 transition-colors">
+            <!-- سەرەتای لای ڕاست: خانەی ڕەنگ قاوەیی کاڵ بۆ پێگە لەگەڵ ناوی کەسەکە -->
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="role-badge-brown">
+                <i class="fa-solid ${icon} text-[10px] opacity-75"></i>
+                <span>${escapeHtml(roleName)}</span>
+              </span>
+              <span class="font-bold text-slate-900 text-xs sm:text-sm truncate">${escapeHtml(staff.name)}</span>
+            </div>
+            <!-- لای چەپ: ژمارەی مۆبایل بە ئینگلیزی -->
+            ${staff.phone ? `
+              <div class="shrink-0 mr-auto sm:mr-0">
+                <a href="tel:${escapeHtml(staff.phone)}" class="phone-num text-xs font-bold text-slate-700 hover:text-emerald-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs inline-flex items-center gap-1.5 transition-colors" dir="ltr">
+                  <i class="fa-solid fa-phone text-[10px] text-emerald-600"></i>
+                  <span>${escapeHtml(staff.phone)}</span>
+                </a>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('')
+    : `<div class="text-xs text-slate-400 italic py-2">هیچ مامۆستایەک هێشتا تۆمار نەکراوە</div>`;
+
+  container.innerHTML = `
+    <!-- خاڵی ٢: دووگمەی مزگەوت کە تەنها ناوی مزگەوتەکەی تیا نووسراوە -->
+    <button 
+      type="button"
+      id="btn-${mosque.id}"
+      onclick="toggleMosqueDetails('${mosque.id}')"
+      class="mosque-toggle-btn w-full bg-white hover:bg-blue-50/70 border-2 border-blue-500 text-blue-950 font-black text-base sm:text-lg py-4 px-5 sm:px-6 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center justify-between cursor-pointer group"
+      title="کلیک بکە بۆ بینینی هەموو زانیارییەکانی ئەم مزگەوتە"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-lg group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shrink-0">
+          <i class="fa-solid fa-mosque"></i>
+        </div>
+        <span class="text-base sm:text-lg font-black tracking-wide text-slate-900 group-hover:text-blue-800 transition-colors">
+          ${escapeHtml(mosque.name)}
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2.5 text-blue-600 text-sm font-bold">
+        <span class="text-xs text-slate-400 group-hover:text-blue-700 font-medium hidden sm:inline">کلیک بکە بۆ بینینی هەموو زانیارییەکان</span>
+        <div class="w-8 h-8 rounded-full bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+          <i id="chevron-${mosque.id}" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+        </div>
+      </div>
+    </button>
+
+    <!-- چوارگۆشەی شین: هەموو زانیارییەکانی مزگەوت (بە کلیک کردن لەسەر دووگمەکە دەردەکەوێت) -->
+    <div id="details-${mosque.id}" class="mosque-details-panel hidden mt-3 bg-white rounded-2xl p-5 sm:p-6 border-2 border-blue-500 shadow-lg shadow-blue-500/10 transition-all animate-fade-in relative overflow-hidden">
+      <!-- Top Blue Accent Line (چوارگۆشەی شین) -->
+      <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600"></div>
+
+      <!-- Header Information -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100">
+        <div>
+          <div class="inline-flex items-center gap-1.5 text-xs text-blue-700 font-bold bg-blue-50 px-3 py-1 rounded-full mb-1.5 border border-blue-200/60">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>پێنجوێن - ${escapeHtml(mosque.location || 'ناوەند')}</span>
+          </div>
+          <h3 class="text-xl font-black text-slate-900">
+            ${escapeHtml(mosque.name)}
+          </h3>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="editMosque('${mosque.id}')" class="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold py-2 px-3.5 rounded-xl border border-blue-200 transition-colors cursor-pointer">
+            <i class="fa-regular fa-pen-to-square"></i>
+            <span>دەستکاری</span>
+          </button>
+          <button onclick="deleteMosque('${mosque.id}')" class="inline-flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold py-2 px-3 rounded-xl border border-red-200 transition-colors cursor-pointer" title="سڕینەوەی ئەم مزگەوتە">
+            <i class="fa-regular fa-trash-can"></i>
+            <span>سڕینەوە</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Notes / Short Description -->
+      ${mosque.notes ? `
+        <div class="bg-blue-50/40 p-3.5 rounded-2xl border border-blue-100 mb-4 text-xs text-slate-700 leading-relaxed">
+          <span class="font-bold text-blue-900 ml-1">تێبینی:</span>
+          ${escapeHtml(mosque.notes)}
+        </div>
+      ` : ''}
+
+      <!-- خانەی وتاری هەینی لەگەڵ خانەی بەروار و MP3 -->
+      <div class="khutbah-box bg-gradient-to-br from-amber-50 to-amber-100/70 border border-amber-200/90 rounded-2xl p-4 mb-4 text-xs shadow-2xs">
+        
+        <!-- Top Row: ناوی وتاری هەینی + خانەی بەروار لەبەرامبەری -->
+        <div class="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-amber-200/70">
+          <div class="flex items-center gap-2 text-amber-900 font-bold text-sm shrink-0">
+            <i class="fa-solid fa-book-quran text-amber-600"></i>
+            <span>وتاری هەینی</span>
+          </div>
+
+          <!-- خانەی بەروار لەبەرامبەر ناوی وتار -->
+          <div class="flex items-center gap-1.5">
+            <label for="picker-${mosque.id}" class="text-xs font-bold text-amber-900 shrink-0">
+              <i class="fa-regular fa-calendar-days text-amber-700 text-xs ml-0.5"></i>بەروار:
+            </label>
+            <input 
+              type="date" 
+              id="picker-${mosque.id}" 
+              value="${initialDate}"
+              onchange="handleSermonDateChange('${mosque.id}', this.value)"
+              class="sermon-date-picker px-3 py-1 bg-white rounded-xl border border-amber-300 text-xs font-bold text-amber-950 shadow-2xs cursor-pointer focus:ring-2 focus:ring-amber-500 focus:outline-none"
+              title="بەروارێک هەڵبژێرە بۆ بینینی ناونیشانی وتار و ناوی وتاربێژی ئەو هەفتەیە"
+            >
+          </div>
+        </div>
+
+        <!-- ناوەڕۆکی ناونیشانی وتار و وتاربێژ و MP3 -->
+        <div id="sermon-display-${mosque.id}">
+          ${renderSermonContentHtml(mosque, initialSermon, initialDate)}
+        </div>
+
+      </div>
+
+      <!-- Staff Section (مامۆستایان و ستاف) -->
+      <div class="space-y-2 pt-2">
+        <div class="flex items-center justify-between text-xs font-bold text-slate-700 mb-2">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-users text-blue-600"></i>
+            <span>مامۆستایان و ستافی خزمەتگوزاری ئەم مزگەوتە:</span>
+          </span>
+          <span class="text-blue-700 font-black">${mosque.staff ? mosque.staff.length : 0} کەس</span>
+        </div>
+        <div class="space-y-2">
+          ${staffBadges}
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  return container;
+}
+
+// ==============================================================
+// ٧. فۆڕمی زیادکردن و دەستکاریکردنی مزگەوت
+// ==============================================================
+function openCreateModal() {
+  editMosqueId.value = '';
+  modalTitle.textContent = 'تۆمارکردنی مزگەوتی نوێ';
+  saveBtnText.textContent = 'تۆمارکردنی مزگەوت';
+  mosqueNameInput.value = '';
+  mosqueLocationInput.value = '';
+  mosqueNotesInput.value = '';
+  
+  if (khutbahDateInput) khutbahDateInput.value = '2026-10-02';
+  khutbahTopicInput.value = '';
+  khutbahSpeakerInput.value = '';
+  
+  // Reset audio input
+  selectedAudioFile = null;
+  if (khutbahAudioFile) khutbahAudioFile.value = '';
+  if (khutbahAudioFileInfo) khutbahAudioFileInfo.textContent = 'هیچ دەنگێک هەڵنەبژێردراوە';
+  if (khutbahAudioBtnText) khutbahAudioBtnText.textContent = 'هەڵبژاردنی فایلی MP3';
+  if (removeKhutbahAudioBtn) removeKhutbahAudioBtn.classList.add('hidden');
+
+  staffListContainer.innerHTML = '';
+  addStaffRow({ name: '', role: 'ووتاربێژ', phone: '' });
+  addStaffRow({ name: '', role: 'پێش نوێژ', phone: '' });
+  addStaffRow({ name: '', role: 'بانگ بێژ', phone: '' });
+  addStaffRow({ name: '', role: 'کارگووزار', phone: '' });
+
+  showModal(mosqueModal);
+}
+
+function addStaffRow(initial = { name: '', role: 'ووتاربێژ', phone: '' }) {
+  const rowId = 'staff_' + Math.random().toString(36).substring(2, 9);
+  const row = document.createElement('div');
+  row.className = 'staff-row p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center gap-2.5 transition-all';
+  row.dataset.rowId = rowId;
+
+  const r = (initial.role || '').toLowerCase();
+  const isKhateeb = r.includes('وتار') || r.includes('ووتار');
+  const isImam = !isKhateeb && r.includes('پێش');
+  const isMuezzin = r.includes('بانگ');
+  const isKarguzar = r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت');
+
+  row.innerHTML = `
+    <!-- لای ڕاست: خانەی قاوەیی کاڵ بۆ هەڵبژاردنی پێگە -->
+    <div class="w-full sm:w-40 shrink-0">
+      <select class="staff-role-select w-full px-3 py-2 bg-[#ede0d4] text-[#4a2810] font-bold rounded-xl border border-[#d5bdaf] text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none cursor-pointer">
+        <option value="ووتاربێژ" ${isKhateeb ? 'selected' : ''}>ووتاربێژ</option>
+        <option value="پێش نوێژ" ${isImam ? 'selected' : ''}>پێش نوێژ</option>
+        <option value="بانگ بێژ" ${isMuezzin ? 'selected' : ''}>بانگ بێژ</option>
+        <option value="کارگووزار" ${isKarguzar ? 'selected' : ''}>کارگووزار</option>
+        <option value="ووتاربێژ و پێشنوێژ" ${initial.role === 'ووتاربێژ و پێشنوێژ' ? 'selected' : ''}>ووتاربێژ و پێشنوێژ</option>
+      </select>
+    </div>
+
+    <!-- ناوەڕاست: ناوی کەسەکە -->
+    <div class="flex-1 w-full sm:w-auto">
+      <input 
+        type="text" 
+        placeholder="ناوی مامۆستا یان کارگوزار..." 
+        value="${escapeHtml(initial.name || '')}" 
+        required
+        class="staff-name-input w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium"
+      >
+    </div>
+
+    <!-- لای چەپ: ژمارەی تەلەفۆن -->
+    <div class="w-full sm:w-36 shrink-0">
+      <input 
+        type="tel" 
+        dir="ltr"
+        placeholder="0770 123 4567" 
+        value="${escapeHtml(initial.phone || '')}" 
+        class="staff-phone-input phone-num w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold"
+      >
+    </div>
+
+    <button 
+      type="button" 
+      onclick="this.closest('.staff-row').remove()" 
+      class="text-red-500 hover:bg-red-50 p-2 rounded-xl text-xs transition-colors shrink-0 self-end sm:self-center"
+      title="سڕینەوەی ئەم دێڕە"
+    >
+      <i class="fa-solid fa-trash-can"></i>
+    </button>
+  `;
+
+  staffListContainer.appendChild(row);
+}
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  
+  const name = mosqueNameInput.value.trim();
+  const location = mosqueLocationInput.value.trim();
+  const notes = mosqueNotesInput.value.trim();
+  const sDate = (khutbahDateInput && khutbahDateInput.value) ? khutbahDateInput.value : '2026-10-02';
+  const sTopic = khutbahTopicInput.value.trim();
+  const sSpeaker = khutbahSpeakerInput.value.trim();
+  const idToEdit = editMosqueId.value;
+
+  if (!name || !location) {
+    showToast('تکایە ناوی مزگەوت و گەڕەک بنووسە', 'error');
+    return;
+  }
+
+  // Collect staff rows (خاڵی ٤: بە ژمارەی ئینگلیزی)
+  const staff = [];
+  const rows = staffListContainer.querySelectorAll('.staff-row');
+  rows.forEach((row, index) => {
+    const stName = row.querySelector('.staff-name-input').value.trim();
+    const stRole = row.querySelector('.staff-role-select').value;
+    const stPhone = row.querySelector('.staff-phone-input').value.trim();
+    if (stName) {
+      staff.push({
+        id: 's_' + Date.now() + '_' + index,
+        name: stName,
+        role: stRole,
+        phone: stPhone
+      });
+    }
+  });
+
+  let targetId = idToEdit;
+
+  if (idToEdit) {
+    // Edit existing
+    const index = mosques.findIndex(m => m.id === idToEdit);
+    if (index !== -1) {
+      const existing = mosques[index];
+      let updatedSermons = existing.sermons ? [...existing.sermons] : [];
+
+      if (sTopic) {
+        const existingSermonIndex = updatedSermons.findIndex(s => s.date === sDate);
+        let hasAudioFlag = existingSermonIndex !== -1 ? Boolean(updatedSermons[existingSermonIndex].hasAudio) : false;
+
+        // ئەگەر فایلی دەنگی نوێ هەڵبژێردرا بێت
+        if (selectedAudioFile) {
+          const key = `${idToEdit}_${sDate}`;
+          await saveSermonAudioBlob(key, selectedAudioFile);
+          hasAudioFlag = true;
+        }
+
+        const sermonObj = {
+          id: existingSermonIndex !== -1 ? updatedSermons[existingSermonIndex].id : ('srm_' + Date.now()),
+          date: sDate,
+          topic: sTopic,
+          speaker: sSpeaker || (staff[0] ? staff[0].name : 'مامۆستای وتاربێژ'),
+          hasAudio: hasAudioFlag
+        };
+
+        if (existingSermonIndex !== -1) {
+          updatedSermons[existingSermonIndex] = sermonObj;
+        } else {
+          updatedSermons.unshift(sermonObj);
+        }
+      }
+
+      mosques[index] = {
+        ...existing,
+        name,
+        location,
+        notes,
+        sermons: updatedSermons,
+        khutbahDate: sDate,
+        khutbahTopic: sTopic || (updatedSermons[0] ? updatedSermons[0].topic : ''),
+        khutbahSpeaker: sSpeaker || (updatedSermons[0] ? updatedSermons[0].speaker : ''),
+        staff,
+        updatedAt: Date.now()
+      };
+      showToast('زانیارییەکانی مزگەوت نوێکرانەوە', 'success');
+    }
+  } else {
+    // Create new
+    targetId = 'mosque_' + Date.now();
+    const initialSermons = [];
+
+    if (sTopic) {
+      let hasAudioFlag = false;
+      if (selectedAudioFile) {
+        const key = `${targetId}_${sDate}`;
+        await saveSermonAudioBlob(key, selectedAudioFile);
+        hasAudioFlag = true;
+      }
+
+      initialSermons.push({
+        id: 'srm_' + Date.now(),
+        date: sDate,
+        topic: sTopic,
+        speaker: sSpeaker || (staff[0] ? staff[0].name : 'مامۆستای وتاربێژ'),
+        hasAudio: hasAudioFlag
+      });
+    }
+
+    const newMosque = {
+      id: targetId,
+      name,
+      location,
+      notes,
+      sermons: initialSermons,
+      khutbahDate: sDate,
+      khutbahTopic: sTopic,
+      khutbahSpeaker: sSpeaker,
+      staff,
+      createdAt: Date.now()
+    };
+    mosques.push(newMosque);
+    showToast(`مزگەوتی (${name}) وەکو دووگمە تۆمار کرا`, 'success');
+  }
+
+  saveMosquesData();
+  hideModal(mosqueModal);
+
+  // Auto-expand the mosque details
+  if (targetId) {
+    setTimeout(() => {
+      window.toggleMosqueDetails(targetId);
+      const targetElem = document.getElementById(`btn-${targetId}`);
+      if (targetElem) targetElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 200);
+  }
+}
+
+window.editMosque = async function(id) {
+  const mosque = mosques.find(m => m.id === id);
+  if (!mosque) return;
+
+  editMosqueId.value = mosque.id;
+  modalTitle.textContent = 'دەستکاریکردنی: ' + mosque.name;
+  saveBtnText.textContent = 'پاشەکەوتکردنی گۆڕانکارییەکان';
+  mosqueNameInput.value = mosque.name;
+  mosqueLocationInput.value = mosque.location || '';
+  mosqueNotesInput.value = mosque.notes || '';
+  
+  const latestSermon = (mosque.sermons && mosque.sermons.length > 0) ? mosque.sermons[0] : null;
+  const sDate = latestSermon ? latestSermon.date : (mosque.khutbahDate || '2026-10-02');
+  if (khutbahDateInput) khutbahDateInput.value = sDate;
+  khutbahTopicInput.value = latestSermon ? latestSermon.topic : (mosque.khutbahTopic || '');
+  khutbahSpeakerInput.value = latestSermon ? latestSermon.speaker : (mosque.khutbahSpeaker || '');
+  
+  // Audio status
+  selectedAudioFile = null;
+  if (khutbahAudioFile) khutbahAudioFile.value = '';
+  
+  if (latestSermon && latestSermon.hasAudio) {
+    khutbahAudioFileInfo.textContent = 'فایلی دەنگی وتار (MP3) خەزن کراوە';
+    khutbahAudioBtnText.textContent = 'گۆڕینی فایلی MP3';
+    removeKhutbahAudioBtn.classList.remove('hidden');
+  } else {
+    khutbahAudioFileInfo.textContent = 'هیچ دەنگێک هەڵنەبژێردراوە';
+    khutbahAudioBtnText.textContent = 'هەڵبژاردنی فایلی MP3';
+    removeKhutbahAudioBtn.classList.add('hidden');
+  }
+
+  staffListContainer.innerHTML = '';
+  if (mosque.staff && mosque.staff.length > 0) {
+    mosque.staff.forEach(s => addStaffRow(s));
+  } else {
+    addStaffRow({ name: '', role: 'وتاربێژ', phone: '' });
+  }
+
+  showModal(mosqueModal);
+};
+
+window.deleteMosque = function(id) {
+  const mosque = mosques.find(m => m.id === id);
+  if (!mosque) return;
+
+  if (confirm(`ئایا دڵنیایت دەتەوێت (${mosque.name}) بسڕیتەوە لە تۆمارەکان؟`)) {
+    mosques = mosques.filter(m => m.id !== id);
+    saveMosquesData();
+    showToast('مزگەوتەکە سڕایەوە', 'success');
+  }
+};
+
+window.viewMosqueDetails = function(id) {
+  const mosque = mosques.find(m => m.id === id);
+  if (!mosque) return;
+
+  viewMosqueTitle.textContent = mosque.name;
+  viewLocationBadge.textContent = 'پێنجوێن - ' + (mosque.location || 'ناوەند');
+
+  let khutbahHtml = '';
+  if (mosque.sermons && mosque.sermons.length > 0) {
+    khutbahHtml = `
+      <div class="bg-amber-50/90 border border-amber-200/80 rounded-2xl p-4 space-y-2.5">
+        <div class="flex items-center justify-between text-amber-900 font-bold text-sm">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-book-quran text-amber-600"></i>
+            <span>ئەرشیفی وتارەکانی هەینی:</span>
+          </span>
+          <span class="text-xs bg-amber-200/80 text-amber-950 px-2 py-0.5 rounded-full font-bold">
+            ${mosque.sermons.length} وتار
+          </span>
+        </div>
+        <div class="space-y-2 mt-2">
+          ${mosque.sermons.map(s => `
+            <div class="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+              <div class="flex items-center justify-between text-[11px] font-bold text-amber-800 mb-1">
+                <span>بەروار: ${escapeHtml(s.date)}</span>
+                <span class="text-slate-600 font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-microphone-lines text-amber-600 text-[10px]"></i>
+                  <span>وتاربێژ: ${escapeHtml(s.speaker || '-')}</span>
+                </span>
+              </div>
+              <div class="text-xs font-bold text-slate-900">
+                «${escapeHtml(s.topic)}»
+              </div>
+              ${s.hasAudio ? `<div class="text-[10px] text-emerald-700 font-bold mt-1"><i class="fa-solid fa-circle-check"></i> خاوەنی فایلی دەنگی MP3 یە</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  let staffHtml = '';
+  if (mosque.staff && mosque.staff.length > 0) {
+    staffHtml = `
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">مامۆستایان و ستافی خزمەتگوزار:</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          ${mosque.staff.map(s => {
+            let roleName = 'کارمەند';
+            let icon = 'fa-user';
+            const r = (s.role || '').toLowerCase();
+            if (r.includes('وتار') || r.includes('ووتار')) {
+              roleName = 'ووتاربێژ';
+              icon = 'fa-bullhorn';
+            } else if (r.includes('پێش')) {
+              roleName = 'پێش نوێژ';
+              icon = 'fa-hands-praying';
+            } else if (r.includes('بانگ')) {
+              roleName = 'بانگ بێژ';
+              icon = 'fa-microphone-lines';
+            } else if (r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت')) {
+              roleName = 'کارگووزار';
+              icon = 'fa-user-gear';
+            } else if (s.role) {
+              roleName = s.role;
+            }
+
+            return `
+              <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-3 flex items-center justify-between gap-2.5">
+                <!-- سەرەتای لای ڕاست: خانەی ڕەنگ قاوەیی کاڵ بۆ پێگە لەگەڵ ناوی کەسەکە -->
+                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                  <span class="role-badge-brown">
+                    <i class="fa-solid ${icon} text-[10px] opacity-75"></i>
+                    <span>${escapeHtml(roleName)}</span>
+                  </span>
+                  <span class="text-sm font-bold text-slate-900 truncate">${escapeHtml(s.name)}</span>
+                </div>
+                <!-- لای چەپ: ژمارەی تەلەفۆن بە ئینگلیزی -->
+                ${s.phone ? `
+                  <div class="shrink-0 mr-auto sm:mr-0">
+                    <a href="tel:${escapeHtml(s.phone)}" class="phone-num text-xs font-bold text-slate-700 hover:text-emerald-700 bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-2xs inline-flex items-center gap-1.5 transition-colors" dir="ltr">
+                      <i class="fa-solid fa-phone text-[10px] text-emerald-600"></i>
+                      <span>${escapeHtml(s.phone)}</span>
+                    </a>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  } else {
+    staffHtml = `<p class="text-sm text-slate-500 italic">هیچ مامۆستایەک بۆ ئەم مزگەوتە دیاری نەکراوە.</p>`;
+  }
+
+  const notesHtml = mosque.notes ? `
+    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+      <h4 class="text-xs font-bold text-slate-500 mb-1.5">تێبینی و زانیاری:</h4>
+      <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${escapeHtml(mosque.notes)}</p>
+    </div>
+  ` : '';
+
+  viewModalBody.innerHTML = `
+    ${khutbahHtml}
+    ${notesHtml}
+    ${staffHtml}
+    <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+      <span>کۆدی مزگەوت: ${mosque.id}</span>
+      <button onclick="hideModal(viewModal); editMosque('${mosque.id}');" class="text-blue-700 hover:text-blue-900 font-bold flex items-center gap-1 cursor-pointer">
+        <i class="fa-regular fa-pen-to-square"></i> دەستکاری بکە
+      </button>
+    </div>
+  `;
+
+  showModal(viewModal);
+};
+
+// ==============================================================
+// ٨. چاپکردن و دروستکردنی PDF بە شێوازی فەرمی
+// ==============================================================
+function prepareAndPrintReport() {
+  const printTableContainer = document.getElementById('printTableContainer');
+  const printReportDate = document.getElementById('printReportDate');
+  const printReportCount = document.getElementById('printReportCount');
+
+  const now = new Date();
+  const dayName = KURDISH_DAYS[now.getDay()];
+  const dayNum = now.getDate();
+  const monthName = KURDISH_MONTHS[now.getMonth()];
+  const year = now.getFullYear();
+
+  printReportDate.textContent = `بەرواری دەرچوون: ${dayName}، ${dayNum}ی ${monthName}ی ${year}`;
+  printReportCount.textContent = `سەرجەم مزگەوتە تۆمارکراوەکان: ${mosques.length}`;
+
+  let tableRows = '';
+  mosques.forEach((m, idx) => {
+    let khateebStr = '-';
+    let imamStr = '-';
+    let muezzinStr = '-';
+
+    (m.staff || []).forEach(s => {
+      const r = s.role || '';
+      if (r.includes('وتاربێژ')) khateebStr = s.name + (s.phone ? ` (${s.phone})` : '');
+      if (r.includes('پێشنوێژ')) imamStr = s.name + (s.phone ? ` (${s.phone})` : '');
+      if (r.includes('بانگبێژ')) muezzinStr = s.name + (s.phone ? ` (${s.phone})` : '');
+    });
+
+    const latestS = (m.sermons && m.sermons[0]) ? m.sermons[0] : (m.khutbahTopic ? { topic: m.khutbahTopic, speaker: m.khutbahSpeaker } : null);
+    const khutbahText = latestS ? `«${escapeHtml(latestS.topic)}» [وتاربێژ: ${escapeHtml(latestS.speaker || khateebStr)}]` : '-';
+
+    tableRows += `
+      <tr>
+        <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+        <td style="font-weight: bold;">${escapeHtml(m.name)}</td>
+        <td>پێنجوێن - ${escapeHtml(m.location || '-')}</td>
+        <td>${escapeHtml(khateebStr)}</td>
+        <td>${escapeHtml(imamStr)}</td>
+        <td>${escapeHtml(muezzinStr)}</td>
+        <td style="font-size: 10pt;">${khutbahText}</td>
+      </tr>
+    `;
+  });
+
+  printTableContainer.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 4%; text-align: center;">#</th>
+          <th style="width: 17%;">ناوی مزگەوت</th>
+          <th style="width: 13%;">گەڕەک / ناونیشان</th>
+          <th style="width: 15%;">وتاربێژ</th>
+          <th style="width: 15%;">پێشنوێژ</th>
+          <th style="width: 14%;">بانگبێژ</th>
+          <th style="width: 22%;">وتار و وتاربێژی هەینی</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRows}
+      </tbody>
+    </table>
+  `;
+
+  window.print();
+}
+
+// ==============================================================
+// ٩. یارمەتیدەرەکان (Helpers, Modals, Toast)
+// ==============================================================
+function showModal(modal) {
+  modal.classList.add('modal-active');
+  document.body.classList.add('overflow-hidden');
+}
+
+function hideModal(modal) {
+  modal.classList.remove('modal-active');
+  document.body.classList.remove('overflow-hidden');
+}
+
+function showToast(message, type = 'success') {
+  toastMsg.textContent = message;
+  if (type === 'error') {
+    toastIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation text-red-400"></i>`;
+  } else if (type === 'info') {
+    toastIcon.innerHTML = `<i class="fa-solid fa-circle-info text-amber-400"></i>`;
+  } else {
+    toastIcon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i>`;
+  }
+  toastEl.classList.remove('translate-y-20', 'opacity-0');
+  setTimeout(() => {
+    toastEl.classList.add('translate-y-20', 'opacity-0');
+  }, 3200);
+}
+
+function escapeHtml(string) {
+  if (!string) return '';
+  return String(string)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// ==============================================================
+// ١٠. گوێگر لە ڕووداوەکان (Event Listeners)
+// ==============================================================
+function initEvents() {
+  // Mosque modal
+  openMosqueModalBtn.addEventListener('click', openCreateModal);
+  closeModalBtn.addEventListener('click', () => hideModal(mosqueModal));
+  cancelModalBtn.addEventListener('click', () => hideModal(mosqueModal));
+  closeViewModalBtn.addEventListener('click', () => hideModal(viewModal));
+
+  mosqueModal.addEventListener('click', (e) => {
+    if (e.target === mosqueModal) hideModal(mosqueModal);
+  });
+  viewModal.addEventListener('click', (e) => {
+    if (e.target === viewModal) hideModal(viewModal);
+  });
+
+  addStaffRowBtn.addEventListener('click', () => {
+    addStaffRow({ name: '', role: 'وتاربێژ', phone: '' });
+  });
+
+  mosqueForm.addEventListener('submit', handleFormSubmit);
+
+  // Audio upload in modal
+  if (khutbahAudioFile) {
+    khutbahAudioFile.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        selectedAudioFile = e.target.files[0];
+        const sizeMb = (selectedAudioFile.size / (1024 * 1024)).toFixed(1);
+        khutbahAudioFileInfo.textContent = `${selectedAudioFile.name} (${sizeMb} MB)`;
+        khutbahAudioBtnText.textContent = 'فایل هەڵبژێردرا';
+        removeKhutbahAudioBtn.classList.remove('hidden');
+      }
+    });
+  }
+
+  if (removeKhutbahAudioBtn) {
+    removeKhutbahAudioBtn.addEventListener('click', () => {
+      selectedAudioFile = null;
+      if (khutbahAudioFile) khutbahAudioFile.value = '';
+      khutbahAudioFileInfo.textContent = 'دەنگ سڕایەوە';
+      khutbahAudioBtnText.textContent = 'هەڵبژاردنی فایلی MP3';
+      removeKhutbahAudioBtn.classList.add('hidden');
+    });
+  }
+
+  // Prayer Edit modal (Point 2)
+  if (openPrayerEditBtn) openPrayerEditBtn.addEventListener('click', openPrayerEditModal);
+  if (closePrayerEditBtn) closePrayerEditBtn.addEventListener('click', () => hideModal(prayerTimesModal));
+  if (cancelPrayerEditBtn) cancelPrayerEditBtn.addEventListener('click', () => hideModal(prayerTimesModal));
+  if (prayerTimesForm) prayerTimesForm.addEventListener('submit', handleSavePrayerTimes);
+  if (resetPrayerTimesBtn) resetPrayerTimesBtn.addEventListener('click', handleResetPrayerTimes);
+
+  if (printReportBtn) {
+    printReportBtn.addEventListener('click', prepareAndPrintReport);
+  }
+
+  refreshWeatherBtn.addEventListener('click', () => {
+    fetchPenjwenWeather();
+    fetchPenjwenPrayerTimes();
+    showToast('کەشوهەوا و کاتەکانی بانگ نوێکرانەوە', 'success');
+  });
+}
+
+// ==============================================================
+// ١١. خزمەتگوزاری ئۆفلاین، PWA و ناردن بۆ مامۆستایان
+// ==============================================================
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => {
+          console.log('[PWA] Service Worker بە سەرکەوتوویی تۆمار کرا:', reg.scope);
+        })
+        .catch((err) => {
+          console.warn('[PWA] کێشە لە تۆمارکردنی Service Worker:', err);
+        });
+    });
+  }
+}
+
+function initNetworkStatusMonitor() {
+  const badge = document.getElementById('networkStatusBadge');
+  const text = document.getElementById('networkStatusText');
+  if (!badge) return;
+
+  function updateStatus() {
+    if (navigator.onLine) {
+      badge.className = 'hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+      badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span>سەرهێڵ</span>`;
+    } else {
+      badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300';
+      badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span><span>ئۆفلاین (کار دەکات)</span>`;
+      showToast('ئێستا بە شێوازی ئۆفلاین کار دەکەیت. هەموو زانیاری و وتارەکان بەردەستن.', 'info');
+    }
+  }
+
+  window.addEventListener('online', () => {
+    updateStatus();
+    showToast('پەیوەندی ئینتەرنێت بەستراوەیەوە', 'success');
+  });
+
+  window.addEventListener('offline', () => {
+    updateStatus();
+  });
+
+  updateStatus();
+}
+
+const OFFICIAL_APP_URL = 'https://farhadhosaen-hub.github.io/penjwen-mosques/';
+
+let deferredPrompt = null;
+
+function checkStandaloneMode() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const banner = document.getElementById('pwaTopBanner');
+  const btn = document.getElementById('pwaInstallBtn');
+  if (isStandalone) {
+    if (banner) banner.style.display = 'none';
+    if (btn) btn.classList.add('hidden');
+  }
+}
+
+window.triggerPwaInstall = async function() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      showToast('دەستخۆش! ئەپەکە بە سەرکەوتوویی ئینستۆڵ کرا لەسەر ئامێرەکەت', 'success');
+      const banner = document.getElementById('pwaTopBanner');
+      if (banner) banner.style.display = 'none';
+      const btn = document.getElementById('pwaInstallBtn');
+      if (btn) btn.classList.add('hidden');
+    }
+    deferredPrompt = null;
+  } else {
+    // پیشاندانی پەنجەرەی ڕێنمایی هەنگاو بە هەنگاو بۆ هەردوو مۆبایل و کۆمپیوتەر
+    openPwaGuideModal();
+  }
+};
+
+window.dismissPwaTopBanner = function() {
+  const banner = document.getElementById('pwaTopBanner');
+  if (banner) {
+    banner.style.display = 'none';
+    try { sessionStorage.setItem('penjwen_pwa_banner_dismissed', '1'); } catch(e) {}
+  }
+};
+
+window.openPwaGuideModal = function() {
+  const modal = document.getElementById('pwaGuideModal');
+  if (modal) showModal(modal);
+};
+
+window.closePwaGuideModal = function() {
+  const modal = document.getElementById('pwaGuideModal');
+  if (modal) hideModal(modal);
+};
+
+function initPwaInstallPrompt() {
+  checkStandaloneMode();
+
+  try {
+    if (sessionStorage.getItem('penjwen_pwa_banner_dismissed') === '1') {
+      const banner = document.getElementById('pwaTopBanner');
+      if (banner) banner.style.display = 'none';
+    }
+  } catch(e) {}
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    const banner = document.getElementById('pwaTopBanner');
+    if (banner) banner.style.display = 'none';
+    const btn = document.getElementById('pwaInstallBtn');
+    if (btn) btn.classList.add('hidden');
+    deferredPrompt = null;
+    showToast('ئەپەکە ئێستا وەک بەرنامەیەکی فەرمی بەردەستە لەسەر شاشەکەت', 'success');
+  });
+}
+
+function setupShareLinks() {
+  const shareUrlInput = document.getElementById('shareUrlInput');
+  const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
+  const shareTelegramBtn = document.getElementById('shareTelegramBtn');
+
+  let currentUrl = window.location.href;
+  // ئەگەر وەک فایلی ناوخۆیی یان لۆکاڵ هۆست کرابێتەوە، بەستەری فەرمی ئۆنلاین بەکاربهێنە
+  if (!currentUrl.startsWith('http') || currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
+    currentUrl = OFFICIAL_APP_URL;
+  }
+
+  if (shareUrlInput) {
+    shareUrlInput.value = currentUrl;
+  }
+
+  const shareMsg = `سڵاو و ڕێز مامۆستای بەڕێز،
+ئەمە ئەپی فەرمی مزگەوتەکانی پێنجوێنە بۆ زانیاری مزگەوتەکان، کاتەکانی بانگی پێنجوێن، وتارەکانی هەینی و تۆمارکردنی دەنگی وتارەکان.
+
+دەتوانیت لە ڕێگەی ئەم بەستەرەوە بیکەیتەوە و بە یەک کرتە وەک ئەپێکی فەرمی دایبەزێنیتە سەر مۆبایل یان کۆمپیوتەرەکەت (بە ئۆفلاین و ئۆنلاین کاردەکات):
+${currentUrl}`;
+
+  if (shareWhatsAppBtn) {
+    shareWhatsAppBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMsg)}`;
+  }
+
+  if (shareTelegramBtn) {
+    shareTelegramBtn.href = `https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(shareMsg)}`;
+  }
+}
+
+function openShareModal() {
+  const modal = document.getElementById('shareModal');
+  if (modal) {
+    setupShareLinks();
+    showModal(modal);
+  }
+}
+window.openShareModal = openShareModal;
+
+function closeShareModal() {
+  const modal = document.getElementById('shareModal');
+  if (modal) {
+    hideModal(modal);
+  }
+}
+window.closeShareModal = closeShareModal;
+
+function initShareModal() {
+  const shareModal = document.getElementById('shareModal');
+  const openShareModalBtn = document.getElementById('openShareModalBtn');
+  const closeShareModalBtn = document.getElementById('closeShareModalBtn');
+  const closeShareModalFooterBtn = document.getElementById('closeShareModalFooterBtn');
+  const shareUrlInput = document.getElementById('shareUrlInput');
+  const copyShareUrlBtn = document.getElementById('copyShareUrlBtn');
+
+  if (openShareModalBtn) {
+    openShareModalBtn.addEventListener('click', openShareModal);
+  }
+
+  if (closeShareModalBtn) {
+    closeShareModalBtn.addEventListener('click', closeShareModal);
+  }
+
+  if (closeShareModalFooterBtn) {
+    closeShareModalFooterBtn.addEventListener('click', closeShareModal);
+  }
+
+  if (shareModal) {
+    shareModal.addEventListener('click', (e) => {
+      if (e.target === shareModal) closeShareModal();
+    });
+  }
+
+  if (copyShareUrlBtn && shareUrlInput) {
+    copyShareUrlBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(shareUrlInput.value);
+        showToast('لینکی ئەپ کۆپی کرا بۆ کلیپبۆرد', 'success');
+      } catch (err) {
+        shareUrlInput.select();
+        document.execCommand('copy');
+        showToast('لینکی ئەپ کۆپی کرا', 'success');
+      }
+    });
+  }
+}
+
+// ==============================================================
+// ١٢. دەستپێکردن لە کاتی بارکردنی پەڕە (App Initialization)
+// ==============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  updateLiveClockAndDate();
+  setInterval(updateLiveClockAndDate, 1000);
+
+  fetchPenjwenWeather();
+  setInterval(fetchPenjwenWeather, 15 * 60 * 1000);
+
+  fetchPenjwenPrayerTimes();
+  setInterval(fetchPenjwenPrayerTimes, 60 * 60 * 1000);
+
+  loadMosquesData();
+  initEvents();
+
+  // خزمەتگوزاری ئۆفلاین و هاوبەشکردن
+  registerServiceWorker();
+  initNetworkStatusMonitor();
+  initPwaInstallPrompt();
+  initShareModal();
+});
+
+</script>
+</body>
+</html>

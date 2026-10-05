@@ -764,6 +764,28 @@ function loadMosquesData() {
 
   if (hasAbbas && hasGaylani) {
     mosques = loaded;
+    // دڵنیابوونەوە لە هەبوونی خانەی کارگووزار لە هەردوو مزگەوتەکەدا
+    mosques.forEach(m => {
+      if (!Array.isArray(m.staff)) m.staff = [];
+      const hasKarguzar = m.staff.some(s => {
+        const r = (s.role || '').toLowerCase();
+        return r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت');
+      });
+      if (!hasKarguzar) {
+        const defM = DEFAULT_MOSQUES.find(dm => dm.id === m.id || (dm.name && dm.name.includes(m.name.includes('مەلا عباس') ? 'مەلا عباس' : 'گەیلانی')));
+        const defKarguzar = defM ? (defM.staff || []).find(s => (s.role || '').includes('کارگ')) : null;
+        if (defKarguzar) {
+          m.staff.push(JSON.parse(JSON.stringify(defKarguzar)));
+        } else {
+          m.staff.push({
+            id: 's_' + Date.now(),
+            name: m.name.includes('مەلا عباس') ? 'کاک کامەران' : 'کاک ئەحمەد سەعید',
+            role: 'کارگووزار',
+            phone: ''
+          });
+        }
+      }
+    });
     updateStats();
     renderMosques();
   } else {
@@ -1111,7 +1133,6 @@ function addStaffRow(initial = { name: '', role: 'ووتاربێژ', phone: '' }
         type="text" 
         placeholder="ناوی مامۆستا یان کارگوزار..." 
         value="${escapeHtml(initial.name || '')}" 
-        required
         class="staff-name-input w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium"
       >
     </div>
@@ -1163,10 +1184,10 @@ async function handleFormSubmit(e) {
     const stName = row.querySelector('.staff-name-input').value.trim();
     const stRole = row.querySelector('.staff-role-select').value;
     const stPhone = row.querySelector('.staff-phone-input').value.trim();
-    if (stName) {
+    if (stName || stPhone) {
       staff.push({
         id: 's_' + Date.now() + '_' + index,
-        name: stName,
+        name: stName || (stRole.includes('کارگ') ? 'کارگووزار' : 'کارمەند'),
         role: stRole,
         phone: stPhone
       });
@@ -1307,8 +1328,18 @@ window.editMosque = async function(id) {
   staffListContainer.innerHTML = '';
   if (mosque.staff && mosque.staff.length > 0) {
     mosque.staff.forEach(s => addStaffRow(s));
+    const hasKarguzar = mosque.staff.some(s => {
+      const r = (s.role || '').toLowerCase();
+      return r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت');
+    });
+    if (!hasKarguzar) {
+      addStaffRow({ name: mosque.name.includes('مەلا عباس') ? 'کاک کامەران' : 'کاک ئەحمەد سەعید', role: 'کارگووزار', phone: '' });
+    }
   } else {
-    addStaffRow({ name: '', role: 'وتاربێژ', phone: '' });
+    addStaffRow({ name: '', role: 'ووتاربێژ', phone: '' });
+    addStaffRow({ name: '', role: 'پێش نوێژ', phone: '' });
+    addStaffRow({ name: '', role: 'بانگ بێژ', phone: '' });
+    addStaffRow({ name: '', role: 'کارگووزار', phone: '' });
   }
 
   showModal(mosqueModal);
@@ -1465,12 +1496,14 @@ function prepareAndPrintReport() {
     let khateebStr = '-';
     let imamStr = '-';
     let muezzinStr = '-';
+    let karguzarStr = '-';
 
     (m.staff || []).forEach(s => {
       const r = s.role || '';
-      if (r.includes('وتاربێژ')) khateebStr = s.name + (s.phone ? ` (${s.phone})` : '');
-      if (r.includes('پێشنوێژ')) imamStr = s.name + (s.phone ? ` (${s.phone})` : '');
-      if (r.includes('بانگبێژ')) muezzinStr = s.name + (s.phone ? ` (${s.phone})` : '');
+      if (r.includes('وتاربێژ') || r.includes('ووتار')) khateebStr = s.name + (s.phone ? ` (${s.phone})` : '');
+      if (r.includes('پێشنوێژ') || r.includes('پێش')) imamStr = s.name + (s.phone ? ` (${s.phone})` : '');
+      if (r.includes('بانگبێژ') || r.includes('بانگ')) muezzinStr = s.name + (s.phone ? ` (${s.phone})` : '');
+      if (r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت')) karguzarStr = s.name + (s.phone ? ` (${s.phone})` : '');
     });
 
     const latestS = (m.sermons && m.sermons[0]) ? m.sermons[0] : (m.khutbahTopic ? { topic: m.khutbahTopic, speaker: m.khutbahSpeaker } : null);
@@ -1484,6 +1517,7 @@ function prepareAndPrintReport() {
         <td>${escapeHtml(khateebStr)}</td>
         <td>${escapeHtml(imamStr)}</td>
         <td>${escapeHtml(muezzinStr)}</td>
+        <td>${escapeHtml(karguzarStr)}</td>
         <td style="font-size: 10pt;">${khutbahText}</td>
       </tr>
     `;
@@ -1495,11 +1529,12 @@ function prepareAndPrintReport() {
         <tr>
           <th style="width: 4%; text-align: center;">#</th>
           <th style="width: 17%;">ناوی مزگەوت</th>
-          <th style="width: 13%;">گەڕەک / ناونیشان</th>
-          <th style="width: 15%;">وتاربێژ</th>
-          <th style="width: 15%;">پێشنوێژ</th>
-          <th style="width: 14%;">بانگبێژ</th>
-          <th style="width: 22%;">وتار و وتاربێژی هەینی</th>
+          <th style="width: 12%;">گەڕەک / ناونیشان</th>
+          <th style="width: 14%;">وتاربێژ</th>
+          <th style="width: 14%;">پێشنوێژ</th>
+          <th style="width: 13%;">بانگبێژ</th>
+          <th style="width: 13%;">کارگووزار</th>
+          <th style="width: 17%;">وتار و وتاربێژی هەینی</th>
         </tr>
       </thead>
       <tbody>

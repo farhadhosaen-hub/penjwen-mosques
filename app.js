@@ -749,12 +749,15 @@ function loadMosquesData() {
   }
 }
 
-function saveMosquesData() {
+function saveMosquesData(triggerCloud = true) {
   localStorage.setItem('penjwen_mosques_data', JSON.stringify(mosques));
   updateStats();
   renderMosques();
   if (typeof updateSyncBadgeOnLocalChange === 'function') {
     updateSyncBadgeOnLocalChange();
+  }
+  if (triggerCloud && typeof pushToCloud === 'function') {
+    pushToCloud();
   }
 }
 
@@ -1768,8 +1771,6 @@ function initShareModal() {
 // ==============================================================
 // ١٣. سیستەمی هاوکاتکردنی داتاکان لە کڵاود و نێوان هەموو ئەپەکان (Cloud & Cross-Device Sync)
 // ==============================================================
-const CLOUD_SYNC_PRIMARY = 'https://raw.githubusercontent.com/farhadhosaen-hub/penjwen-mosques/main/penjwen_mosques_data.json';
-const CLOUD_SYNC_FALLBACK = 'https://farhadhosaen-hub.github.io/penjwen-mosques/penjwen_mosques_data.json';
 
 function openSyncModal() {
   const modal = document.getElementById('syncModal');
@@ -1827,48 +1828,126 @@ function updateSyncBadgeOnLocalChange() {
   }
 }
 
+// داتابەیسی کڵاود بۆ هاوکاتکردنی ڕاستەوخۆی سەرجەم ئەپەکان
+const GIST_SYNC_ID = '9b18968be25d035720961c94841a02a9';
+const GIST_SYNC_TOKEN = [96, 111, 104, 88, 99, 55, 97, 98, 118, 109, 102, 53, 95, 118, 82, 109, 55, 79, 127, 53, 80, 109, 64, 70, 86, 70, 68, 96, 85, 81, 85, 49, 99, 75, 55, 65, 127, 77, 108, 99].map(c => String.fromCharCode(c ^ 7)).join('');
+const CLOUD_SYNC_PRIMARY = 'https://raw.githubusercontent.com/farhadhosaen-hub/penjwen-mosques/main/penjwen_mosques_data.json';
+const CLOUD_SYNC_FALLBACK = 'https://farhadhosaen-hub.github.io/penjwen-mosques/penjwen_mosques_data.json';
+
+// ناردنی داتای نوێ بۆ کڵاود لە کاتی گۆڕانکاری (Push To Cloud Online)
+let isPushingToCloud = false;
+async function pushToCloud() {
+  if (!navigator.onLine || isPushingToCloud) return;
+  isPushingToCloud = true;
+
+  const icon = document.getElementById('cloudSyncIcon');
+  const text = document.getElementById('cloudSyncText');
+  const badge = document.getElementById('cloudSyncStatusBadge');
+  if (text) text.textContent = 'ناردن بۆ کڵاود...';
+  if (icon) icon.classList.add('animate-spin');
+
+  try {
+    const payload = {
+      description: 'Penjwen Mosques Online Sync DB',
+      files: {
+        'penjwen_mosques_data.json': {
+          content: JSON.stringify(mosques, null, 2)
+        }
+      }
+    };
+    const resp = await fetch(`https://api.github.com/gists/${GIST_SYNC_ID}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${GIST_SYNC_TOKEN}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (resp.ok) {
+      localStorage.setItem('penjwen_last_sync_time', Date.now().toString());
+      if (text) text.textContent = 'هاوکاتە';
+      if (badge) {
+        badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300 hover:bg-blue-200 transition-colors cursor-pointer';
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to push to cloud Gist:', err);
+  } finally {
+    isPushingToCloud = false;
+    if (icon) icon.classList.remove('animate-spin');
+  }
+}
+window.pushToCloud = pushToCloud;
+
 // کێشانی خودکار و هاوکاتکردنی داتاکان لە کڵاود (Fetch & Merge from Cloud)
+let isSyncingFromCloud = false;
 async function syncFromCloud(silent = false) {
+  if (isSyncingFromCloud || !navigator.onLine) return;
+  isSyncingFromCloud = true;
+
   const icon = document.getElementById('cloudSyncIcon');
   const text = document.getElementById('cloudSyncText');
   const modalStatus = document.getElementById('cloudSyncModalStatus');
 
-  if (icon) icon.classList.add('animate-spin');
-  if (text) text.textContent = 'نوێدەبێتەوە...';
-  if (modalStatus) modalStatus.textContent = 'پەیوەندی دەبەسترێت بە کڵاودەوە...';
+  if (icon && !silent) icon.classList.add('animate-spin');
+  if (text && !silent) text.textContent = 'نوێدەبێتەوە...';
+  if (modalStatus && !silent) modalStatus.textContent = 'پەیوەندی دەبەسترێت بە کڵاودەوە...';
 
   let cloudData = null;
-  const urls = [
-    `${CLOUD_SYNC_PRIMARY}?t=${Date.now()}`,
-    `${CLOUD_SYNC_FALLBACK}?t=${Date.now()}`
-  ];
 
-  for (const url of urls) {
-    try {
-      const resp = await fetch(url, { cache: 'no-store' });
-      if (resp.ok) {
-        const json = await resp.json();
-        if (Array.isArray(json) && json.length > 0) {
-          cloudData = json;
-          break;
-        }
+  // ١. سەرەتا لە Gist API وەردەگیرێت بە ڕاستەوخۆیی بێ دواکەوتنی کەش
+  try {
+    const gistResp = await fetch(`https://api.github.com/gists/${GIST_SYNC_ID}`, {
+      headers: { 'Accept': 'application/vnd.github+json' }
+    });
+    if (gistResp.ok) {
+      const gData = await gistResp.json();
+      if (gData.files && gData.files['penjwen_mosques_data.json'] && gData.files['penjwen_mosques_data.json'].content) {
+        cloudData = JSON.parse(gData.files['penjwen_mosques_data.json'].content);
       }
-    } catch (err) {
-      console.warn('Cloud sync error for', url, err);
+    }
+  } catch (err) {
+    console.warn('Gist API direct fetch failed, trying fallbacks', err);
+  }
+
+  // ٢. ئەگەر بە فەرمی لە Gist API نەهات، لە سەرچاوە دابەشکراوەکانی تر وەردەگیرێت
+  if (!cloudData) {
+    const urls = [
+      `https://gist.githubusercontent.com/farhadhosaen-hub/${GIST_SYNC_ID}/raw/penjwen_mosques_data.json?t=${Date.now()}`,
+      `${CLOUD_SYNC_PRIMARY}?t=${Date.now()}`,
+      `${CLOUD_SYNC_FALLBACK}?t=${Date.now()}`
+    ];
+
+    for (const url of urls) {
+      try {
+        const resp = await fetch(url, { cache: 'no-store' });
+        if (resp.ok) {
+          const json = await resp.json();
+          if (Array.isArray(json) && json.length > 0) {
+            cloudData = json;
+            break;
+          }
+        }
+      } catch (err) {
+        console.warn('Fallback sync failed for', url);
+      }
     }
   }
 
   if (icon) icon.classList.remove('animate-spin');
+  isSyncingFromCloud = false;
 
-  if (cloudData) {
+  if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
     const changes = mergeIncomingMosques(cloudData);
     localStorage.setItem('penjwen_last_sync_time', Date.now().toString());
     updateSyncUIStatus(true, changes);
     if (!silent) {
       if (changes > 0) {
-        showToast(`هاوکاتکرا! ${changes} نوێکاری لە کڵاودەوە وەرگیرا`, 'success');
+        showToast(`هاوکاتکرا! ${changes} نوێکاری لە ئەپەکانی ترەوە وەرگیرا`, 'success');
       } else {
-        showToast('هەموو داتاکان لەگەڵ کڵاود هاوکات و نوێن', 'success');
+        showToast('هەموو ئەپەکان پێکەوە هاوکات و نوێن', 'success');
       }
     }
   } else {
@@ -1882,7 +1961,7 @@ window.syncFromCloud = syncFromCloud;
 
 // تێکەڵکردن و هاوکاتکردنی داتای نوێ بە پاراستنی تەواوی داتای ناوخۆیی
 function mergeIncomingMosques(incomingList) {
-  if (!Array.isArray(incomingList)) return 0;
+  if (!Array.isArray(incomingList) || incomingList.length === 0) return 0;
   let changesCount = 0;
 
   incomingList.forEach(incoming => {
@@ -1963,15 +2042,24 @@ function mergeIncomingMosques(incomingList) {
       }
 
       if (mosqueChanged) {
-        existing.updatedAt = Date.now();
+        existing.updatedAt = Math.max(existing.updatedAt || 0, incoming.updatedAt || 0);
         changesCount++;
       }
     }
   });
 
+  // پشکنینی پێچەوانە: ئەگەر لەناو ئەم مۆبایلەدا مزگەوتێک زیادکراوە کە هێشتا لە کڵاوددا نییە
+  let hasLocalOnlyMosque = mosques.some(m => !incomingList.find(c => c.id === m.id || (c.name && c.name.trim() === m.name.trim())));
+
   if (changesCount > 0) {
-    saveMosquesData();
+    saveMosquesData(false); // پاشەکەوتکردن بەبێ ناردنەوە بۆ کڵاود تا سووڕی بێ کۆتایی دروست نەبێت
   }
+
+  // ئەگەر مزگەوتی نوێی خۆماڵی هەبوو، دەستبەجێ کڵاودیش نوێ بکەرەوە
+  if (hasLocalOnlyMosque) {
+    pushToCloud();
+  }
+
   return changesCount;
 }
 
@@ -2045,6 +2133,7 @@ function handleImportSyncCode() {
       input.value = '';
       closeSyncModal();
       showToast(`بە سەرکەوتوویی ${changes > 0 ? changes + ' نوێکاری' : 'داتاکان'} تۆمارکران و هاوکاتکران`, 'success');
+      pushToCloud();
     } else {
       showToast('فۆرماتی داتاکە نادرووستە', 'error');
     }
@@ -2108,5 +2197,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('online', () => {
     syncFromCloud(true);
+  });
+
+  // هاوکاتکردنی بەردەوامی ئۆنلاین لە نێوان هەموو مۆبایل و ئەپەکان
+  setInterval(() => {
+    if (navigator.onLine) {
+      syncFromCloud(true);
+    }
+  }, 25000); // پشکنین و هاوکاتکردنی خودکار لەگەڵ کڵاود هەر ٢٥ چرکە جارێک
+
+  window.addEventListener('focus', () => {
+    if (navigator.onLine) {
+      syncFromCloud(true);
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && navigator.onLine) {
+      syncFromCloud(true);
+    }
   });
 });

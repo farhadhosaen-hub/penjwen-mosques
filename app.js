@@ -952,50 +952,50 @@ function createMosqueCard(mosque) {
     : `<div class="text-xs text-slate-400 italic py-2">هیچ مامۆستایەک هێشتا تۆمار نەکراوە</div>`;
 
   container.innerHTML = `
-    <!-- خاڵی ٢: دووگمەی مزگەوت کە تەنها ناوی مزگەوتەکەی تیا نووسراوە -->
+    <!-- خانەی مزگەوت بە ڕەنگی قاوەیی کاڵ -->
     <button 
-      type="button"
-      id="btn-${mosque.id}"
-      onclick="toggleMosqueDetails('${mosque.id}')"
-      class="mosque-toggle-btn w-full bg-white hover:bg-blue-50/70 border-2 border-blue-500 text-blue-950 font-black text-base sm:text-lg py-4 px-5 sm:px-6 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center justify-between cursor-pointer group"
+      type="button" 
+      id="btn-${mosque.id}" 
+      onclick="toggleMosqueDetails('${mosque.id}')" 
+      class="mosque-toggle-btn w-full bg-[#fdfbf7] hover:bg-[#f7ede2] border-2 border-[#b08968] text-[#3d2314] font-black text-base sm:text-lg py-4 px-5 sm:px-6 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center justify-between cursor-pointer group" 
       title="کلیک بکە بۆ بینینی هەموو زانیارییەکانی ئەم مزگەوتە"
     >
       <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-lg group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shrink-0">
+        <div class="w-11 h-11 rounded-xl bg-[#ede0d4] text-[#7f4f24] flex items-center justify-center text-lg group-hover:bg-[#8d5b4c] group-hover:text-white transition-colors duration-300 shrink-0">
           <i class="fa-solid fa-mosque"></i>
         </div>
-        <span class="text-base sm:text-lg font-black tracking-wide text-slate-900 group-hover:text-blue-800 transition-colors">
+        <span class="text-base sm:text-lg font-black tracking-wide text-[#3d2314] group-hover:text-[#7f4f24] transition-colors">
           ${escapeHtml(mosque.name)}
         </span>
       </div>
 
-      <div class="flex items-center gap-2.5 text-blue-600 text-sm font-bold">
-        <span class="text-xs text-slate-400 group-hover:text-blue-700 font-medium hidden sm:inline">کلیک بکە بۆ بینینی هەموو زانیارییەکان</span>
-        <div class="w-8 h-8 rounded-full bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+      <div class="flex items-center gap-2.5 text-[#7f4f24] text-sm font-bold">
+        <span class="text-xs text-stone-500 group-hover:text-[#7f4f24] font-medium hidden sm:inline">کلیک بکە بۆ بینینی هەموو زانیارییەکان</span>
+        <div class="w-8 h-8 rounded-full bg-[#ede0d4] group-hover:bg-[#ddb892] flex items-center justify-center transition-colors text-[#7f4f24]">
           <i id="chevron-${mosque.id}" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
         </div>
       </div>
     </button>
 
-    <!-- چوارگۆشەی شین: هەموو زانیارییەکانی مزگەوت (بە کلیک کردن لەسەر دووگمەکە دەردەکەوێت) -->
-    <div id="details-${mosque.id}" class="mosque-details-panel hidden mt-3 bg-white rounded-2xl p-5 sm:p-6 border-2 border-blue-500 shadow-lg shadow-blue-500/10 transition-all animate-fade-in relative overflow-hidden">
-      <!-- Top Blue Accent Line (چوارگۆشەی شین) -->
-      <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600"></div>
+    <!-- خانەی زانیارییەکانی مزگەوت بە ڕەنگی قاوەیی کاڵ -->
+    <div id="details-${mosque.id}" class="mosque-details-panel hidden mt-3 bg-[#fdfbf7] rounded-2xl p-5 sm:p-6 border-2 border-[#b08968] shadow-lg shadow-amber-950/10 transition-all animate-fade-in relative overflow-hidden">
+      <!-- Top Accent Line (قاوەیی کاڵ) -->
+      <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#8d5b4c] via-[#b08968] to-[#8d5b4c]"></div>
 
       <!-- Header Information -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-stone-200/80">
         <div>
-          <div class="inline-flex items-center gap-1.5 text-xs text-blue-700 font-bold bg-blue-50 px-3 py-1 rounded-full mb-1.5 border border-blue-200/60">
+          <div class="inline-flex items-center gap-1.5 text-xs text-[#5e3023] font-bold bg-[#ede0d4] px-3 py-1 rounded-full mb-1.5 border border-[#d5bdaf]">
             <i class="fa-solid fa-location-dot"></i>
             <span>پێنجوێن - ${escapeHtml(mosque.location || 'ناوەند')}</span>
           </div>
-          <h3 class="text-xl font-black text-slate-900">
+          <h3 class="text-xl font-black text-[#3d2314]">
             ${escapeHtml(mosque.name)}
           </h3>
         </div>
 
         <div class="flex items-center gap-2">
-          <button onclick="editMosque('${mosque.id}')" class="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold py-2 px-3.5 rounded-xl border border-blue-200 transition-colors cursor-pointer">
+          <button onclick="editMosque('${mosque.id}')" class="inline-flex items-center gap-1.5 bg-[#ede0d4] hover:bg-[#ddb892] text-[#4a2810] text-xs font-bold py-2 px-3.5 rounded-xl border border-[#d5bdaf] transition-colors cursor-pointer">
             <i class="fa-regular fa-pen-to-square"></i>
             <span>دەستکاری</span>
           </button>
@@ -1008,8 +1008,8 @@ function createMosqueCard(mosque) {
 
       <!-- Notes / Short Description -->
       ${mosque.notes ? `
-        <div class="bg-blue-50/40 p-3.5 rounded-2xl border border-blue-100 mb-4 text-xs text-slate-700 leading-relaxed">
-          <span class="font-bold text-blue-900 ml-1">تێبینی:</span>
+        <div class="bg-[#f7ede2]/70 p-3.5 rounded-2xl border border-[#e6ccb2] mb-4 text-xs text-[#4a2810] leading-relaxed">
+          <span class="font-bold text-[#7f4f24] ml-1">تێبینی:</span>
           ${escapeHtml(mosque.notes)}
         </div>
       ` : ''}
@@ -1051,14 +1051,14 @@ function createMosqueCard(mosque) {
       <div class="space-y-2 pt-2">
         <div class="flex items-center justify-between text-xs font-bold text-slate-700 mb-2">
           <span class="flex items-center gap-1.5">
-            <i class="fa-solid fa-users text-blue-600"></i>
+            <i class="fa-solid fa-users text-[#7f4f24]"></i>
             <span>مامۆستایان و ستافی خزمەتگوزاری ئەم مزگەوتە:</span>
           </span>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="editMosque('${mosque.id}')" class="text-[10px] bg-slate-100 hover:bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-md border border-slate-200 shadow-2xs transition-colors cursor-pointer" title="دەستکاریکردنی ستاف و مامۆستایان">
+            <button type="button" onclick="editMosque('${mosque.id}')" class="text-[10px] bg-[#ede0d4] hover:bg-[#ddb892] text-[#4a2810] font-bold px-2 py-0.5 rounded-md border border-[#d5bdaf] shadow-2xs transition-colors cursor-pointer" title="دەستکاریکردنی ستاف و مامۆستایان">
               <i class="fa-regular fa-pen-to-square"></i> دەستکاری ستاف
             </button>
-            <span class="text-blue-700 font-black">${mosque.staff ? mosque.staff.length : 0} کەس</span>
+            <span class="text-[#7f4f24] font-black">${mosque.staff ? mosque.staff.length : 0} کەس</span>
           </div>
         </div>
         <div class="space-y-2">
@@ -1465,7 +1465,7 @@ window.viewMosqueDetails = function(id) {
     ${staffHtml}
     <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
       <span>کۆدی مزگەوت: ${mosque.id}</span>
-      <button onclick="hideModal(viewModal); editMosque('${mosque.id}');" class="text-blue-700 hover:text-blue-900 font-bold flex items-center gap-1 cursor-pointer">
+      <button onclick="hideModal(viewModal); editMosque('${mosque.id}');" class="text-[#7f4f24] hover:text-[#5e3023] font-bold flex items-center gap-1 cursor-pointer">
         <i class="fa-regular fa-pen-to-square"></i> دەستکاری بکە
       </button>
     </div>

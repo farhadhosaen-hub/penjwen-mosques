@@ -1487,9 +1487,14 @@ function renderSermonContentHtml(mosque, sermon, dateValue) {
       <div class="space-y-2 animate-fade-in">
         <div class="flex items-center justify-between text-[11px] text-amber-900 font-semibold">
           <span>ناونیشانی وتاری ئەو هەفتەیە:</span>
-          <span class="bg-amber-200/90 text-amber-950 font-bold px-2 py-0.5 rounded-md text-[10px] shadow-2xs">
-            هەینی: ${escapeHtml(sermon.date)}
-          </span>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="openEditSermonForDate('${mosque.id}', '${sermon.date}')" class="text-[10px] bg-white hover:bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-md border border-amber-300 shadow-2xs transition-colors cursor-pointer" title="دەستکاریکردنی ئەم وتارە">
+              <i class="fa-regular fa-pen-to-square"></i> دەستکاری وتار
+            </button>
+            <span class="bg-amber-200/90 text-amber-950 font-bold px-2 py-0.5 rounded-md text-[10px] shadow-2xs">
+              هەینی: ${escapeHtml(sermon.date)}
+            </span>
+          </div>
         </div>
         <div class="sermon-topic text-slate-900 font-bold text-xs sm:text-sm leading-relaxed bg-white/95 p-2.5 rounded-xl border border-amber-200/70 shadow-2xs">
           «${escapeHtml(sermon.topic)}»
@@ -1643,6 +1648,25 @@ window.openAddSermonForDate = function(mosqueId, targetDate) {
   if (khutbahDateInput) khutbahDateInput.value = targetDate;
   if (khutbahTopicInput) {
     khutbahTopicInput.value = '';
+    khutbahTopicInput.focus();
+  }
+};
+
+window.openEditSermonForDate = function(mosqueId, targetDate) {
+  const mosque = mosques.find(m => m.id === mosqueId);
+  if (!mosque) return;
+
+  window.editMosque(mosqueId);
+  if (khutbahDateInput) khutbahDateInput.value = targetDate;
+  const s = (mosque.sermons || []).find(x => x.date === targetDate);
+  if (s) {
+    if (khutbahTopicInput) khutbahTopicInput.value = s.topic || '';
+    if (khutbahSpeakerInput) khutbahSpeakerInput.value = s.speaker || '';
+  } else {
+    if (khutbahTopicInput) khutbahTopicInput.value = '';
+    if (khutbahSpeakerInput) khutbahSpeakerInput.value = (mosque.staff && mosque.staff[0]) ? mosque.staff[0].name : '';
+  }
+  if (khutbahTopicInput) {
     khutbahTopicInput.focus();
   }
 };
@@ -2018,6 +2042,11 @@ window.toggleMosqueDetails = function(mosqueId) {
     btn.classList.add('btn-active');
     if (chevron) chevron.classList.add('rotate-180');
 
+    // کاتی کردنەوە، پشکنینێکی بێدەنگ بۆ کڵاود بکە تا دڵنیابین نوێترین داتایە
+    if (navigator.onLine && typeof syncFromCloud === 'function') {
+      syncFromCloud(true);
+    }
+
     // ئەگەر دەنگ هەبوو، لە کاتی کردنەوە پلەیەرەکە باربکە
     const mosque = mosques.find(m => m.id === mosqueId);
     if (mosque) {
@@ -2035,6 +2064,10 @@ window.toggleMosqueDetails = function(mosqueId) {
 };
 
 function renderMosques() {
+  const openMosqueIds = Array.from(document.querySelectorAll('.mosque-details-panel:not(.hidden)'))
+    .map(el => el.id.replace('details-', ''))
+    .filter(Boolean);
+
   mosquesContainer.innerHTML = '';
 
   if (mosques.length === 0) {
@@ -2046,6 +2079,16 @@ function renderMosques() {
   mosques.forEach(mosque => {
     const card = createMosqueCard(mosque);
     mosquesContainer.appendChild(card);
+  });
+
+  // Restore open panels seamlessly
+  openMosqueIds.forEach(id => {
+    const panel = document.getElementById(`details-${id}`);
+    const btn = document.getElementById(`btn-${id}`);
+    const chevron = document.getElementById(`chevron-${id}`);
+    if (panel) panel.classList.remove('hidden');
+    if (btn) btn.classList.add('btn-active');
+    if (chevron) chevron.classList.add('rotate-180');
   });
 }
 
@@ -2206,7 +2249,12 @@ function createMosqueCard(mosque) {
             <i class="fa-solid fa-users text-blue-600"></i>
             <span>مامۆستایان و ستافی خزمەتگوزاری ئەم مزگەوتە:</span>
           </span>
-          <span class="text-blue-700 font-black">${mosque.staff ? mosque.staff.length : 0} کەس</span>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="editMosque('${mosque.id}')" class="text-[10px] bg-slate-100 hover:bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-md border border-slate-200 shadow-2xs transition-colors cursor-pointer" title="دەستکاریکردنی ستاف و مامۆستایان">
+              <i class="fa-regular fa-pen-to-square"></i> دەستکاری ستاف
+            </button>
+            <span class="text-blue-700 font-black">${mosque.staff ? mosque.staff.length : 0} کەس</span>
+          </div>
         </div>
         <div class="space-y-2">
           ${staffBadges}
@@ -2741,6 +2789,24 @@ function initEvents() {
 
   mosqueForm.addEventListener('submit', handleFormSubmit);
 
+  if (khutbahDateInput) {
+    khutbahDateInput.addEventListener('change', () => {
+      const curId = editMosqueId.value;
+      if (!curId) return;
+      const m = mosques.find(x => x.id === curId);
+      if (!m) return;
+      const curDate = khutbahDateInput.value;
+      const s = (m.sermons || []).find(x => x.date === curDate);
+      if (s) {
+        khutbahTopicInput.value = s.topic || '';
+        khutbahSpeakerInput.value = s.speaker || '';
+      } else {
+        khutbahTopicInput.value = '';
+        khutbahSpeakerInput.value = (m.staff && m.staff[0]) ? m.staff[0].name : '';
+      }
+    });
+  }
+
   // Audio upload in modal
   if (khutbahAudioFile) {
     khutbahAudioFile.addEventListener('change', (e) => {
@@ -3117,7 +3183,10 @@ async function syncFromCloud(silent = false) {
   // ١. سەرەتا لە Gist API وەردەگیرێت بە ڕاستەوخۆیی بێ دواکەوتنی کەش
   try {
     const gistResp = await fetch(`https://api.github.com/gists/${GIST_SYNC_ID}`, {
-      headers: { 'Accept': 'application/vnd.github+json' }
+      headers: {
+        'Authorization': `Bearer ${GIST_SYNC_TOKEN}`,
+        'Accept': 'application/vnd.github+json'
+      }
     });
     if (gistResp.ok) {
       const gData = await gistResp.json();
@@ -3185,82 +3254,105 @@ function mergeIncomingMosques(incomingList) {
     if (!incoming || !incoming.name) return;
     
     // دۆزینەوە بە ID یان ناو
-    let existing = mosques.find(m => m.id === incoming.id || (m.name && m.name.trim() === incoming.name.trim()));
+    let existingIndex = mosques.findIndex(m => m.id === incoming.id || (m.name && m.name.trim() === incoming.name.trim()));
 
-    if (!existing) {
+    if (existingIndex === -1) {
       // زیادکردنی مزگەوتی نوێ
       mosques.push(incoming);
       changesCount++;
     } else {
-      let mosqueChanged = false;
+      let existing = mosques[existingIndex];
+      const incUpdated = incoming.updatedAt || 0;
+      const existUpdated = existing.updatedAt || 0;
 
-      // ١. وتارەکان (Sermons merge)
-      if (Array.isArray(incoming.sermons)) {
-        if (!Array.isArray(existing.sermons)) existing.sermons = [];
-        incoming.sermons.forEach(incSermon => {
-          const sExists = existing.sermons.find(s => s.date === incSermon.date || (s.topic && s.topic === incSermon.topic));
-          if (!sExists) {
-            existing.sermons.push(incSermon);
-            mosqueChanged = true;
-          } else {
-            if (incSermon.topic && incSermon.topic !== sExists.topic) {
-              sExists.topic = incSermon.topic;
-              mosqueChanged = true;
-            }
-            if (incSermon.speaker && incSermon.speaker !== sExists.speaker) {
-              sExists.speaker = incSermon.speaker;
-              mosqueChanged = true;
-            }
-          }
-        });
-      }
+      // ئەگەر نوسخەی کڵاود لەسەر ئامێرێکی تر دەستکاری کرابوو و نوێتر بوو
+      if (incUpdated > existUpdated) {
+        const locSermons = existing.sermons || [];
+        const mergedSermons = Array.isArray(incoming.sermons) ? incoming.sermons.map(s => {
+          const locS = locSermons.find(ls => ls.date === s.date);
+          return {
+            ...s,
+            hasAudio: s.hasAudio || (locS && locS.hasAudio)
+          };
+        }) : incoming.sermons;
 
-      // ٢. وتاری سەرەکی
-      if (incoming.khutbahTopic && incoming.khutbahTopic !== existing.khutbahTopic) {
-        existing.khutbahTopic = incoming.khutbahTopic;
-        existing.khutbahDate = incoming.khutbahDate || existing.khutbahDate;
-        existing.khutbahSpeaker = incoming.khutbahSpeaker || existing.khutbahSpeaker;
-        mosqueChanged = true;
-      }
+        mosques[existingIndex] = {
+          ...existing,
+          ...incoming,
+          sermons: mergedSermons
+        };
+        changesCount++;
+      } else {
+        let mosqueChanged = false;
 
-      // ٣. کارمەندان (Staff merge)
-      if (Array.isArray(incoming.staff) && incoming.staff.length > 0) {
-        if (!Array.isArray(existing.staff) || existing.staff.length === 0) {
-          existing.staff = incoming.staff;
-          mosqueChanged = true;
-        } else {
-          incoming.staff.forEach(incStaff => {
-            const staffExists = existing.staff.find(s => s.role === incStaff.role || s.name === incStaff.name);
-            if (!staffExists) {
-              existing.staff.push(incStaff);
+        // ١. وتارەکان (Sermons merge)
+        if (Array.isArray(incoming.sermons)) {
+          if (!Array.isArray(existing.sermons)) existing.sermons = [];
+          incoming.sermons.forEach(incSermon => {
+            const sExists = existing.sermons.find(s => s.date === incSermon.date || (s.topic && s.topic === incSermon.topic));
+            if (!sExists) {
+              existing.sermons.push(incSermon);
               mosqueChanged = true;
             } else {
-              if (incStaff.phone && incStaff.phone !== staffExists.phone) {
-                staffExists.phone = incStaff.phone;
+              if (incSermon.topic && incSermon.topic !== sExists.topic) {
+                sExists.topic = incSermon.topic;
                 mosqueChanged = true;
               }
-              if (incStaff.name && incStaff.name !== staffExists.name) {
-                staffExists.name = incStaff.name;
+              if (incSermon.speaker && incSermon.speaker !== sExists.speaker) {
+                sExists.speaker = incSermon.speaker;
                 mosqueChanged = true;
               }
             }
           });
         }
-      }
 
-      // ٤. شوێن و تێبینی
-      if (incoming.location && !existing.location) {
-        existing.location = incoming.location;
-        mosqueChanged = true;
-      }
-      if (incoming.notes && !existing.notes) {
-        existing.notes = incoming.notes;
-        mosqueChanged = true;
-      }
+        // ٢. وتاری سەرەکی
+        if (incoming.khutbahTopic && incoming.khutbahTopic !== existing.khutbahTopic) {
+          existing.khutbahTopic = incoming.khutbahTopic;
+          existing.khutbahDate = incoming.khutbahDate || existing.khutbahDate;
+          existing.khutbahSpeaker = incoming.khutbahSpeaker || existing.khutbahSpeaker;
+          mosqueChanged = true;
+        }
 
-      if (mosqueChanged) {
-        existing.updatedAt = Math.max(existing.updatedAt || 0, incoming.updatedAt || 0);
-        changesCount++;
+        // ٣. کارمەندان (Staff merge)
+        if (Array.isArray(incoming.staff) && incoming.staff.length > 0) {
+          if (!Array.isArray(existing.staff) || existing.staff.length === 0) {
+            existing.staff = incoming.staff;
+            mosqueChanged = true;
+          } else {
+            incoming.staff.forEach(incStaff => {
+              const staffExists = existing.staff.find(s => s.role === incStaff.role || s.name === incStaff.name);
+              if (!staffExists) {
+                existing.staff.push(incStaff);
+                mosqueChanged = true;
+              } else {
+                if (incStaff.phone && incStaff.phone !== staffExists.phone) {
+                  staffExists.phone = incStaff.phone;
+                  mosqueChanged = true;
+                }
+                if (incStaff.name && incStaff.name !== staffExists.name) {
+                  staffExists.name = incStaff.name;
+                  mosqueChanged = true;
+                }
+              }
+            });
+          }
+        }
+
+        // ٤. شوێن و تێبینی
+        if (incoming.location && !existing.location) {
+          existing.location = incoming.location;
+          mosqueChanged = true;
+        }
+        if (incoming.notes && !existing.notes) {
+          existing.notes = incoming.notes;
+          mosqueChanged = true;
+        }
+
+        if (mosqueChanged) {
+          existing.updatedAt = Math.max(existUpdated, incUpdated, Date.now());
+          changesCount++;
+        }
       }
     }
   });
@@ -3421,7 +3513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navigator.onLine) {
       syncFromCloud(true);
     }
-  }, 25000); // پشکنین و هاوکاتکردنی خودکار لەگەڵ کڵاود هەر ٢٥ چرکە جارێک
+  }, 10000); // پشکنین و هاوکاتکردنی خودکار لەگەڵ کڵاود هەر ١٠ چرکە جارێک
 
   window.addEventListener('focus', () => {
     if (navigator.onLine) {

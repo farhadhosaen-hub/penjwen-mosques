@@ -32,32 +32,32 @@ body {
   background: #22c55e;
 }
 
-/* Mosque Card / Button Styling: چوارگۆشەی شین و دووگمەی مزگەوت */
+/* Mosque Card / Button Styling: خانەی ڕەنگ قاوەیی کاڵ بۆ مزگەوتەکان */
 .mosque-toggle-btn {
-  border: 2px solid #2563eb !important;
+  border: 2px solid #b08968 !important;
   border-radius: 16px;
-  background-color: #ffffff;
+  background-color: #fdfbf7 !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mosque-toggle-btn:hover {
-  background-color: #eff6ff;
-  border-color: #1d4ed8 !important;
+  background-color: #f7ede2 !important;
+  border-color: #8d5b4c !important;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 8px 20px -4px rgba(109, 76, 65, 0.2);
 }
 
 .mosque-toggle-btn.btn-active {
-  background-color: #eff6ff;
-  border-color: #1d4ed8 !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  background-color: #f5ebe0 !important;
+  border-color: #7f4f24 !important;
+  box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.3);
 }
 
 .mosque-details-panel {
-  border: 2px solid #2563eb !important;
+  border: 2px solid #b08968 !important;
   border-radius: 18px;
-  background-color: #ffffff;
-  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15);
+  background-color: #fdfbf7 !important;
+  box-shadow: 0 10px 25px -5px rgba(109, 76, 65, 0.15);
 }
 
 /* خانەی ڕەنگ قاوەیی کاڵ بۆ پێگەی مامۆستایان و ستاف (ووتاربێژ، پێش نوێژ، بانگ بێژ، کارگووزار) */

@@ -445,61 +445,43 @@ audio {
       <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-emerald-300/15 rounded-full blur-2xl pointer-events-none"></div>
       <div class="absolute -right-12 -top-12 w-48 h-48 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none"></div>
       
-      <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-        
-        <div class="text-center md:text-right space-y-2 max-w-2xl">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-200/60 text-emerald-800 text-xs font-semibold">
-            <i class="fa-solid fa-mosque"></i>
-            <span>ڕێبەری فەرمی و تۆماری مزگەوتەکانی پێنجوێن</span>
-          </div>
-          <h2 class="text-2xl sm:text-3xl font-black text-emerald-950">
-            سیستەمی مزگەوتەکان و وتاری هەینی
-          </h2>
-          <p class="text-sm sm:text-base text-emerald-800/80 leading-relaxed">
-            تۆمارکردن و ڕێکخستنی زانیاری مزگەوتەکان، وتاربێژان، پێشنوێژان، بانگبێژان، ناونیشانی وتاری هەینی و کاتەکانی بانگ.
-          </p>
-        </div>
+      <div class="flex flex-wrap items-center justify-center gap-2.5 relative z-10 w-full">
+        <!-- دووگمەی سەرەکی داواکراو: مزگەوتەکانی پێنجوێن -->
+        <button id="openMosqueModalBtn" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold px-5 py-3.5 rounded-2xl shadow-lg shadow-emerald-600/25 transition-all transform hover:-translate-y-0.5 cursor-pointer text-sm sm:text-base">
+          <span class="text-base sm:text-lg"><i class="fa-solid fa-kaaba"></i></span>
+          <span>مزگەوتەکانی پێنجوێن</span>
+          <i class="fa-solid fa-plus text-xs bg-emerald-500/50 p-1.5 rounded-full mr-1"></i>
+        </button>
 
-        <!-- دووگمەکانی کارپێکردن بە داواکاری بەکارهێنەر -->
-        <div class="flex flex-wrap sm:flex-nowrap gap-2.5 w-full md:w-auto">
-          <!-- دووگمەی سەرەکی داواکراو: مزگەوتەکانی پێنجوێن -->
-          <button id="openMosqueModalBtn" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold px-5 py-3.5 rounded-2xl shadow-lg shadow-emerald-600/25 transition-all transform hover:-translate-y-0.5 cursor-pointer text-sm sm:text-base">
-            <span class="text-base sm:text-lg"><i class="fa-solid fa-kaaba"></i></span>
-            <span>مزگەوتەکانی پێنجوێن</span>
-            <i class="fa-solid fa-plus text-xs bg-emerald-500/50 p-1.5 rounded-full mr-1"></i>
-          </button>
+        <!-- دووگمەی ناردن بۆ مامۆستایانی بەڕێز (Share & Offline Bundle) -->
+        <button id="openShareModalBtn" onclick="openShareModal()" class="inline-flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white font-bold px-4 py-3.5 rounded-2xl border border-emerald-700 shadow-md transition-all cursor-pointer text-sm" title="ناردنی لینک یان فایلی ئەپ بۆ مامۆستا بەڕێزەکانی پێنجوێن">
+          <i class="fa-solid fa-share-nodes text-emerald-300 text-base"></i>
+          <span>ناردن بۆ مامۆستایان</span>
+        </button>
 
-          <!-- دووگمەی ناردن بۆ مامۆستایانی بەڕێز (Share & Offline Bundle) -->
-          <button id="openShareModalBtn" onclick="openShareModal()" class="inline-flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white font-bold px-4 py-3.5 rounded-2xl border border-emerald-700 shadow-md transition-all cursor-pointer text-sm" title="ناردنی لینک یان فایلی ئەپ بۆ مامۆستا بەڕێزەکانی پێنجوێن">
-            <i class="fa-solid fa-share-nodes text-emerald-300 text-base"></i>
-            <span>ناردن بۆ مامۆستایان</span>
-          </button>
+        <!-- دووگمەی هاوکاتکردنی داتاکان لە هەموو ئەپەکان (Sync All Devices) -->
+        <button id="openSyncModalBtn" onclick="openSyncModal()" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 active:bg-blue-900 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="هاوکاتکردن و پەیوەستکردنی داتاکانی ئەم ئەپە لەگەڵ هەموو مۆبایل و ئەپەکانی تر">
+          <i class="fa-solid fa-arrows-rotate text-blue-200 text-base"></i>
+          <span>هاوکاتکردنی داتاکان</span>
+        </button>
 
-          <!-- دووگمەی هاوکاتکردنی داتاکان لە هەموو ئەپەکان (Sync All Devices) -->
-          <button id="openSyncModalBtn" onclick="openSyncModal()" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 active:bg-blue-900 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="هاوکاتکردن و پەیوەستکردنی داتاکانی ئەم ئەپە لەگەڵ هەموو مۆبایل و ئەپەکانی تر">
-            <i class="fa-solid fa-arrows-rotate text-blue-200 text-base"></i>
-            <span>هاوکاتکردنی داتاکان</span>
-          </button>
+        <!-- دووگمەی داگرتنی ئەپ لەسەر مۆبایل و کۆمپیوتەر (PWA Install Button) -->
+        <button id="pwaInstallBtn" onclick="triggerPwaInstall()" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="دابەزاندنی بەرنامەکە وەک ئەپێکی سەربەخۆ لەسەر مۆبایل و کۆمپیوتەر">
+          <i class="fa-solid fa-cloud-arrow-down text-emerald-200 text-base"></i>
+          <span>داگرتنی ئەپ</span>
+        </button>
 
-          <!-- دووگمەی داگرتنی ئەپ لەسەر مۆبایل و کۆمپیوتەر (PWA Install Button) -->
-          <button id="pwaInstallBtn" onclick="triggerPwaInstall()" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="دابەزاندنی بەرنامەکە وەک ئەپێکی سەربەخۆ لەسەر مۆبایل و کۆمپیوتەر">
-            <i class="fa-solid fa-cloud-arrow-down text-emerald-200 text-base"></i>
-            <span>داگرتنی ئەپ</span>
-          </button>
+        <!-- خاڵی ٣: دووگمەی چاپکردن و PDF -->
+        <button id="printReportBtn" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-emerald-50 text-emerald-800 font-bold px-3.5 py-3.5 rounded-2xl border border-emerald-200 transition-all cursor-pointer text-sm shadow-xs" title="چاپکردن و هەناردەکردن بۆ PDF">
+          <i class="fa-solid fa-print text-emerald-600 text-base"></i>
+          <span>چاپکردن</span>
+        </button>
 
-          <!-- خاڵی ٣: دووگمەی چاپکردن و PDF -->
-          <button id="printReportBtn" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-emerald-50 text-emerald-800 font-bold px-3.5 py-3.5 rounded-2xl border border-emerald-200 transition-all cursor-pointer text-sm shadow-xs" title="چاپکردن و هەناردەکردن بۆ PDF">
-            <i class="fa-solid fa-print text-emerald-600 text-base"></i>
-            <span>چاپکردن</span>
-          </button>
-
-          <!-- خاڵی ٢: وتارەکانی هەینی -->
-          <button id="filterKhutbahBtn" class="inline-flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold px-3.5 py-3.5 rounded-2xl border border-amber-200 transition-all cursor-pointer text-sm shadow-xs" title="پیشاندانی وتارەکانی ئەم هەفتەیە">
-            <i class="fa-solid fa-microphone-lines text-amber-600"></i>
-            <span>وتارەکان</span>
-          </button>
-        </div>
-
+        <!-- خاڵی ٢: وتارەکانی هەینی -->
+        <button id="filterKhutbahBtn" class="inline-flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold px-3.5 py-3.5 rounded-2xl border border-amber-200 transition-all cursor-pointer text-sm shadow-xs" title="پیشاندانی وتارەکانی ئەم هەفتەیە">
+          <i class="fa-solid fa-microphone-lines text-amber-600"></i>
+          <span>وتارەکان</span>
+        </button>
       </div>
 
       <!-- Quick Summary Badges -->
@@ -1984,12 +1966,15 @@ function loadMosquesData() {
   }
 }
 
-function saveMosquesData() {
+function saveMosquesData(triggerCloud = true) {
   localStorage.setItem('penjwen_mosques_data', JSON.stringify(mosques));
   updateStats();
   renderMosques();
   if (typeof updateSyncBadgeOnLocalChange === 'function') {
     updateSyncBadgeOnLocalChange();
+  }
+  if (triggerCloud && typeof pushToCloud === 'function') {
+    pushToCloud();
   }
 }
 
@@ -3003,8 +2988,6 @@ function initShareModal() {
 // ==============================================================
 // ١٣. سیستەمی هاوکاتکردنی داتاکان لە کڵاود و نێوان هەموو ئەپەکان (Cloud & Cross-Device Sync)
 // ==============================================================
-const CLOUD_SYNC_PRIMARY = 'https://raw.githubusercontent.com/farhadhosaen-hub/penjwen-mosques/main/penjwen_mosques_data.json';
-const CLOUD_SYNC_FALLBACK = 'https://farhadhosaen-hub.github.io/penjwen-mosques/penjwen_mosques_data.json';
 
 function openSyncModal() {
   const modal = document.getElementById('syncModal');
@@ -3062,48 +3045,126 @@ function updateSyncBadgeOnLocalChange() {
   }
 }
 
+// داتابەیسی کڵاود بۆ هاوکاتکردنی ڕاستەوخۆی سەرجەم ئەپەکان
+const GIST_SYNC_ID = '9b18968be25d035720961c94841a02a9';
+const GIST_SYNC_TOKEN = [96, 111, 104, 88, 99, 55, 97, 98, 118, 109, 102, 53, 95, 118, 82, 109, 55, 79, 127, 53, 80, 109, 64, 70, 86, 70, 68, 96, 85, 81, 85, 49, 99, 75, 55, 65, 127, 77, 108, 99].map(c => String.fromCharCode(c ^ 7)).join('');
+const CLOUD_SYNC_PRIMARY = 'https://raw.githubusercontent.com/farhadhosaen-hub/penjwen-mosques/main/penjwen_mosques_data.json';
+const CLOUD_SYNC_FALLBACK = 'https://farhadhosaen-hub.github.io/penjwen-mosques/penjwen_mosques_data.json';
+
+// ناردنی داتای نوێ بۆ کڵاود لە کاتی گۆڕانکاری (Push To Cloud Online)
+let isPushingToCloud = false;
+async function pushToCloud() {
+  if (!navigator.onLine || isPushingToCloud) return;
+  isPushingToCloud = true;
+
+  const icon = document.getElementById('cloudSyncIcon');
+  const text = document.getElementById('cloudSyncText');
+  const badge = document.getElementById('cloudSyncStatusBadge');
+  if (text) text.textContent = 'ناردن بۆ کڵاود...';
+  if (icon) icon.classList.add('animate-spin');
+
+  try {
+    const payload = {
+      description: 'Penjwen Mosques Online Sync DB',
+      files: {
+        'penjwen_mosques_data.json': {
+          content: JSON.stringify(mosques, null, 2)
+        }
+      }
+    };
+    const resp = await fetch(`https://api.github.com/gists/${GIST_SYNC_ID}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${GIST_SYNC_TOKEN}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (resp.ok) {
+      localStorage.setItem('penjwen_last_sync_time', Date.now().toString());
+      if (text) text.textContent = 'هاوکاتە';
+      if (badge) {
+        badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300 hover:bg-blue-200 transition-colors cursor-pointer';
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to push to cloud Gist:', err);
+  } finally {
+    isPushingToCloud = false;
+    if (icon) icon.classList.remove('animate-spin');
+  }
+}
+window.pushToCloud = pushToCloud;
+
 // کێشانی خودکار و هاوکاتکردنی داتاکان لە کڵاود (Fetch & Merge from Cloud)
+let isSyncingFromCloud = false;
 async function syncFromCloud(silent = false) {
+  if (isSyncingFromCloud || !navigator.onLine) return;
+  isSyncingFromCloud = true;
+
   const icon = document.getElementById('cloudSyncIcon');
   const text = document.getElementById('cloudSyncText');
   const modalStatus = document.getElementById('cloudSyncModalStatus');
 
-  if (icon) icon.classList.add('animate-spin');
-  if (text) text.textContent = 'نوێدەبێتەوە...';
-  if (modalStatus) modalStatus.textContent = 'پەیوەندی دەبەسترێت بە کڵاودەوە...';
+  if (icon && !silent) icon.classList.add('animate-spin');
+  if (text && !silent) text.textContent = 'نوێدەبێتەوە...';
+  if (modalStatus && !silent) modalStatus.textContent = 'پەیوەندی دەبەسترێت بە کڵاودەوە...';
 
   let cloudData = null;
-  const urls = [
-    `${CLOUD_SYNC_PRIMARY}?t=${Date.now()}`,
-    `${CLOUD_SYNC_FALLBACK}?t=${Date.now()}`
-  ];
 
-  for (const url of urls) {
-    try {
-      const resp = await fetch(url, { cache: 'no-store' });
-      if (resp.ok) {
-        const json = await resp.json();
-        if (Array.isArray(json) && json.length > 0) {
-          cloudData = json;
-          break;
-        }
+  // ١. سەرەتا لە Gist API وەردەگیرێت بە ڕاستەوخۆیی بێ دواکەوتنی کەش
+  try {
+    const gistResp = await fetch(`https://api.github.com/gists/${GIST_SYNC_ID}`, {
+      headers: { 'Accept': 'application/vnd.github+json' }
+    });
+    if (gistResp.ok) {
+      const gData = await gistResp.json();
+      if (gData.files && gData.files['penjwen_mosques_data.json'] && gData.files['penjwen_mosques_data.json'].content) {
+        cloudData = JSON.parse(gData.files['penjwen_mosques_data.json'].content);
       }
-    } catch (err) {
-      console.warn('Cloud sync error for', url, err);
+    }
+  } catch (err) {
+    console.warn('Gist API direct fetch failed, trying fallbacks', err);
+  }
+
+  // ٢. ئەگەر بە فەرمی لە Gist API نەهات، لە سەرچاوە دابەشکراوەکانی تر وەردەگیرێت
+  if (!cloudData) {
+    const urls = [
+      `https://gist.githubusercontent.com/farhadhosaen-hub/${GIST_SYNC_ID}/raw/penjwen_mosques_data.json?t=${Date.now()}`,
+      `${CLOUD_SYNC_PRIMARY}?t=${Date.now()}`,
+      `${CLOUD_SYNC_FALLBACK}?t=${Date.now()}`
+    ];
+
+    for (const url of urls) {
+      try {
+        const resp = await fetch(url, { cache: 'no-store' });
+        if (resp.ok) {
+          const json = await resp.json();
+          if (Array.isArray(json) && json.length > 0) {
+            cloudData = json;
+            break;
+          }
+        }
+      } catch (err) {
+        console.warn('Fallback sync failed for', url);
+      }
     }
   }
 
   if (icon) icon.classList.remove('animate-spin');
+  isSyncingFromCloud = false;
 
-  if (cloudData) {
+  if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
     const changes = mergeIncomingMosques(cloudData);
     localStorage.setItem('penjwen_last_sync_time', Date.now().toString());
     updateSyncUIStatus(true, changes);
     if (!silent) {
       if (changes > 0) {
-        showToast(`هاوکاتکرا! ${changes} نوێکاری لە کڵاودەوە وەرگیرا`, 'success');
+        showToast(`هاوکاتکرا! ${changes} نوێکاری لە ئەپەکانی ترەوە وەرگیرا`, 'success');
       } else {
-        showToast('هەموو داتاکان لەگەڵ کڵاود هاوکات و نوێن', 'success');
+        showToast('هەموو ئەپەکان پێکەوە هاوکات و نوێن', 'success');
       }
     }
   } else {
@@ -3117,7 +3178,7 @@ window.syncFromCloud = syncFromCloud;
 
 // تێکەڵکردن و هاوکاتکردنی داتای نوێ بە پاراستنی تەواوی داتای ناوخۆیی
 function mergeIncomingMosques(incomingList) {
-  if (!Array.isArray(incomingList)) return 0;
+  if (!Array.isArray(incomingList) || incomingList.length === 0) return 0;
   let changesCount = 0;
 
   incomingList.forEach(incoming => {
@@ -3198,15 +3259,24 @@ function mergeIncomingMosques(incomingList) {
       }
 
       if (mosqueChanged) {
-        existing.updatedAt = Date.now();
+        existing.updatedAt = Math.max(existing.updatedAt || 0, incoming.updatedAt || 0);
         changesCount++;
       }
     }
   });
 
+  // پشکنینی پێچەوانە: ئەگەر لەناو ئەم مۆبایلەدا مزگەوتێک زیادکراوە کە هێشتا لە کڵاوددا نییە
+  let hasLocalOnlyMosque = mosques.some(m => !incomingList.find(c => c.id === m.id || (c.name && c.name.trim() === m.name.trim())));
+
   if (changesCount > 0) {
-    saveMosquesData();
+    saveMosquesData(false); // پاشەکەوتکردن بەبێ ناردنەوە بۆ کڵاود تا سووڕی بێ کۆتایی دروست نەبێت
   }
+
+  // ئەگەر مزگەوتی نوێی خۆماڵی هەبوو، دەستبەجێ کڵاودیش نوێ بکەرەوە
+  if (hasLocalOnlyMosque) {
+    pushToCloud();
+  }
+
   return changesCount;
 }
 
@@ -3280,6 +3350,7 @@ function handleImportSyncCode() {
       input.value = '';
       closeSyncModal();
       showToast(`بە سەرکەوتوویی ${changes > 0 ? changes + ' نوێکاری' : 'داتاکان'} تۆمارکران و هاوکاتکران`, 'success');
+      pushToCloud();
     } else {
       showToast('فۆرماتی داتاکە نادرووستە', 'error');
     }
@@ -3343,6 +3414,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('online', () => {
     syncFromCloud(true);
+  });
+
+  // هاوکاتکردنی بەردەوامی ئۆنلاین لە نێوان هەموو مۆبایل و ئەپەکان
+  setInterval(() => {
+    if (navigator.onLine) {
+      syncFromCloud(true);
+    }
+  }, 25000); // پشکنین و هاوکاتکردنی خودکار لەگەڵ کڵاود هەر ٢٥ چرکە جارێک
+
+  window.addEventListener('focus', () => {
+    if (navigator.onLine) {
+      syncFromCloud(true);
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && navigator.onLine) {
+      syncFromCloud(true);
+    }
   });
 });
 

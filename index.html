@@ -101,6 +101,11 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span id="networkStatusText">سەرهێڵ</span>
               </span>
+              <!-- دۆخی هاوکاتکردنی کڵاود (Cloud Sync Status) -->
+              <button id="cloudSyncStatusBadge" onclick="syncFromCloud(false)" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300 hover:bg-blue-200 transition-colors cursor-pointer" title="هاوکاتکردنی ڕاستەوخۆ لەگەڵ کڵاود">
+                <i id="cloudSyncIcon" class="fa-solid fa-arrows-rotate text-[9px]"></i>
+                <span id="cloudSyncText">هاوکاتە</span>
+              </button>
             </div>
             <div class="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-700 font-medium">
               <i class="fa-regular fa-calendar-days text-[10px] text-emerald-600"></i>
@@ -236,6 +241,12 @@
           <button id="openShareModalBtn" onclick="openShareModal()" class="inline-flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white font-bold px-4 py-3.5 rounded-2xl border border-emerald-700 shadow-md transition-all cursor-pointer text-sm" title="ناردنی لینک یان فایلی ئەپ بۆ مامۆستا بەڕێزەکانی پێنجوێن">
             <i class="fa-solid fa-share-nodes text-emerald-300 text-base"></i>
             <span>ناردن بۆ مامۆستایان</span>
+          </button>
+
+          <!-- دووگمەی هاوکاتکردنی داتاکان لە هەموو ئەپەکان (Sync All Devices) -->
+          <button id="openSyncModalBtn" onclick="openSyncModal()" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 active:bg-blue-900 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="هاوکاتکردن و پەیوەستکردنی داتاکانی ئەم ئەپە لەگەڵ هەموو مۆبایل و ئەپەکانی تر">
+            <i class="fa-solid fa-arrows-rotate text-blue-200 text-base"></i>
+            <span>هاوکاتکردنی داتاکان</span>
           </button>
 
           <!-- دووگمەی داگرتنی ئەپ لەسەر مۆبایل و کۆمپیوتەر (PWA Install Button) -->
@@ -788,6 +799,104 @@
       <!-- Modal Footer -->
       <div class="border-t border-slate-100 p-4 bg-slate-50 flex items-center justify-end">
         <button id="closeShareModalFooterBtn" onclick="closeShareModal()" class="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors cursor-pointer">
+          داخستن
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MODAL: هاوکاتکردنی داتاکان لەگەڵ کڵاود و ئەپەکانی تر (Cloud & Device Sync Modal) ================= -->
+  <div id="syncModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border-2 border-blue-600 overflow-hidden transform scale-95 transition-all duration-300 max-h-[92vh] flex flex-col text-right">
+      
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-blue-800 to-indigo-900 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg text-blue-200">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold">هاوکاتکردنی داتاکان لەگەڵ هەموو ئەپەکان</h3>
+            <p class="text-xs text-blue-100">پەیوەستکردنی مۆبایلی مامۆستایان، کۆمپیوتەر و کڵاود بەیەکەوە</p>
+          </div>
+        </div>
+        <button onclick="closeSyncModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 overflow-y-auto space-y-5 flex-1 text-xs text-slate-700">
+        
+        <!-- بەشی یەکەم: کڵاودی فەرمی سەرەکی -->
+        <div class="bg-blue-50/80 border border-blue-200 rounded-2xl p-4.5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping"></span>
+              <h4 class="text-sm font-bold text-blue-950">١. کڵاودی ناوەندی و سەرەکی (Central Cloud)</h4>
+            </div>
+            <span id="cloudLastSyncBadge" class="text-[11px] font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">سەرهێڵ</span>
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            هەر کاتێک ئەم ئەپە دەکرێتەوە لە مۆبایل یان کۆمپیوتەر بە شێوەی خودکار نوێترین زانیاری مزگەوتەکان و وتارەکان لە کڵاودەوە وەردەگرێت. بۆ هاوکاتکردنی دەستبەجێ دەتوانیت ئەم دوگمەیە دابگریت:
+          </p>
+          <div class="flex flex-wrap items-center gap-2.5 pt-1">
+            <button onclick="syncFromCloud(false)" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition-all cursor-pointer">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>وەرگرتنی نوێترین داتا لە کڵاود ئێستا</span>
+            </button>
+            <span id="cloudSyncModalStatus" class="text-[11px] text-slate-500 font-medium">دۆخ: ئامادەیە</span>
+          </div>
+        </div>
+
+        <!-- بەشی دووەم: ناردنی نوێکاری بۆ مۆبایل و مامۆستایانی تر بە واتسئاپ -->
+        <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-4.5 space-y-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-brands fa-whatsapp text-emerald-600 text-lg"></i>
+            <h4 class="text-sm font-bold text-emerald-950">٢. ناردنی نوێکاری بۆ مامۆستایانی تر بە واتسئاپ</h4>
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            ئەگەر لەسەر مۆبایل یان کۆمپیوتەرەکەت زانیاری نوێ (وتاری هەینی، مزگەوت، کارمەند، ژمارە تەلەفۆن)ت داخڵ کردووە، دەتوانیت بە یەک کلیک بە واتسئاپ بینێریت بۆ مامۆستایان؛ هەر کە ئەوان کلیکیان لە لینکەکە کرد دەستبەجێ لە مۆبایلەکانی ئەوانیش تۆمار دەبێت:
+          </p>
+          <div class="flex flex-wrap items-center gap-2 pt-1">
+            <button onclick="shareSyncViaWhatsApp()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all cursor-pointer">
+              <i class="fa-brands fa-whatsapp text-sm"></i>
+              <span>ناردنی نوێکارییەکان بە واتسئاپ بۆ مامۆستایان</span>
+            </button>
+            <button onclick="copySyncLinkToClipboard()" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs transition-all cursor-pointer">
+              <i class="fa-solid fa-link text-slate-500"></i>
+              <span>کۆپیکردنی لینکی هاوکاتکردن</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- بەشی سێیەم: هاوردەکردنی داتای نوێ بە دەست یان بە کۆد -->
+        <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-4.5 space-y-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-file-import text-amber-700 text-base"></i>
+            <h4 class="text-sm font-bold text-amber-950">٣. هاوردەکردن و لکاندنی داتای نوێ لە مامۆستایەکی ترەوە</h4>
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            ئەگەر کۆدێکی هاوکاتکردن یان دەقێکت لە مامۆستایەکەوە پێگەیشتووە، لێرە بیلکێنە تاوەکو دەستبەجێ بخرێتە ناو بەرنامەکەتەوە:
+          </p>
+          <div class="space-y-2">
+            <textarea id="importSyncCodeInput" rows="2" class="w-full text-xs font-mono p-2.5 rounded-xl border border-amber-300 bg-white focus:outline-emerald-600" placeholder="کۆدی هاوکاتکردن لێرە دابنێ..."></textarea>
+            <button onclick="handleImportSyncCode()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs transition-colors cursor-pointer">
+              <i class="fa-solid fa-check"></i>
+              <span>تۆمارکردن و هاوکاتکردن لەم ئەپەدا</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="border-t border-slate-100 p-4 bg-slate-50 flex items-center justify-between">
+        <span class="text-[11px] text-slate-500 font-medium">
+          <i class="fa-solid fa-shield-halved text-blue-600 ml-1"></i> داتاکان لە هەردوو دۆخی سەرهێڵ و دەرهێڵ دەپارێزرێن
+        </span>
+        <button onclick="closeSyncModal()" class="px-6 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-colors cursor-pointer">
           داخستن
         </button>
       </div>

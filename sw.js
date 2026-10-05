@@ -1,5 +1,5 @@
 // Service Worker بۆ ئەپی مزگەوتەکانی پێنجوێن (Offline & Online PWA)
-const CACHE_NAME = 'penjwen-mosques-v4';
+const CACHE_NAME = 'penjwen-mosques-v11';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -46,6 +46,11 @@ self.addEventListener('activate', (event) => {
 // 3. Fetch Event: Cache First for static assets, Network First with Cache Fallback for APIs
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  // For GitHub Gist / Cloud Sync APIs: Bypass Service Worker completely (Network Only)
+  if (url.hostname.includes('github.com') || url.hostname.includes('githubusercontent.com')) {
+    return;
+  }
 
   // For external APIs (Open-Meteo, Aladhan): Network first, then cache
   if (url.hostname.includes('open-meteo.com') || url.hostname.includes('aladhan.com')) {

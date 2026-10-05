@@ -1722,24 +1722,81 @@ function checkStandaloneMode() {
   if (isStandalone) {
     if (banner) banner.style.display = 'none';
     if (btn) btn.classList.add('hidden');
+    if (typeof closeAutoInstallModal === 'function') closeAutoInstallModal();
   }
+  return isStandalone;
 }
 
-window.triggerPwaInstall = async function() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      showToast('دەستخۆش! ئەپەکە بە سەرکەوتوویی ئینستۆڵ کرا لەسەر ئامێرەکەت', 'success');
-      const banner = document.getElementById('pwaTopBanner');
-      if (banner) banner.style.display = 'none';
-      const btn = document.getElementById('pwaInstallBtn');
-      if (btn) btn.classList.add('hidden');
-    }
-    deferredPrompt = null;
+window.openAutoInstallModal = function() {
+  if (checkStandaloneMode()) return;
+  const modal = document.getElementById('autoInstallModal');
+  if (!modal) return;
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const iosHint = document.getElementById('iosAutoInstallHint');
+  const standardAction = document.getElementById('standardAutoInstallAction');
+  if (isIOS) {
+    if (iosHint) iosHint.classList.remove('hidden');
+    if (standardAction) standardAction.classList.add('hidden');
   } else {
-    // پیشاندانی پەنجەرەی ڕێنمایی هەنگاو بە هەنگاو بۆ هەردوو مۆبایل و کۆمپیوتەر
-    openPwaGuideModal();
+    if (iosHint) iosHint.classList.add('hidden');
+    if (standardAction) standardAction.classList.remove('hidden');
+  }
+
+  showModal(modal);
+};
+
+window.closeAutoInstallModal = function() {
+  const modal = document.getElementById('autoInstallModal');
+  if (modal) {
+    hideModal(modal);
+    try { sessionStorage.setItem('penjwen_auto_install_dismissed', '1'); } catch(e) {}
+  }
+};
+
+window.triggerPwaInstall = async function() {
+  const isStandalone = checkStandaloneMode();
+  if (isStandalone) {
+    showToast('ئەپەکە ئێستا وەک بەرنامەیەکی فەرمی لەسەر شاشەکەت جێگیرکراوە', 'success');
+    return;
+  }
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    window.closeAutoInstallModal();
+    window.openPwaGuideModal('ios');
+    return;
+  }
+
+  if (deferredPrompt) {
+    try {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        showToast('دەستخۆش! ئەپەکە بە سەرکەوتوویی ئینستۆڵ کرا لەسەر شاشەی ئامێرەکەت', 'success');
+        window.closeAutoInstallModal();
+        const banner = document.getElementById('pwaTopBanner');
+        if (banner) banner.style.display = 'none';
+        const btn = document.getElementById('pwaInstallBtn');
+        if (btn) btn.classList.add('hidden');
+      }
+      deferredPrompt = null;
+    } catch(err) {
+      console.warn('Install error:', err);
+      window.closeAutoInstallModal();
+      window.openPwaGuideModal();
+    }
+  } else {
+    // ئەگەر وێبگەڕ هێشتا لۆدی نەبووە، کەمێک چاوەڕێ بکە یان پەنجەرەی ڕێنمایی بکەرەوە
+    showToast('تکایە کەمێک چاوەڕوان بە...', 'info');
+    setTimeout(() => {
+      if (deferredPrompt) {
+        window.triggerPwaInstall();
+      } else {
+        window.closeAutoInstallModal();
+        window.openPwaGuideModal();
+      }
+    }, 700);
   }
 };
 
@@ -1751,9 +1808,41 @@ window.dismissPwaTopBanner = function() {
   }
 };
 
-window.openPwaGuideModal = function() {
+window.openPwaGuideModal = function(preferredTab) {
   const modal = document.getElementById('pwaGuideModal');
-  if (modal) showModal(modal);
+  if (!modal) return;
+
+  const isIOS = preferredTab === 'ios' || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
+  const isAndroid = preferredTab === 'android' || (/android/i.test(navigator.userAgent));
+  const isWindows = !isIOS && !isAndroid;
+
+  const iosCard = document.getElementById('pwaGuideIos');
+  const androidCard = document.getElementById('pwaGuideAndroid');
+  const winCard = document.getElementById('pwaGuideWindows');
+
+  if (iosCard) {
+    if (isIOS) {
+      iosCard.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-50/70');
+    } else {
+      iosCard.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-50/70');
+    }
+  }
+  if (androidCard) {
+    if (isAndroid) {
+      androidCard.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-50/70');
+    } else {
+      androidCard.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-50/70');
+    }
+  }
+  if (winCard) {
+    if (isWindows) {
+      winCard.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-50/70');
+    } else {
+      winCard.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-50/70');
+    }
+  }
+
+  showModal(modal);
 };
 
 window.closePwaGuideModal = function() {
@@ -1762,7 +1851,7 @@ window.closePwaGuideModal = function() {
 };
 
 function initPwaInstallPrompt() {
-  checkStandaloneMode();
+  const isStandalone = checkStandaloneMode();
 
   try {
     if (sessionStorage.getItem('penjwen_pwa_banner_dismissed') === '1') {
@@ -1774,6 +1863,15 @@ function initPwaInstallPrompt() {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
+    const btn = document.getElementById('pwaInstallBtn');
+    if (btn && !checkStandaloneMode()) btn.classList.remove('hidden');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!checkStandaloneMode() && urlParams.get('install') === '1') {
+      setTimeout(() => {
+        window.openAutoInstallModal();
+      }, 350);
+    }
   });
 
   window.addEventListener('appinstalled', () => {
@@ -1781,9 +1879,20 @@ function initPwaInstallPrompt() {
     if (banner) banner.style.display = 'none';
     const btn = document.getElementById('pwaInstallBtn');
     if (btn) btn.classList.add('hidden');
+    window.closeAutoInstallModal();
     deferredPrompt = null;
     showToast('ئەپەکە ئێستا وەک بەرنامەیەکی فەرمی بەردەستە لەسەر شاشەکەت', 'success');
   });
+
+  // ئەگەر لە ڕێگەی لینکی داگرتنەوە (?install=1) کرایەوە و پێشتر ئینستۆڵ نەکراوە
+  if (!isStandalone) {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('install') === '1' && sessionStorage.getItem('penjwen_auto_install_dismissed') !== '1') {
+      setTimeout(() => {
+        window.openAutoInstallModal();
+      }, 500);
+    }
+  }
 }
 
 function setupShareLinks() {
@@ -1791,24 +1900,20 @@ function setupShareLinks() {
   const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
   const shareTelegramBtn = document.getElementById('shareTelegramBtn');
 
-  let currentUrl = window.location.href;
-  // ئەگەر وەک فایلی ناوخۆیی یان لۆکاڵ هۆست کرابێتەوە، بەستەری فەرمی ئۆنلاین بەکاربهێنە
-  if (!currentUrl.startsWith('http') || currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
-    currentUrl = OFFICIAL_APP_URL;
-  }
+  const installUrl = `${OFFICIAL_APP_URL}?install=1`;
 
   if (shareUrlInput) {
-    shareUrlInput.value = currentUrl;
+    shareUrlInput.value = installUrl;
   }
 
-  const shareMsg = `سڵاو و ڕێز مامۆستای بەڕێز،\nئەمە ئەپی فەرمی مزگەوتەکانی پێنجوێنە بۆ زانیاری مزگەوتەکان، کاتەکانی بانگی پێنجوێن، وتارەکانی هەینی و تۆمارکردنی دەنگی وتارەکان.\n\nدەتوانیت لە ڕێگەی ئەم بەستەرەوە بیکەیتەوە و بە یەک کرتە وەک ئەپێکی فەرمی دایبەزێنیتە سەر مۆبایل یان کۆمپیوتەرەکەت (بە ئۆفلاین و ئۆنلاین کاردەکات):\n${currentUrl}`;
+  const shareMsg = `سڵاو و ڕێز مامۆستای بەڕێز،\nئەمە ئەپی فەرمی مزگەوتەکانی پێنجوێنە بۆ زانیاری مزگەوتەکان، کاتەکانی بانگی پێنجوێن، وتارەکانی هەینی و تۆمارکردنی دەنگی وتارەکان.\n\nتەنها لەم بەستەرە بدە، بە یەک کرتە دەچێتە سەر شاشەی مۆبایل یان کۆمپیوتەرەکەت وەک ئەپێکی فەرمی و سەربەخۆ:\n${installUrl}\n\n(بە تەواوی بەبێ ئینتەرنێت و بە ئۆنلاینیش کاردەکات)`;
 
   if (shareWhatsAppBtn) {
     shareWhatsAppBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMsg)}`;
   }
 
   if (shareTelegramBtn) {
-    shareTelegramBtn.href = `https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(shareMsg)}`;
+    shareTelegramBtn.href = `https://t.me/share/url?url=${encodeURIComponent(installUrl)}&text=${encodeURIComponent(shareMsg)}`;
   }
 }
 

@@ -41,7 +41,8 @@ const DEFAULT_MOSQUES = [
       { id: "s_gaylani_3", name: "کاک فاتح", role: "بانگ بێژ", phone: "" },
       { id: "s_gaylani_4", name: "کاک ئەحمەد سەعید", role: "کارگووزار", phone: "" }
     ],
-    createdAt: 1791099916289
+    createdAt: 1791099916289,
+    updatedAt: 1791148000000
   },
   {
     id: "mosque_mala_abbas",
@@ -73,7 +74,8 @@ const DEFAULT_MOSQUES = [
       { id: "s_abbas_3", name: "حاجی فرج", role: "بانگ بێژ", phone: "" },
       { id: "s_abbas_4", name: "کاک کامەران", role: "کارگووزار", phone: "" }
     ],
-    createdAt: 1791100239418
+    createdAt: 1791100239418,
+    updatedAt: 1791148000000
   }
 ];
 
@@ -81,11 +83,19 @@ const DEFAULT_MOSQUES = [
 let mosques = [];
 let currentPrayerTimes = null;
 
-// پاراستنی تەواوی داتای مزگەوتەکان - ئەگەر پێشتر داتا هەبووبێت، دەستکاری ناکرێت و بە پارێزراوی وەک خۆی دەمێنێتەوە
+// پاراستنی سەدی سەدی داتای مزگەوتەکان و ڕێگری لە هەر گۆڕانکاری و سڕینەوەیەک لە کاتی ئەبدەیتدا
 try {
-  const checkStored = localStorage.getItem('penjwen_mosques_data');
-  if (!checkStored) {
-    localStorage.setItem('penjwen_mosques_data', JSON.stringify(DEFAULT_MOSQUES));
+  let existingStore = localStorage.getItem('penjwen_mosques_data');
+  if (!existingStore) {
+    existingStore = localStorage.getItem('penjwen_mosques_backup') || localStorage.getItem('penjwen_mosques_permanent_vault');
+    if (existingStore) {
+      localStorage.setItem('penjwen_mosques_data', existingStore);
+    } else {
+      const defStr = JSON.stringify(DEFAULT_MOSQUES);
+      localStorage.setItem('penjwen_mosques_data', defStr);
+      localStorage.setItem('penjwen_mosques_backup', defStr);
+      localStorage.setItem('penjwen_mosques_permanent_vault', defStr);
+    }
   }
 } catch (e) {}
 
@@ -144,6 +154,67 @@ async function deleteSermonAudioBlob(key) {
       tx.oncomplete = () => resolve(true);
     });
   } catch (e) {}
+}
+
+// ==============================================================
+// سیستەمی کۆگای پارێزراوی هەمیشەیی داتاکان (Permanent Vault in IndexedDB)
+// ==============================================================
+const VAULT_DB_NAME = 'PenjwenPermanentVaultDB';
+const VAULT_STORE_NAME = 'mosques_vault';
+
+function openVaultDB() {
+  return new Promise((resolve) => {
+    try {
+      if (!('indexedDB' in window)) return resolve(null);
+      const req = indexedDB.open(VAULT_DB_NAME, 1);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(VAULT_STORE_NAME)) {
+          db.createObjectStore(VAULT_STORE_NAME);
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch (e) {
+      resolve(null);
+    }
+  });
+}
+
+async function saveToIndexedDBVault(data) {
+  try {
+    const db = await openVaultDB();
+    if (!db) return;
+    return new Promise((resolve) => {
+      const tx = db.transaction(VAULT_STORE_NAME, 'readwrite');
+      tx.objectStore(VAULT_STORE_NAME).put(JSON.stringify(data), 'active_mosques');
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    });
+  } catch (e) {
+    console.warn('Vault save error:', e);
+  }
+}
+
+async function getFromIndexedDBVault() {
+  try {
+    const db = await openVaultDB();
+    if (!db) return null;
+    return new Promise((resolve) => {
+      const tx = db.transaction(VAULT_STORE_NAME, 'readonly');
+      const req = tx.objectStore(VAULT_STORE_NAME).get('active_mosques');
+      req.onsuccess = () => {
+        try {
+          resolve(req.result ? JSON.parse(req.result) : null);
+        } catch (e) {
+          resolve(null);
+        }
+      };
+      req.onerror = () => resolve(null);
+    });
+  } catch (e) {
+    return null;
+  }
 }
 
 // DOM Elements
@@ -747,7 +818,7 @@ async function fetchPenjwenWeather() {
 }
 
 // ==============================================================
-// ٥. بەڕێوەبردنی مزگەوتەکان (خاڵی ١: تەنها مزگەوتی گەیلانی پێنجوێن)
+// ٥. بەڕێوەبردنی مزگەوتەکان و پاراستنی سەدی سەدی داتاکان
 // ==============================================================
 function loadMosquesData() {
   let loaded = null;
@@ -760,27 +831,57 @@ function loadMosquesData() {
     console.warn('Error reading stored mosques data:', e);
   }
 
-  // پاراستنی سەدی سەدی داتای تۆمارکراو: ئەگەر داتا لە ستۆریجدا هەبێت بە پارێزراوی و بێ دەستکاری دەمێنێتەوە
+  // پشکنینی نوسخەی یەدەگ و کۆگای هەمیشەیی ئەگەر ستۆریجی سەرەکی بەتاڵ بوو
+  if (!Array.isArray(loaded) || loaded.length === 0) {
+    try {
+      const backupStored = localStorage.getItem('penjwen_mosques_backup');
+      if (backupStored) loaded = JSON.parse(backupStored);
+    } catch(e) {}
+  }
+
+  if (!Array.isArray(loaded) || loaded.length === 0) {
+    try {
+      const vaultStored = localStorage.getItem('penjwen_mosques_permanent_vault');
+      if (vaultStored) loaded = JSON.parse(vaultStored);
+    } catch(e) {}
+  }
+
+  // پاراستنی سەدی سەدی داتای تۆمارکراوی مزگەوتەکان
   if (Array.isArray(loaded) && loaded.length > 0) {
     mosques = loaded;
   } else {
-    // پشکنینی نوسخەی یەدەگی پارێزراو
-    let backupLoaded = null;
-    try {
-      const backupStored = localStorage.getItem('penjwen_mosques_backup');
-      if (backupStored) backupLoaded = JSON.parse(backupStored);
-    } catch(e) {}
-
-    if (Array.isArray(backupLoaded) && backupLoaded.length > 0) {
-      mosques = backupLoaded;
-    } else {
-      mosques = JSON.parse(JSON.stringify(DEFAULT_MOSQUES));
-    }
-    try {
-      localStorage.setItem('penjwen_mosques_data', JSON.stringify(mosques));
-      localStorage.setItem('penjwen_mosques_backup', JSON.stringify(mosques));
-    } catch(e) {}
+    mosques = JSON.parse(JSON.stringify(DEFAULT_MOSQUES));
   }
+
+  // دڵنیابوونەوە لە کاتی نوێکردنەوە بۆ هەموو مزگەوتەکان
+  mosques.forEach(m => {
+    if (!m.updatedAt) m.updatedAt = m.createdAt || Date.now();
+  });
+
+  // پاشەکەوتکردنی دەستبەجێ لە هەموو شوێنەکان بۆ دڵنیابوونی هەمیشەیی
+  try {
+    const s = JSON.stringify(mosques);
+    localStorage.setItem('penjwen_mosques_data', s);
+    localStorage.setItem('penjwen_mosques_backup', s);
+    localStorage.setItem('penjwen_mosques_permanent_vault', s);
+    saveToIndexedDBVault(mosques);
+  } catch(e) {}
+
+  // پشکنینی پاشبنەمای کۆگای هەمیشەیی (IndexedDB Vault)
+  getFromIndexedDBVault().then(vaultData => {
+    if (Array.isArray(vaultData) && vaultData.length > 0) {
+      let changed = false;
+      vaultData.forEach(vm => {
+        if (!mosques.find(m => m.id === vm.id || (m.name && m.name.trim() === vm.name.trim()))) {
+          mosques.push(vm);
+          changed = true;
+        }
+      });
+      if (changed) {
+        saveMosquesData(false);
+      }
+    }
+  });
 
   updateStats();
   renderMosques();
@@ -788,12 +889,15 @@ function loadMosquesData() {
 
 function saveMosquesData(triggerCloud = true) {
   try {
+    mosques.forEach(m => {
+      if (!m.updatedAt) m.updatedAt = Date.now();
+    });
+
     const dataStr = JSON.stringify(mosques);
     localStorage.setItem('penjwen_mosques_data', dataStr);
-    // هەڵگرتنی نوسخەی باکئەپی یەدەگ بۆ پاراستنی هەمیشەیی داتاکان
-    if (Array.isArray(mosques) && mosques.length > 0) {
-      localStorage.setItem('penjwen_mosques_backup', dataStr);
-    }
+    localStorage.setItem('penjwen_mosques_backup', dataStr);
+    localStorage.setItem('penjwen_mosques_permanent_vault', dataStr);
+    saveToIndexedDBVault(mosques);
   } catch(e) {
     console.warn('Error saving mosques data:', e);
   }
@@ -1326,7 +1430,8 @@ window.editMosque = async function(id) {
       return r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت');
     });
     if (!hasKarguzar) {
-      addStaffRow({ name: mosque.name.includes('مەلا عباس') ? 'کاک کامەران' : 'کاک ئەحمەد سەعید', role: 'کارگووزار', phone: '' });
+      const defaultKarguzarName = mosque.name.includes('مەلا عباس') ? 'کاک کامەران' : (mosque.name.includes('گەیلانی') ? 'کاک ئەحمەد سەعید' : '');
+      addStaffRow({ name: defaultKarguzarName, role: 'کارگووزار', phone: '' });
     }
   } else {
     addStaffRow({ name: '', role: 'ووتاربێژ', phone: '' });
@@ -2187,7 +2292,18 @@ async function syncFromCloud(silent = false) {
 }
 window.syncFromCloud = syncFromCloud;
 
-// تێکەڵکردن و هاوکاتکردنی داتای نوێ بە پاراستنی تەواوی داتای ناوخۆیی
+// ڕێکخستنی ستانداردی ناوی پێگەکان (ووتاربێژ، پێش نوێژ، بانگ بێژ، کارگووزار)
+function normalizeRole(role) {
+  if (!role) return '';
+  const r = role.toString().trim().toLowerCase();
+  if (r.includes('وتار') || r.includes('ووتار')) return 'khateeb';
+  if (r.includes('پێش')) return 'imam';
+  if (r.includes('بانگ')) return 'muezzin';
+  if (r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت')) return 'karguzar';
+  return r;
+}
+
+// تێکەڵکردن و هاوکاتکردنی داتای نوێ بە پاراستنی سەدی سەدی داتای ناوخۆیی و ڕێگریکردن لە هەر گۆڕانکارییەکی نەخوازراو
 function mergeIncomingMosques(incomingList) {
   if (!Array.isArray(incomingList) || incomingList.length === 0) return 0;
   let changesCount = 0;
@@ -2199,117 +2315,103 @@ function mergeIncomingMosques(incomingList) {
     let existingIndex = mosques.findIndex(m => m.id === incoming.id || (m.name && m.name.trim() === incoming.name.trim()));
 
     if (existingIndex === -1) {
-      // زیادکردنی مزگەوتی نوێ
+      // مزگەوتێکی نوێیە لە کڵاود یان لە ئامێرێکی ترەوە -> زیاد دەکرێت بەبێ دەستکاریکردنی هیچ مزگەوتێکی تر
       mosques.push(incoming);
       changesCount++;
     } else {
       let existing = mosques[existingIndex];
-      const incUpdated = incoming.updatedAt || 0;
-      const existUpdated = existing.updatedAt || 0;
+      let mosqueChanged = false;
 
-      // ئەگەر نوسخەی کڵاود لەسەر ئامێرێکی تر دەستکاری کرابوو و نوێتر بوو
-      if (incUpdated > existUpdated) {
-        const locSermons = existing.sermons || [];
-        const mergedSermons = Array.isArray(incoming.sermons) ? incoming.sermons.map(s => {
-          const locS = locSermons.find(ls => ls.date === s.date);
-          return {
-            ...s,
-            hasAudio: s.hasAudio || (locS && locS.hasAudio)
-          };
-        }) : incoming.sermons;
+      // ١. پاراستنی تەواوەتی کارمەندان (مامۆستا، پێش نوێژ، وتاربێژ، بانگ بێژ، کارگووزار):
+      // بنەمای نەگۆڕ: هەموو ئەو زانیاری و ناوانەی بەکارهێنەر داخڵی کردوون بە پارێزراوی دەمێننەوە و هەرگیز لە هیچ ئەبدەیتێکدا ناگۆڕدرێن!
+      if (Array.isArray(incoming.staff) && incoming.staff.length > 0) {
+        if (!Array.isArray(existing.staff) || existing.staff.length === 0) {
+          existing.staff = incoming.staff;
+          mosqueChanged = true;
+        } else {
+          incoming.staff.forEach(incStaff => {
+            if (!incStaff || !incStaff.role) return;
+            const normIncRole = normalizeRole(incStaff.role);
 
-        mosques[existingIndex] = {
-          ...existing,
-          ...incoming,
-          sermons: mergedSermons
-        };
-        changesCount++;
-      } else {
-        let mosqueChanged = false;
+            const localStaff = existing.staff.find(s => {
+              if (s.id && incStaff.id && s.id === incStaff.id) return true;
+              return normalizeRole(s.role) === normIncRole;
+            });
 
-        // ١. وتارەکان (Sermons merge)
-        if (Array.isArray(incoming.sermons)) {
-          if (!Array.isArray(existing.sermons)) existing.sermons = [];
-          incoming.sermons.forEach(incSermon => {
-            const sExists = existing.sermons.find(s => s.date === incSermon.date || (s.topic && s.topic === incSermon.topic));
-            if (!sExists) {
-              existing.sermons.push(incSermon);
+            if (!localStaff) {
+              // ئەگەر ئەم پێگەیە لە ناوخۆدا بە هیچ شێوەیەک نەبوو، زیاد دەکرێت
+              existing.staff.push(incStaff);
               mosqueChanged = true;
             } else {
-              if (incSermon.topic && incSermon.topic !== sExists.topic) {
-                sExists.topic = incSermon.topic;
+              // ئەگەر پێگەکە لە ناوخۆدا هەبوو:
+              // ناوی ناوخۆیی بە هیچ جۆرێک دەستکاری ناکرێت، تەنها ئەگەر ناوی ناوخۆیی بەتاڵ بێت ناوی کڵاود وەردەگیرێت
+              if ((!localStaff.name || localStaff.name.trim() === '') && (incStaff.name && incStaff.name.trim() !== '')) {
+                localStaff.name = incStaff.name;
                 mosqueChanged = true;
               }
-              if (incSermon.speaker && incSermon.speaker !== sExists.speaker) {
-                sExists.speaker = incSermon.speaker;
+              // هەمان شت بۆ ژمارەی تەلەفۆن: تەنها ئەگەر ناوخۆیی بەتاڵ بێت
+              if ((!localStaff.phone || localStaff.phone.trim() === '') && (incStaff.phone && incStaff.phone.trim() !== '')) {
+                localStaff.phone = incStaff.phone;
                 mosqueChanged = true;
               }
             }
           });
         }
+      }
 
-        // ٢. وتاری سەرەکی
-        if (incoming.khutbahTopic && incoming.khutbahTopic !== existing.khutbahTopic) {
-          existing.khutbahTopic = incoming.khutbahTopic;
-          existing.khutbahDate = incoming.khutbahDate || existing.khutbahDate;
-          existing.khutbahSpeaker = incoming.khutbahSpeaker || existing.khutbahSpeaker;
-          mosqueChanged = true;
-        }
-
-        // ٣. کارمەندان (Staff merge)
-        if (Array.isArray(incoming.staff) && incoming.staff.length > 0) {
-          if (!Array.isArray(existing.staff) || existing.staff.length === 0) {
-            existing.staff = incoming.staff;
+      // ٢. وتارەکان: پاراستنی هەموو وتارەکانی پێشوو و دەنگەکانیان
+      if (Array.isArray(incoming.sermons)) {
+        if (!Array.isArray(existing.sermons)) existing.sermons = [];
+        incoming.sermons.forEach(incSermon => {
+          if (!incSermon || !incSermon.date) return;
+          const sExists = existing.sermons.find(s => s.date === incSermon.date);
+          if (!sExists) {
+            existing.sermons.push(incSermon);
             mosqueChanged = true;
           } else {
-            incoming.staff.forEach(incStaff => {
-              const staffExists = existing.staff.find(s => s.role === incStaff.role || s.name === incStaff.name);
-              if (!staffExists) {
-                existing.staff.push(incStaff);
-                mosqueChanged = true;
-              } else {
-                if (incStaff.phone && incStaff.phone !== staffExists.phone) {
-                  staffExists.phone = incStaff.phone;
-                  mosqueChanged = true;
-                }
-                if (incStaff.name && incStaff.name !== staffExists.name) {
-                  staffExists.name = incStaff.name;
-                  mosqueChanged = true;
-                }
-              }
-            });
+            if (!sExists.topic && incSermon.topic) {
+              sExists.topic = incSermon.topic;
+              mosqueChanged = true;
+            }
+            if (!sExists.speaker && incSermon.speaker) {
+              sExists.speaker = incSermon.speaker;
+              mosqueChanged = true;
+            }
           }
-        }
+        });
+      }
 
-        // ٤. شوێن و تێبینی
-        if (incoming.location && !existing.location) {
-          existing.location = incoming.location;
-          mosqueChanged = true;
-        }
-        if (incoming.notes && !existing.notes) {
-          existing.notes = incoming.notes;
-          mosqueChanged = true;
-        }
+      // ٣. زانیارییە سەرەکییەکانی مزگەوت (شوێن، تێبینی، وتاری ڕۆژ)
+      if (!existing.location && incoming.location) {
+        existing.location = incoming.location;
+        mosqueChanged = true;
+      }
+      if (!existing.notes && incoming.notes) {
+        existing.notes = incoming.notes;
+        mosqueChanged = true;
+      }
+      if (!existing.khutbahTopic && incoming.khutbahTopic) {
+        existing.khutbahTopic = incoming.khutbahTopic;
+        mosqueChanged = true;
+      }
+      if (!existing.khutbahSpeaker && incoming.khutbahSpeaker) {
+        existing.khutbahSpeaker = incoming.khutbahSpeaker;
+        mosqueChanged = true;
+      }
 
-        if (mosqueChanged) {
-          existing.updatedAt = Math.max(existUpdated, incUpdated, Date.now());
-          changesCount++;
-        }
+      if (mosqueChanged) {
+        existing.updatedAt = Math.max(existing.updatedAt || 0, incoming.updatedAt || 0, Date.now());
+        changesCount++;
       }
     }
   });
 
-  // پشکنینی پێچەوانە: ئەگەر لەناو ئەم مۆبایلەدا مزگەوتێک زیادکراوە کە هێشتا لە کڵاوددا نییە
-  let hasLocalOnlyMosque = mosques.some(m => !incomingList.find(c => c.id === m.id || (c.name && c.name.trim() === m.name.trim())));
-
   if (changesCount > 0) {
-    saveMosquesData(false); // پاشەکەوتکردن بەبێ ناردنەوە بۆ کڵاود تا سووڕی بێ کۆتایی دروست نەبێت
+    saveMosquesData(false);
   }
 
-  // ئەگەر مزگەوتی نوێی خۆماڵی هەبوو، دەستبەجێ کڵاودیش نوێ بکەرەوە
-  if (hasLocalOnlyMosque) {
-    pushToCloud();
-  }
+  // نوێکردنەوەی کڵاود لەگەڵ داتای تەواوی ناوخۆیی بەبێ لەدەستچوونی هیچ زانیارییەک
+  pushToCloud();
 
   return changesCount;
 }

@@ -1315,10 +1315,10 @@ const DEFAULT_MOSQUES = [
     khutbahTopic: "گەورەیی پێغەمبەر (د.خ) و شوێنکەوتنی سوننەتەکانی",
     khutbahSpeaker: "مامۆستا ملا محمدی گەیلانی",
     staff: [
-      { id: "s_gaylani_1", name: "مامۆستا ملا محمدی گەیلانی", role: "ووتاربێژ", phone: "0772 545 3179" },
-      { id: "s_gaylani_2", name: "مامۆستا محمد", role: "پێش نوێژ", phone: "0750 987 6543" },
-      { id: "s_gaylani_3", name: "کاک فاتح", role: "بانگ بێژ", phone: "0770 555 4433" },
-      { id: "s_gaylani_4", name: "کاک ئەحمەد سەعید", role: "کارگووزار", phone: "0770 222 1144" }
+      { id: "s_gaylani_1", name: "مامۆستا ملا محمدی گەیلانی", role: "ووتاربێژ", phone: "" },
+      { id: "s_gaylani_2", name: "مامۆستا محمد", role: "پێش نوێژ", phone: "" },
+      { id: "s_gaylani_3", name: "کاک فاتح", role: "بانگ بێژ", phone: "" },
+      { id: "s_gaylani_4", name: "کاک ئەحمەد سەعید", role: "کارگووزار", phone: "" }
     ],
     createdAt: 1791099916289
   },
@@ -2064,7 +2064,12 @@ function loadMosquesData() {
           });
         }
       }
+      // سڕینەوەی ژمارەی تەلەفۆن تاوەکو تەنها ناوەکان دەربکەون
+      m.staff.forEach(s => {
+        s.phone = '';
+      });
     });
+    localStorage.setItem('penjwen_mosques_data', JSON.stringify(mosques));
     updateStats();
     renderMosques();
   } else {
@@ -2183,7 +2188,7 @@ function createMosqueCard(mosque) {
   const initialDate = getLatestSermonDate(mosque);
   const initialSermon = findSermonByDate(mosque, initialDate);
 
-  // خاڵی ٤: ژمارەی تەلەفۆنەکان بە ئینگلیزی، و خانەی ڕەنگ قاوەیی کاڵ بۆ پێگە لە سەرەتای لای ڕاست
+  // پیشاندانی ناوی مامۆستایان، وتاربێژ، بانگبێژ و کارگوزار لەگەڵ پێگەکەیان (بێ ژمارەی تەلەفۆن)
   const staffBadges = (mosque.staff && mosque.staff.length > 0) 
     ? mosque.staff.map(staff => {
         let roleName = 'کارمەند';
@@ -2207,28 +2212,19 @@ function createMosqueCard(mosque) {
         }
 
         return `
-          <div class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 p-2.5 rounded-xl text-xs bg-slate-50 border border-slate-200/80 hover:bg-slate-100/70 transition-colors">
+          <div class="flex items-center gap-3 p-3 rounded-xl text-xs sm:text-sm bg-white border border-stone-200/80 shadow-2xs hover:bg-stone-50/70 transition-colors">
             <!-- سەرەتای لای ڕاست: خانەی ڕەنگ قاوەیی کاڵ بۆ پێگە لەگەڵ ناوی کەسەکە -->
-            <div class="flex items-center gap-2.5 min-w-0 flex-1">
-              <span class="role-badge-brown">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <span class="role-badge-brown shrink-0">
                 <i class="fa-solid ${icon} text-[10px] opacity-75"></i>
                 <span>${escapeHtml(roleName)}</span>
               </span>
-              <span class="font-bold text-slate-900 text-xs sm:text-sm truncate">${escapeHtml(staff.name)}</span>
+              <span class="font-bold text-stone-900 text-xs sm:text-sm truncate">${escapeHtml(staff.name)}</span>
             </div>
-            <!-- لای چەپ: ژمارەی مۆبایل بە ئینگلیزی -->
-            ${staff.phone ? `
-              <div class="shrink-0 mr-auto sm:mr-0">
-                <a href="tel:${escapeHtml(staff.phone)}" class="phone-num text-xs font-bold text-slate-700 hover:text-emerald-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs inline-flex items-center gap-1.5 transition-colors" dir="ltr">
-                  <i class="fa-solid fa-phone text-[10px] text-emerald-600"></i>
-                  <span>${escapeHtml(staff.phone)}</span>
-                </a>
-              </div>
-            ` : ''}
           </div>
         `;
       }).join('')
-    : `<div class="text-xs text-slate-400 italic py-2">هیچ مامۆستایەک هێشتا تۆمار نەکراوە</div>`;
+    : `<div class="text-xs text-stone-400 italic py-2">هیچ مامۆستایەک هێشتا تۆمار نەکراوە</div>`;
 
   container.innerHTML = `
     <!-- خانەی مزگەوت بە ڕەنگی قاوەیی کاڵ -->
@@ -2703,24 +2699,15 @@ window.viewMosqueDetails = function(id) {
             }
 
             return `
-              <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-3 flex items-center justify-between gap-2.5">
+              <div class="bg-white border border-slate-200/80 rounded-2xl p-3 flex items-center gap-3 shadow-2xs">
                 <!-- سەرەتای لای ڕاست: خانەی ڕەنگ قاوەیی کاڵ بۆ پێگە لەگەڵ ناوی کەسەکە -->
-                <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                  <span class="role-badge-brown">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                  <span class="role-badge-brown shrink-0">
                     <i class="fa-solid ${icon} text-[10px] opacity-75"></i>
                     <span>${escapeHtml(roleName)}</span>
                   </span>
                   <span class="text-sm font-bold text-slate-900 truncate">${escapeHtml(s.name)}</span>
                 </div>
-                <!-- لای چەپ: ژمارەی تەلەفۆن بە ئینگلیزی -->
-                ${s.phone ? `
-                  <div class="shrink-0 mr-auto sm:mr-0">
-                    <a href="tel:${escapeHtml(s.phone)}" class="phone-num text-xs font-bold text-slate-700 hover:text-emerald-700 bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-2xs inline-flex items-center gap-1.5 transition-colors" dir="ltr">
-                      <i class="fa-solid fa-phone text-[10px] text-emerald-600"></i>
-                      <span>${escapeHtml(s.phone)}</span>
-                    </a>
-                  </div>
-                ` : ''}
               </div>
             `;
           }).join('')}
@@ -2779,10 +2766,10 @@ function prepareAndPrintReport() {
 
     (m.staff || []).forEach(s => {
       const r = s.role || '';
-      if (r.includes('وتاربێژ') || r.includes('ووتار')) khateebStr = s.name + (s.phone ? ` (${s.phone})` : '');
-      if (r.includes('پێشنوێژ') || r.includes('پێش')) imamStr = s.name + (s.phone ? ` (${s.phone})` : '');
-      if (r.includes('بانگبێژ') || r.includes('بانگ')) muezzinStr = s.name + (s.phone ? ` (${s.phone})` : '');
-      if (r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت')) karguzarStr = s.name + (s.phone ? ` (${s.phone})` : '');
+      if (r.includes('وتاربێژ') || r.includes('ووتار')) khateebStr = s.name;
+      if (r.includes('پێشنوێژ') || r.includes('پێش')) imamStr = s.name;
+      if (r.includes('بانگبێژ') || r.includes('بانگ')) muezzinStr = s.name;
+      if (r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت')) karguzarStr = s.name;
     });
 
     const latestS = (m.sermons && m.sermons[0]) ? m.sermons[0] : (m.khutbahTopic ? { topic: m.khutbahTopic, speaker: m.khutbahSpeaker } : null);

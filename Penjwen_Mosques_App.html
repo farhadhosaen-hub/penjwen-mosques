@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ئەپی مزگەوتەکانی پێنجوێن | Penjwen Mosques</title>
-  <!-- PWA & Mobile Meta Tags (کارکردن بە ئۆفلاین و ئۆنلاین) -->
+  <!-- PWA & Mobile Meta Tags (کارکردن بە ئۆفلاین و ئۆنلاین ڕاستەوخۆ وەک ئەپ) -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#15803d">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="مزگەوتەکانی پێنجوێن">
+  <meta name="application-name" content="مزگەوتەکانی پێنجوێن">
+  <meta name="format-detection" content="telephone=no">
   <link rel="apple-touch-icon" href="icon-192.png">
 
   <!-- Google Fonts: Vazirmatn for clean Kurdish UI & Amiri for Islamic Calligraphy -->
@@ -901,7 +904,7 @@ audio {
 
           <div class="flex flex-col sm:flex-row items-center gap-4 bg-white p-3.5 rounded-xl border border-emerald-200 shadow-2xs">
             <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs shrink-0 text-center">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=https%3A%2F%2Ffarhadhosaen-hub.github.io%2Fpenjwen-mosques%2F%3Finstall%3D1" alt="QR Code" class="w-28 h-28 mx-auto" />
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=https%3A%2F%2Ffarhadhosaen-hub.github.io%2Fpenjwen-mosques%2F" alt="QR Code" class="w-28 h-28 mx-auto" />
               <div class="text-[10px] text-slate-500 font-bold mt-1">سکانی بکە بە کامێرای مۆبایل</div>
             </div>
             <div class="flex-1 space-y-2.5 w-full text-right">
@@ -912,7 +915,7 @@ audio {
                   id="shareUrlInput" 
                   readonly 
                   class="w-full text-xs font-mono font-bold text-emerald-950 bg-transparent px-1 focus:outline-none select-all" 
-                  value="https://farhadhosaen-hub.github.io/penjwen-mosques/?install=1"
+                  value="https://farhadhosaen-hub.github.io/penjwen-mosques/"
                   dir="ltr"
                 >
                 <button id="copyShareUrlBtn" class="shrink-0 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer">
@@ -3131,13 +3134,6 @@ function initPwaInstallPrompt() {
     deferredPrompt = e;
     const btn = document.getElementById('pwaInstallBtn');
     if (btn && !checkStandaloneMode()) btn.classList.remove('hidden');
-
-    const urlParams = new URLSearchParams(window.location.search);
-    if (!checkStandaloneMode() && urlParams.get('install') === '1') {
-      setTimeout(() => {
-        window.openAutoInstallModal();
-      }, 350);
-    }
   });
 
   window.addEventListener('appinstalled', () => {
@@ -3149,16 +3145,6 @@ function initPwaInstallPrompt() {
     deferredPrompt = null;
     showToast('ئەپەکە ئێستا وەک بەرنامەیەکی فەرمی بەردەستە لەسەر شاشەکەت', 'success');
   });
-
-  // ئەگەر لە ڕێگەی لینکی داگرتنەوە (?install=1) کرایەوە و پێشتر ئینستۆڵ نەکراوە
-  if (!isStandalone) {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('install') === '1' && sessionStorage.getItem('penjwen_auto_install_dismissed') !== '1') {
-      setTimeout(() => {
-        window.openAutoInstallModal();
-      }, 500);
-    }
-  }
 }
 
 function setupShareLinks() {
@@ -3166,20 +3152,20 @@ function setupShareLinks() {
   const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
   const shareTelegramBtn = document.getElementById('shareTelegramBtn');
 
-  const installUrl = `${OFFICIAL_APP_URL}?install=1`;
+  const appUrl = OFFICIAL_APP_URL;
 
   if (shareUrlInput) {
-    shareUrlInput.value = installUrl;
+    shareUrlInput.value = appUrl;
   }
 
-  const shareMsg = `سڵاو و ڕێز مامۆستای بەڕێز،\nئەمە ئەپی فەرمی مزگەوتەکانی پێنجوێنە بۆ زانیاری مزگەوتەکان، کاتەکانی بانگی پێنجوێن، وتارەکانی هەینی و تۆمارکردنی دەنگی وتارەکان.\n\nتەنها لەم بەستەرە بدە، بە یەک کرتە دەچێتە سەر شاشەی مۆبایل یان کۆمپیوتەرەکەت وەک ئەپێکی فەرمی و سەربەخۆ:\n${installUrl}\n\n(بە تەواوی بەبێ ئینتەرنێت و بە ئۆنلاینیش کاردەکات)`;
+  const shareMsg = `سڵاو و ڕێز مامۆستای بەڕێز،\nئەمە ئەپی فەرمی مزگەوتەکانی پێنجوێنە بۆ زانیاری مزگەوتەکان، کاتەکانی بانگی پێنجوێن، وتارەکانی هەینی و دەنگی وتارەکان.\n\nتەنها لەم بەستەرە بدە، دەستبەجێ ئەپەکە بە تەواوی و وەک ئەپێکی فەرمی لەسەر مۆبایل یان کۆمپیوتەرەکەت دەکرێتەوە (بە ئۆفلاین و ئۆنلاین کاردەکات):\n${appUrl}`;
 
   if (shareWhatsAppBtn) {
     shareWhatsAppBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMsg)}`;
   }
 
   if (shareTelegramBtn) {
-    shareTelegramBtn.href = `https://t.me/share/url?url=${encodeURIComponent(installUrl)}&text=${encodeURIComponent(shareMsg)}`;
+    shareTelegramBtn.href = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(shareMsg)}`;
   }
 }
 

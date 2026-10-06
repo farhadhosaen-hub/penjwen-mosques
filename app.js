@@ -1921,6 +1921,27 @@ function initEvents() {
     printReportBtn.addEventListener('click', prepareAndPrintReport);
   }
 
+  const filterKhutbahBtn = document.getElementById('filterKhutbahBtn');
+  if (filterKhutbahBtn) {
+    filterKhutbahBtn.addEventListener('click', () => {
+      mosques.forEach(m => {
+        const panel = document.getElementById(`details-${m.id}`);
+        const btn = document.getElementById(`btn-${m.id}`);
+        const chevron = document.getElementById(`chevron-${m.id}`);
+        if (panel && panel.classList.contains('hidden')) {
+          panel.classList.remove('hidden');
+          if (btn) btn.classList.add('btn-active');
+          if (chevron) chevron.classList.add('rotate-180');
+        }
+      });
+      const mContainer = document.getElementById('mosquesContainer');
+      if (mContainer) {
+        mContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      showToast('وتارەکانی هەینی هەموو مزگەوتەکان پیشان دران', 'info');
+    });
+  }
+
   refreshWeatherBtn.addEventListener('click', () => {
     fetchPenjwenWeather();
     fetchPenjwenPrayerTimes();

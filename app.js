@@ -81,10 +81,10 @@ const DEFAULT_MOSQUES = [
 let mosques = [];
 let currentPrayerTimes = null;
 
-// دڵنیابوونەوەی دەستبەجێ لە بوونی هەردوو مزگەوتەکە لە داتابەیسی لۆکاڵدا
+// پاراستنی تەواوی داتای مزگەوتەکان - ئەگەر پێشتر داتا هەبووبێت، دەستکاری ناکرێت و بە پارێزراوی وەک خۆی دەمێنێتەوە
 try {
   const checkStored = localStorage.getItem('penjwen_mosques_data');
-  if (!checkStored || !checkStored.includes('مەلا عباس') || !checkStored.includes('گەیلانی')) {
+  if (!checkStored) {
     localStorage.setItem('penjwen_mosques_data', JSON.stringify(DEFAULT_MOSQUES));
   }
 } catch (e) {}
@@ -750,60 +750,57 @@ async function fetchPenjwenWeather() {
 // ٥. بەڕێوەبردنی مزگەوتەکان (خاڵی ١: تەنها مزگەوتی گەیلانی پێنجوێن)
 // ==============================================================
 function loadMosquesData() {
-  const stored = localStorage.getItem('penjwen_mosques_data');
   let loaded = null;
-  if (stored) {
-    try {
+  try {
+    const stored = localStorage.getItem('penjwen_mosques_data');
+    if (stored) {
       loaded = JSON.parse(stored);
-    } catch (e) {}
+    }
+  } catch (e) {
+    console.warn('Error reading stored mosques data:', e);
   }
 
-  // دڵنیابوونەوە لەوەی هەردوو مزگەوتە تۆمارکراوەکە (گەیلانی و مەلا عباس) بە تەواوی لە داتابەیسدا هەبن
-  const hasAbbas = Array.isArray(loaded) && loaded.some(m => m.name && m.name.includes('مەلا عباس'));
-  const hasGaylani = Array.isArray(loaded) && loaded.some(m => m.name && m.name.includes('گەیلانی'));
-
-  if (hasAbbas && hasGaylani) {
+  // پاراستنی سەدی سەدی داتای تۆمارکراو: ئەگەر داتا لە ستۆریجدا هەبێت بە پارێزراوی و بێ دەستکاری دەمێنێتەوە
+  if (Array.isArray(loaded) && loaded.length > 0) {
     mosques = loaded;
-    // دڵنیابوونەوە لە هەبوونی خانەی کارگووزار لە هەردوو مزگەوتەکەدا
-    mosques.forEach(m => {
-      if (!Array.isArray(m.staff)) m.staff = [];
-      const hasKarguzar = m.staff.some(s => {
-        const r = (s.role || '').toLowerCase();
-        return r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت');
-      });
-      if (!hasKarguzar) {
-        const defM = DEFAULT_MOSQUES.find(dm => dm.id === m.id || (dm.name && dm.name.includes(m.name.includes('مەلا عباس') ? 'مەلا عباس' : 'گەیلانی')));
-        const defKarguzar = defM ? (defM.staff || []).find(s => (s.role || '').includes('کارگ')) : null;
-        if (defKarguzar) {
-          m.staff.push(JSON.parse(JSON.stringify(defKarguzar)));
-        } else {
-          m.staff.push({
-            id: 's_' + Date.now(),
-            name: m.name.includes('مەلا عباس') ? 'کاک کامەران' : 'کاک ئەحمەد سەعید',
-            role: 'کارگووزار',
-            phone: ''
-          });
-        }
-      }
-      // سڕینەوەی ژمارەی تەلەفۆن تاوەکو تەنها ناوەکان دەربکەون
-      m.staff.forEach(s => {
-        s.phone = '';
-      });
-    });
-    localStorage.setItem('penjwen_mosques_data', JSON.stringify(mosques));
-    updateStats();
-    renderMosques();
   } else {
-    // دەستبەجێ گێڕانەوەی ئەو دوو مزگەوتەی تۆمار کرابوون بۆ ناو داتابەیس
-    mosques = JSON.parse(JSON.stringify(DEFAULT_MOSQUES));
-    saveMosquesData();
+    // پشکنینی نوسخەی یەدەگی پارێزراو
+    let backupLoaded = null;
+    try {
+      const backupStored = localStorage.getItem('penjwen_mosques_backup');
+      if (backupStored) backupLoaded = JSON.parse(backupStored);
+    } catch(e) {}
+
+    if (Array.isArray(backupLoaded) && backupLoaded.length > 0) {
+      mosques = backupLoaded;
+    } else {
+      mosques = JSON.parse(JSON.stringify(DEFAULT_MOSQUES));
+    }
+    try {
+      localStorage.setItem('penjwen_mosques_data', JSON.stringify(mosques));
+      localStorage.setItem('penjwen_mosques_backup', JSON.stringify(mosques));
+    } catch(e) {}
   }
+
+  updateStats();
+  renderMosques();
 }
 
 function saveMosquesData(triggerCloud = true) {
-  localStorage.setItem('penjwen_mosques_data', JSON.stringify(mosques));
+  try {
+    const dataStr = JSON.stringify(mosques);
+    localStorage.setItem('penjwen_mosques_data', dataStr);
+    // هەڵگرتنی نوسخەی باکئەپی یەدەگ بۆ پاراستنی هەمیشەیی داتاکان
+    if (Array.isArray(mosques) && mosques.length > 0) {
+      localStorage.setItem('penjwen_mosques_backup', dataStr);
+    }
+  } catch(e) {
+    console.warn('Error saving mosques data:', e);
+  }
+
   updateStats();
   renderMosques();
+
   if (typeof updateSyncBadgeOnLocalChange === 'function') {
     updateSyncBadgeOnLocalChange();
   }

@@ -1852,13 +1852,6 @@ function initPwaInstallPrompt() {
     deferredPrompt = e;
     const btn = document.getElementById('pwaInstallBtn');
     if (btn && !checkStandaloneMode()) btn.classList.remove('hidden');
-
-    const urlParams = new URLSearchParams(window.location.search);
-    if (!checkStandaloneMode() && urlParams.get('install') === '1') {
-      setTimeout(() => {
-        window.openAutoInstallModal();
-      }, 350);
-    }
   });
 
   window.addEventListener('appinstalled', () => {
@@ -1870,16 +1863,6 @@ function initPwaInstallPrompt() {
     deferredPrompt = null;
     showToast('ئەپەکە ئێستا وەک بەرنامەیەکی فەرمی بەردەستە لەسەر شاشەکەت', 'success');
   });
-
-  // ئەگەر لە ڕێگەی لینکی داگرتنەوە (?install=1) کرایەوە و پێشتر ئینستۆڵ نەکراوە
-  if (!isStandalone) {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('install') === '1' && sessionStorage.getItem('penjwen_auto_install_dismissed') !== '1') {
-      setTimeout(() => {
-        window.openAutoInstallModal();
-      }, 500);
-    }
-  }
 }
 
 function setupShareLinks() {
@@ -1887,20 +1870,20 @@ function setupShareLinks() {
   const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
   const shareTelegramBtn = document.getElementById('shareTelegramBtn');
 
-  const installUrl = `${OFFICIAL_APP_URL}?install=1`;
+  const appUrl = OFFICIAL_APP_URL;
 
   if (shareUrlInput) {
-    shareUrlInput.value = installUrl;
+    shareUrlInput.value = appUrl;
   }
 
-  const shareMsg = `سڵاو و ڕێز مامۆستای بەڕێز،\nئەمە ئەپی فەرمی مزگەوتەکانی پێنجوێنە بۆ زانیاری مزگەوتەکان، کاتەکانی بانگی پێنجوێن، وتارەکانی هەینی و تۆمارکردنی دەنگی وتارەکان.\n\nتەنها لەم بەستەرە بدە، بە یەک کرتە دەچێتە سەر شاشەی مۆبایل یان کۆمپیوتەرەکەت وەک ئەپێکی فەرمی و سەربەخۆ:\n${installUrl}\n\n(بە تەواوی بەبێ ئینتەرنێت و بە ئۆنلاینیش کاردەکات)`;
+  const shareMsg = `سڵاو و ڕێز مامۆستای بەڕێز،\nئەمە ئەپی فەرمی مزگەوتەکانی پێنجوێنە بۆ زانیاری مزگەوتەکان، کاتەکانی بانگی پێنجوێن، وتارەکانی هەینی و دەنگی وتارەکان.\n\nتەنها لەم بەستەرە بدە، دەستبەجێ ئەپەکە بە تەواوی و وەک ئەپێکی فەرمی لەسەر مۆبایل یان کۆمپیوتەرەکەت دەکرێتەوە (بە ئۆفلاین و ئۆنلاین کاردەکات):\n${appUrl}`;
 
   if (shareWhatsAppBtn) {
     shareWhatsAppBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMsg)}`;
   }
 
   if (shareTelegramBtn) {
-    shareTelegramBtn.href = `https://t.me/share/url?url=${encodeURIComponent(installUrl)}&text=${encodeURIComponent(shareMsg)}`;
+    shareTelegramBtn.href = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(shareMsg)}`;
   }
 }
 

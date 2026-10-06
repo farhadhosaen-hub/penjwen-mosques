@@ -287,3 +287,23 @@ body {
     border-radius: 14px !important;
   }
 }
+
+/* خانەی قاوەیی کاڵ بۆ دوگمەی چاپکردن و وتارەکان */
+#printReportBtn,
+#filterKhutbahBtn {
+  background-color: #ede0d4 !important;
+  color: #4a2810 !important;
+  border: 1px solid #d5bdaf !important;
+}
+
+#printReportBtn:hover,
+#filterKhutbahBtn:hover {
+  background-color: #ddb892 !important;
+  border-color: #b08968 !important;
+}
+
+#printReportBtn i,
+#filterKhutbahBtn i {
+  color: #7f4f24 !important;
+}
+

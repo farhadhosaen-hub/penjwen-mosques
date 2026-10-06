@@ -1697,6 +1697,58 @@ function initNetworkStatusMonitor() {
 
 const OFFICIAL_APP_URL = 'https://farhadhosaen-hub.github.io/penjwen-mosques/';
 
+// دوگمەی پڕکردنی تەواوی شاشە (Fullscreen Toggle) بۆ مۆبایل و کۆمپیوتەر
+function toggleFullScreen() {
+  const doc = window.document;
+  const docEl = doc.documentElement;
+
+  const isFs = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement);
+
+  if (!isFs) {
+    const rfs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+    if (rfs) {
+      rfs.call(docEl).then(() => {
+        updateFullScreenButtonIcon(true);
+      }).catch((err) => {
+        console.warn('[Fullscreen] Could not enter fullscreen:', err);
+      });
+    } else {
+      showToast('ئامێرەکەت یان وێبگەڕەکەت ڕێگە بە Fullscreen نادات', 'info');
+    }
+  } else {
+    const cfs = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
+    if (cfs) {
+      cfs.call(doc).then(() => {
+        updateFullScreenButtonIcon(false);
+      }).catch((err) => {
+        console.warn('[Fullscreen] Could not exit fullscreen:', err);
+      });
+    }
+  }
+}
+
+function updateFullScreenButtonIcon(isFullscreen) {
+  const icon = document.getElementById('fullScreenIcon');
+  const btn = document.getElementById('fullScreenToggleBtn');
+  if (!icon) return;
+  if (isFullscreen) {
+    icon.className = 'fa-solid fa-compress text-[10px]';
+    if (btn) btn.title = 'گەڕانەوە بۆ باری ئاسایی';
+  } else {
+    icon.className = 'fa-solid fa-expand text-[10px]';
+    if (btn) btn.title = 'پڕکردنی تەواوی شاشە (Fullscreen)';
+  }
+}
+
+['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
+  document.addEventListener(evt, () => {
+    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    updateFullScreenButtonIcon(isFs);
+  });
+});
+
+window.toggleFullScreen = toggleFullScreen;
+
 let deferredPrompt = null;
 
 function checkStandaloneMode() {

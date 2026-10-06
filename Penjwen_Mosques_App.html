@@ -341,6 +341,26 @@ body {
   }
 }
 
+/* خانەی قاوەیی کاڵ بۆ دوگمەی چاپکردن و وتارەکان */
+#printReportBtn,
+#filterKhutbahBtn {
+  background-color: #ede0d4 !important;
+  color: #4a2810 !important;
+  border: 1px solid #d5bdaf !important;
+}
+
+#printReportBtn:hover,
+#filterKhutbahBtn:hover {
+  background-color: #ddb892 !important;
+  border-color: #b08968 !important;
+}
+
+#printReportBtn i,
+#filterKhutbahBtn i {
+  color: #7f4f24 !important;
+}
+
+
 </style>
   <link rel="icon" type="image/png" href="data:image/png;base64,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">
   <link rel="apple-touch-icon" href="data:image/png;base64,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">
@@ -540,15 +560,15 @@ body {
           <span>داگرتنی ئەپ</span>
         </button>
 
-        <!-- خاڵی ٣: دووگمەی چاپکردن و PDF -->
-        <button id="printReportBtn" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-emerald-50 text-emerald-800 font-bold px-3.5 py-3.5 rounded-2xl border border-emerald-200 transition-all cursor-pointer text-sm shadow-xs" title="چاپکردن و هەناردەکردن بۆ PDF">
-          <i class="fa-solid fa-print text-emerald-600 text-base"></i>
+        <!-- خاڵی ٣: دووگمەی چاپکردن و PDF (ڕەنگی قاوەیی کاڵ) -->
+        <button id="printReportBtn" class="inline-flex items-center justify-center gap-2 bg-[#ede0d4] hover:bg-[#ddb892] active:bg-[#d5bdaf] text-[#4a2810] font-bold px-3.5 py-3.5 rounded-2xl border border-[#d5bdaf] transition-all cursor-pointer text-sm shadow-xs" title="چاپکردن و هەناردەکردن بۆ PDF">
+          <i class="fa-solid fa-print text-[#7f4f24] text-base"></i>
           <span>چاپکردن</span>
         </button>
 
-        <!-- خاڵی ٢: وتارەکانی هەینی -->
-        <button id="filterKhutbahBtn" class="inline-flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold px-3.5 py-3.5 rounded-2xl border border-amber-200 transition-all cursor-pointer text-sm shadow-xs" title="پیشاندانی وتارەکانی ئەم هەفتەیە">
-          <i class="fa-solid fa-microphone-lines text-amber-600"></i>
+        <!-- خاڵی ٢: وتارەکانی هەینی (ڕەنگی قاوەیی کاڵ) -->
+        <button id="filterKhutbahBtn" class="inline-flex items-center justify-center gap-2 bg-[#ede0d4] hover:bg-[#ddb892] active:bg-[#d5bdaf] text-[#4a2810] font-bold px-3.5 py-3.5 rounded-2xl border border-[#d5bdaf] transition-all cursor-pointer text-sm shadow-xs" title="پیشاندانی وتارەکانی ئەم هەفتەیە">
+          <i class="fa-solid fa-microphone-lines text-[#7f4f24]"></i>
           <span>وتارەکان</span>
         </button>
       </div>
@@ -3267,6 +3287,27 @@ function initEvents() {
 
   if (printReportBtn) {
     printReportBtn.addEventListener('click', prepareAndPrintReport);
+  }
+
+  const filterKhutbahBtn = document.getElementById('filterKhutbahBtn');
+  if (filterKhutbahBtn) {
+    filterKhutbahBtn.addEventListener('click', () => {
+      mosques.forEach(m => {
+        const panel = document.getElementById(`details-${m.id}`);
+        const btn = document.getElementById(`btn-${m.id}`);
+        const chevron = document.getElementById(`chevron-${m.id}`);
+        if (panel && panel.classList.contains('hidden')) {
+          panel.classList.remove('hidden');
+          if (btn) btn.classList.add('btn-active');
+          if (chevron) chevron.classList.add('rotate-180');
+        }
+      });
+      const mContainer = document.getElementById('mosquesContainer');
+      if (mContainer) {
+        mContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      showToast('وتارەکانی هەینی هەموو مزگەوتەکان پیشان دران', 'info');
+    });
   }
 
   refreshWeatherBtn.addEventListener('click', () => {

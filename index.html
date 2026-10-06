@@ -2,7 +2,7 @@
 <html lang="ku" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ئەپی مزگەوتەکانی پێنجوێن | Penjwen Mosques</title>
   <!-- PWA & Mobile Meta Tags (کارکردن بە ئۆفلاین و ئۆنلاین ڕاستەوخۆ وەک ئەپ) -->
   <link rel="manifest" href="manifest.json">
@@ -108,6 +108,10 @@
               <button id="cloudSyncStatusBadge" onclick="syncFromCloud(false)" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300 hover:bg-blue-200 transition-colors cursor-pointer" title="هاوکاتکردنی ڕاستەوخۆ لەگەڵ کڵاود">
                 <i id="cloudSyncIcon" class="fa-solid fa-arrows-rotate text-[9px]"></i>
                 <span id="cloudSyncText">هاوکاتە</span>
+              </button>
+              <!-- دوگمەی پڕکردنی تەواوی شاشە (Fullscreen Toggle) -->
+              <button id="fullScreenToggleBtn" onclick="toggleFullScreen()" class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-100/80 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 shadow-2xs transition-colors cursor-pointer" title="پڕکردنی تەواوی شاشە (Fullscreen)">
+                <i id="fullScreenIcon" class="fa-solid fa-expand text-[10px]"></i>
               </button>
             </div>
             <div class="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-700 font-medium">
@@ -1046,6 +1050,6 @@
     <span id="toastMsg">کردارەکە سەرکەوتووبوو</span>
   </div>
 
-  <script src="app.js?v=20261006_v17"></script>
+  <script src="app.js?v=20261006_v18"></script>
 </body>
 </html>

@@ -67,6 +67,7 @@
 
 html {
   min-height: 100%;
+  min-height: 100vh;
   min-height: 100dvh;
   min-height: -webkit-fill-available;
   width: 100%;
@@ -74,6 +75,7 @@ html {
 
 body {
   min-height: 100%;
+  min-height: 100vh;
   min-height: 100dvh;
   min-height: -webkit-fill-available;
   width: 100%;
@@ -1269,17 +1271,27 @@ body {
           </ol>
         </div>
 
-        <!-- بەشی ئەندرۆید -->
-        <div id="pwaGuideAndroid" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2 transition-all">
-          <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
-            <i class="fa-brands fa-android text-base text-green-600"></i>
-            <span>بۆ مۆبایلی ئەندرۆید (Samsung, Xiaomi, Chrome):</span>
+        <!-- بەشی ئەندرۆید (Android 5.0+) -->
+        <div id="pwaGuideAndroid" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5 transition-all">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+              <i class="fa-brands fa-android text-base text-green-600"></i>
+              <span>بۆ مۆبایلی ئەندرۆید (هەموو ئەندرۆیدەکان ٥ بۆسەرەوە):</span>
+            </div>
+            <span class="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full border border-green-200">Android 5.0+</span>
           </div>
           <ol class="space-y-1.5 list-decimal list-inside pr-1 text-slate-600 leading-relaxed">
             <li>کلیک لە دوگمەی سەرەکی <strong>«داگرتنی ئەپ»</strong> بکە.</li>
-            <li>یان لە کرۆم کلیک لە <strong>سێ خاڵەکەی سەرەوە (⋮)</strong> بکە.</li>
-            <li>هەڵبژاردنی <strong>«Install app / ئەپەکە دابەزێنە»</strong> یان <strong>«Add to Home screen»</strong> بکە.</li>
+            <li>یان لە وێبگەڕ/کرۆم کلیک لە <strong>سێ خاڵەکەی سەرەوە (⋮)</strong> بکە.</li>
+            <li>هەڵبژاردنی <strong>«Install app / ئەپەکە دابەزێنە»</strong> یان <strong>«Add to Home screen / خستنەسەر شاشە»</strong> بکە.</li>
           </ol>
+          <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between gap-2">
+            <span class="text-[11px] text-slate-500 font-medium">داگرتنی فایلی تەواوی ئەپ (بەبێ ئینتەرنێت):</span>
+            <a href="Penjwen_Mosques_App.html" download="ئەپی مزگەوتەکانی پێنجوێن.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors shadow-2xs">
+              <i class="fa-solid fa-download text-[11px]"></i>
+              <span>فایلی ئەپ دابەزێنە</span>
+            </a>
+          </div>
         </div>
 
         <!-- بەشی کۆمپیوتەر -->
@@ -1373,6 +1385,8 @@ body {
       <div>
         <span>بەشەکان: کاتەکانی بانگ، وتاری هەینی، چاپکردن و باکئەپ</span>
         <span class="mx-2">•</span>
+        <span class="font-bold text-emerald-700">ڤێرژن 2.4 (Android 5.0+)</span>
+        <span class="mx-2">•</span>
         <span id="footerYear">2026</span>
       </div>
     </div>
@@ -1387,8 +1401,141 @@ body {
   <script>
 // Penjwen Mosques App Bundle Script
 // ==============================================================
-// ئەپی مزگەوتەکانی پێنجوێن - Penjwen Mosques & Prayer Times App
+// ئەپی مزگەوتەکانی پێنجوێن - Penjwen Mosques & Prayer Times App (v2.4)
+// پشتگیری و سازگاری تەواو بۆ هەموو مۆبایلەکانی ئەندرۆید (Android 5.0+)
 // ==============================================================
+
+// Polyfills for Android 5.0+ (Lollipop, Chrome 37+ / System WebView)
+(function() {
+  if (typeof window === 'undefined') return;
+
+  // 1. String.prototype.padStart
+  if (!String.prototype.padStart) {
+    String.prototype.padStart = function(targetLength, padString) {
+      targetLength = targetLength >> 0;
+      padString = String(typeof padString !== 'undefined' ? padString : ' ');
+      if (this.length > targetLength) return String(this);
+      targetLength = targetLength - this.length;
+      var pad = '';
+      while (pad.length < targetLength) pad += padString;
+      return pad.slice(0, targetLength) + String(this);
+    };
+  }
+
+  // 2. String.prototype.includes
+  if (!String.prototype.includes) {
+    String.prototype.includes = function(search, start) {
+      if (typeof start !== 'number') start = 0;
+      if (start + search.length > this.length) return false;
+      return this.indexOf(search, start) !== -1;
+    };
+  }
+
+  // 3. Array.prototype.find
+  if (!Array.prototype.find) {
+    Array.prototype.find = function(predicate) {
+      if (this == null) throw new TypeError('Array.prototype.find called on null or undefined');
+      if (typeof predicate !== 'function') throw new TypeError('predicate must be a function');
+      var list = Object(this);
+      var length = list.length >>> 0;
+      var thisArg = arguments[1];
+      for (var i = 0; i < length; i++) {
+        if (predicate.call(thisArg, list[i], i, list)) return list[i];
+      }
+      return undefined;
+    };
+  }
+
+  // 4. Array.prototype.findIndex
+  if (!Array.prototype.findIndex) {
+    Array.prototype.findIndex = function(predicate) {
+      if (this == null) throw new TypeError('Array.prototype.findIndex called on null or undefined');
+      if (typeof predicate !== 'function') throw new TypeError('predicate must be a function');
+      var list = Object(this);
+      var length = list.length >>> 0;
+      var thisArg = arguments[1];
+      for (var i = 0; i < length; i++) {
+        if (predicate.call(thisArg, list[i], i, list)) return i;
+      }
+      return -1;
+    };
+  }
+
+  // 5. Array.prototype.includes
+  if (!Array.prototype.includes) {
+    Array.prototype.includes = function(searchElement, fromIndex) {
+      return this.indexOf(searchElement, fromIndex) !== -1;
+    };
+  }
+
+  // 6. Object.values
+  if (!Object.values) {
+    Object.values = function(obj) {
+      if (obj !== Object(obj)) return [];
+      return Object.keys(obj).map(function(k) { return obj[k]; });
+    };
+  }
+
+  // 7. Object.entries
+  if (!Object.entries) {
+    Object.entries = function(obj) {
+      if (obj !== Object(obj)) return [];
+      return Object.keys(obj).map(function(k) { return [k, obj[k]]; });
+    };
+  }
+
+  // 8. Object.assign
+  if (!Object.assign) {
+    Object.assign = function(target) {
+      if (target == null) throw new TypeError('Cannot convert undefined or null to object');
+      var to = Object(target);
+      for (var index = 1; index < arguments.length; index++) {
+        var nextSource = arguments[index];
+        if (nextSource != null) {
+          for (var nextKey in nextSource) {
+            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+              to[nextKey] = nextSource[nextKey];
+            }
+          }
+        }
+      }
+      return to;
+    };
+  }
+
+  // 9. Window.fetch fallback for Android 5 WebViews
+  if (typeof window.fetch !== 'function') {
+    window.fetch = function(url, options) {
+      options = options || {};
+      return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(options.method || 'GET', url, true);
+        if (options.headers) {
+          for (var h in options.headers) {
+            if (Object.prototype.hasOwnProperty.call(options.headers, h)) {
+              xhr.setRequestHeader(h, options.headers[h]);
+            }
+          }
+        }
+        xhr.onload = function() {
+          resolve({
+            ok: xhr.status >= 200 && xhr.status < 300,
+            status: xhr.status,
+            statusText: xhr.statusText,
+            text: function() { return Promise.resolve(xhr.responseText); },
+            json: function() {
+              try { return Promise.resolve(JSON.parse(xhr.responseText)); }
+              catch(e) { return Promise.reject(e); }
+            }
+          });
+        };
+        xhr.onerror = function() { reject(new TypeError('Network request failed')); };
+        xhr.ontimeout = function() { reject(new TypeError('Network request timed out')); };
+        xhr.send(options.body || null);
+      });
+    };
+  }
+})();
 
 // داتای ئەو دوو مزگەوتەی تۆمار کرابوون (مزگەوتی گەیلانی پێنجوێن و مزگەوتی مەلا عباس)
 const DEFAULT_MOSQUES = [

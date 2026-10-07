@@ -2060,33 +2060,73 @@ function initNetworkStatusMonitor() {
 
 const OFFICIAL_APP_URL = 'https://farhadhosaen-hub.github.io/penjwen-mosques/';
 
-// دوگمەی پڕکردنی تەواوی شاشە (Fullscreen Toggle) بۆ مۆبایل و کۆمپیوتەر
+// ==============================================================
+// سیستەمی فوول سکرین (پڕکردنی شاشە بە تەواوی و ئۆتۆماتیکی لە مۆبایلدا)
+// ==============================================================
+let userManuallyExitedFullscreen = false;
+
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+         (window.innerWidth <= 850 && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+}
+
+function requestFullScreenElement(docEl = document.documentElement) {
+  const rfs = docEl.requestFullscreen || 
+              docEl.webkitRequestFullscreen || 
+              docEl.mozRequestFullScreen || 
+              docEl.msRequestFullscreen;
+  if (rfs) {
+    try {
+      const p = rfs.call(docEl);
+      if (p && typeof p.then === 'function') {
+        return p.then(() => {
+          updateFullScreenButtonIcon(true);
+          return true;
+        }).catch(() => false);
+      }
+      updateFullScreenButtonIcon(true);
+      return Promise.resolve(true);
+    } catch(e) {}
+  }
+  return Promise.resolve(false);
+}
+
+function exitFullScreenElement() {
+  const doc = window.document;
+  const cfs = doc.exitFullscreen || 
+              doc.webkitExitFullscreen || 
+              doc.mozCancelFullScreen || 
+              doc.msExitFullscreen;
+  if (cfs) {
+    try {
+      const p = cfs.call(doc);
+      if (p && typeof p.then === 'function') {
+        return p.then(() => {
+          updateFullScreenButtonIcon(false);
+          return true;
+        }).catch(() => false);
+      }
+      updateFullScreenButtonIcon(false);
+      return Promise.resolve(true);
+    } catch(e) {}
+  }
+  return Promise.resolve(false);
+}
+
 function toggleFullScreen() {
   const doc = window.document;
-  const docEl = doc.documentElement;
-
   const isFs = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement);
 
   if (!isFs) {
-    const rfs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
-    if (rfs) {
-      rfs.call(docEl).then(() => {
-        updateFullScreenButtonIcon(true);
-      }).catch((err) => {
-        console.warn('[Fullscreen] Could not enter fullscreen:', err);
-      });
-    } else {
-      showToast('ئامێرەکەت یان وێبگەڕەکەت ڕێگە بە Fullscreen نادات', 'info');
-    }
+    userManuallyExitedFullscreen = false;
+    requestFullScreenElement().then(success => {
+      if (!success) {
+        showToast('ئامێرەکەت یان وێبگەڕەکەت ڕێگە بە Fullscreen نادات', 'info');
+      }
+    });
   } else {
-    const cfs = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
-    if (cfs) {
-      cfs.call(doc).then(() => {
-        updateFullScreenButtonIcon(false);
-      }).catch((err) => {
-        console.warn('[Fullscreen] Could not exit fullscreen:', err);
-      });
-    }
+    userManuallyExitedFullscreen = true;
+    exitFullScreenElement();
   }
 }
 
@@ -2111,6 +2151,45 @@ function updateFullScreenButtonIcon(isFullscreen) {
 });
 
 window.toggleFullScreen = toggleFullScreen;
+
+// ئۆتۆماتیکی پڕکردنی شاشە لە کاتی کردنەوەی ئەپ لە مۆبایلدا
+function initAutoFullScreenOnMobile() {
+  if (!isMobileDevice()) return;
+
+  const tryEnterFullscreen = () => {
+    if (userManuallyExitedFullscreen) return;
+    const doc = window.document;
+    const isFs = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement);
+    if (!isFs) {
+      requestFullScreenElement();
+    }
+  };
+
+  // ١. هەوڵی ڕاستەوخۆ دەستبەجێ لە کاتی کردنەوەی پەڕە
+  tryEnterFullscreen();
+  setTimeout(tryEnterFullscreen, 150);
+  setTimeout(tryEnterFullscreen, 500);
+  setTimeout(tryEnterFullscreen, 1200);
+
+  // ٢. لەگەڵ یەکەمین پەنجەلێدان / تاچ لەسەر هەر شوێنێکی شاشە
+  const onFirstInteraction = () => {
+    if (!userManuallyExitedFullscreen) {
+      tryEnterFullscreen();
+    }
+  };
+
+  ['touchstart', 'touchend', 'pointerdown', 'click'].forEach(evt => {
+    window.addEventListener(evt, onFirstInteraction, { passive: true });
+  });
+
+  // ٣. کاتێک وێبگەڕ فوکەس دەبێتەوە یان دەگەڕێتەوە سەر ئەپەکە
+  window.addEventListener('focus', tryEnterFullscreen);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      tryEnterFullscreen();
+    }
+  });
+}
 
 let deferredPrompt = null;
 
@@ -2815,6 +2894,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNetworkStatusMonitor();
   initPwaInstallPrompt();
   initShareModal();
+  initAutoFullScreenOnMobile();
 
   window.addEventListener('online', () => {
     syncFromCloud(true);

@@ -1,6 +1,139 @@
 // ==============================================================
-// ئەپی مزگەوتەکانی پێنجوێن - Penjwen Mosques & Prayer Times App
+// ئەپی مزگەوتەکانی پێنجوێن - Penjwen Mosques & Prayer Times App (v2.4)
+// پشتگیری و سازگاری تەواو بۆ هەموو مۆبایلەکانی ئەندرۆید (Android 5.0+)
 // ==============================================================
+
+// Polyfills for Android 5.0+ (Lollipop, Chrome 37+ / System WebView)
+(function() {
+  if (typeof window === 'undefined') return;
+
+  // 1. String.prototype.padStart
+  if (!String.prototype.padStart) {
+    String.prototype.padStart = function(targetLength, padString) {
+      targetLength = targetLength >> 0;
+      padString = String(typeof padString !== 'undefined' ? padString : ' ');
+      if (this.length > targetLength) return String(this);
+      targetLength = targetLength - this.length;
+      var pad = '';
+      while (pad.length < targetLength) pad += padString;
+      return pad.slice(0, targetLength) + String(this);
+    };
+  }
+
+  // 2. String.prototype.includes
+  if (!String.prototype.includes) {
+    String.prototype.includes = function(search, start) {
+      if (typeof start !== 'number') start = 0;
+      if (start + search.length > this.length) return false;
+      return this.indexOf(search, start) !== -1;
+    };
+  }
+
+  // 3. Array.prototype.find
+  if (!Array.prototype.find) {
+    Array.prototype.find = function(predicate) {
+      if (this == null) throw new TypeError('Array.prototype.find called on null or undefined');
+      if (typeof predicate !== 'function') throw new TypeError('predicate must be a function');
+      var list = Object(this);
+      var length = list.length >>> 0;
+      var thisArg = arguments[1];
+      for (var i = 0; i < length; i++) {
+        if (predicate.call(thisArg, list[i], i, list)) return list[i];
+      }
+      return undefined;
+    };
+  }
+
+  // 4. Array.prototype.findIndex
+  if (!Array.prototype.findIndex) {
+    Array.prototype.findIndex = function(predicate) {
+      if (this == null) throw new TypeError('Array.prototype.findIndex called on null or undefined');
+      if (typeof predicate !== 'function') throw new TypeError('predicate must be a function');
+      var list = Object(this);
+      var length = list.length >>> 0;
+      var thisArg = arguments[1];
+      for (var i = 0; i < length; i++) {
+        if (predicate.call(thisArg, list[i], i, list)) return i;
+      }
+      return -1;
+    };
+  }
+
+  // 5. Array.prototype.includes
+  if (!Array.prototype.includes) {
+    Array.prototype.includes = function(searchElement, fromIndex) {
+      return this.indexOf(searchElement, fromIndex) !== -1;
+    };
+  }
+
+  // 6. Object.values
+  if (!Object.values) {
+    Object.values = function(obj) {
+      if (obj !== Object(obj)) return [];
+      return Object.keys(obj).map(function(k) { return obj[k]; });
+    };
+  }
+
+  // 7. Object.entries
+  if (!Object.entries) {
+    Object.entries = function(obj) {
+      if (obj !== Object(obj)) return [];
+      return Object.keys(obj).map(function(k) { return [k, obj[k]]; });
+    };
+  }
+
+  // 8. Object.assign
+  if (!Object.assign) {
+    Object.assign = function(target) {
+      if (target == null) throw new TypeError('Cannot convert undefined or null to object');
+      var to = Object(target);
+      for (var index = 1; index < arguments.length; index++) {
+        var nextSource = arguments[index];
+        if (nextSource != null) {
+          for (var nextKey in nextSource) {
+            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+              to[nextKey] = nextSource[nextKey];
+            }
+          }
+        }
+      }
+      return to;
+    };
+  }
+
+  // 9. Window.fetch fallback for Android 5 WebViews
+  if (typeof window.fetch !== 'function') {
+    window.fetch = function(url, options) {
+      options = options || {};
+      return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(options.method || 'GET', url, true);
+        if (options.headers) {
+          for (var h in options.headers) {
+            if (Object.prototype.hasOwnProperty.call(options.headers, h)) {
+              xhr.setRequestHeader(h, options.headers[h]);
+            }
+          }
+        }
+        xhr.onload = function() {
+          resolve({
+            ok: xhr.status >= 200 && xhr.status < 300,
+            status: xhr.status,
+            statusText: xhr.statusText,
+            text: function() { return Promise.resolve(xhr.responseText); },
+            json: function() {
+              try { return Promise.resolve(JSON.parse(xhr.responseText)); }
+              catch(e) { return Promise.reject(e); }
+            }
+          });
+        };
+        xhr.onerror = function() { reject(new TypeError('Network request failed')); };
+        xhr.ontimeout = function() { reject(new TypeError('Network request timed out')); };
+        xhr.send(options.body || null);
+      });
+    };
+  }
+})();
 
 // داتای ئەو دوو مزگەوتەی تۆمار کرابوون (مزگەوتی گەیلانی پێنجوێن و مزگەوتی مەلا عباس)
 const DEFAULT_MOSQUES = [

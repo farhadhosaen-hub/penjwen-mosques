@@ -11,6 +11,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="مزگەوتەکانی پێنجوێن">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="full-screen" content="yes">
+  <meta name="browsermode" content="application">
+  <meta name="x5-fullscreen" content="true">
+  <meta name="x5-page-mode" content="app">
+  <meta name="screen-orientation" content="portrait">
   <meta name="application-name" content="مزگەوتەکانی پێنجوێن">
   <meta name="format-detection" content="telephone=no">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -59,7 +65,22 @@
   --light-green-bg: #f2fbf5;
 }
 
+html {
+  min-height: 100%;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  width: 100%;
+}
+
 body {
+  min-height: 100%;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  width: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
   background-color: var(--light-green-bg);
   background-image: radial-gradient(#dcfce7 0.8px, transparent 0.8px), radial-gradient(#e2f8ec 0.8px, var(--light-green-bg) 0.8px);
   background-size: 32px 32px;
@@ -3427,33 +3448,73 @@ function initNetworkStatusMonitor() {
 
 const OFFICIAL_APP_URL = 'https://farhadhosaen-hub.github.io/penjwen-mosques/';
 
-// دوگمەی پڕکردنی تەواوی شاشە (Fullscreen Toggle) بۆ مۆبایل و کۆمپیوتەر
+// ==============================================================
+// سیستەمی فوول سکرین (پڕکردنی شاشە بە تەواوی و ئۆتۆماتیکی لە مۆبایلدا)
+// ==============================================================
+let userManuallyExitedFullscreen = false;
+
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+         (window.innerWidth <= 850 && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+}
+
+function requestFullScreenElement(docEl = document.documentElement) {
+  const rfs = docEl.requestFullscreen || 
+              docEl.webkitRequestFullscreen || 
+              docEl.mozRequestFullScreen || 
+              docEl.msRequestFullscreen;
+  if (rfs) {
+    try {
+      const p = rfs.call(docEl);
+      if (p && typeof p.then === 'function') {
+        return p.then(() => {
+          updateFullScreenButtonIcon(true);
+          return true;
+        }).catch(() => false);
+      }
+      updateFullScreenButtonIcon(true);
+      return Promise.resolve(true);
+    } catch(e) {}
+  }
+  return Promise.resolve(false);
+}
+
+function exitFullScreenElement() {
+  const doc = window.document;
+  const cfs = doc.exitFullscreen || 
+              doc.webkitExitFullscreen || 
+              doc.mozCancelFullScreen || 
+              doc.msExitFullscreen;
+  if (cfs) {
+    try {
+      const p = cfs.call(doc);
+      if (p && typeof p.then === 'function') {
+        return p.then(() => {
+          updateFullScreenButtonIcon(false);
+          return true;
+        }).catch(() => false);
+      }
+      updateFullScreenButtonIcon(false);
+      return Promise.resolve(true);
+    } catch(e) {}
+  }
+  return Promise.resolve(false);
+}
+
 function toggleFullScreen() {
   const doc = window.document;
-  const docEl = doc.documentElement;
-
   const isFs = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement);
 
   if (!isFs) {
-    const rfs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
-    if (rfs) {
-      rfs.call(docEl).then(() => {
-        updateFullScreenButtonIcon(true);
-      }).catch((err) => {
-        console.warn('[Fullscreen] Could not enter fullscreen:', err);
-      });
-    } else {
-      showToast('ئامێرەکەت یان وێبگەڕەکەت ڕێگە بە Fullscreen نادات', 'info');
-    }
+    userManuallyExitedFullscreen = false;
+    requestFullScreenElement().then(success => {
+      if (!success) {
+        showToast('ئامێرەکەت یان وێبگەڕەکەت ڕێگە بە Fullscreen نادات', 'info');
+      }
+    });
   } else {
-    const cfs = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
-    if (cfs) {
-      cfs.call(doc).then(() => {
-        updateFullScreenButtonIcon(false);
-      }).catch((err) => {
-        console.warn('[Fullscreen] Could not exit fullscreen:', err);
-      });
-    }
+    userManuallyExitedFullscreen = true;
+    exitFullScreenElement();
   }
 }
 
@@ -3478,6 +3539,45 @@ function updateFullScreenButtonIcon(isFullscreen) {
 });
 
 window.toggleFullScreen = toggleFullScreen;
+
+// ئۆتۆماتیکی پڕکردنی شاشە لە کاتی کردنەوەی ئەپ لە مۆبایلدا
+function initAutoFullScreenOnMobile() {
+  if (!isMobileDevice()) return;
+
+  const tryEnterFullscreen = () => {
+    if (userManuallyExitedFullscreen) return;
+    const doc = window.document;
+    const isFs = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement);
+    if (!isFs) {
+      requestFullScreenElement();
+    }
+  };
+
+  // ١. هەوڵی ڕاستەوخۆ دەستبەجێ لە کاتی کردنەوەی پەڕە
+  tryEnterFullscreen();
+  setTimeout(tryEnterFullscreen, 150);
+  setTimeout(tryEnterFullscreen, 500);
+  setTimeout(tryEnterFullscreen, 1200);
+
+  // ٢. لەگەڵ یەکەمین پەنجەلێدان / تاچ لەسەر هەر شوێنێکی شاشە
+  const onFirstInteraction = () => {
+    if (!userManuallyExitedFullscreen) {
+      tryEnterFullscreen();
+    }
+  };
+
+  ['touchstart', 'touchend', 'pointerdown', 'click'].forEach(evt => {
+    window.addEventListener(evt, onFirstInteraction, { passive: true });
+  });
+
+  // ٣. کاتێک وێبگەڕ فوکەس دەبێتەوە یان دەگەڕێتەوە سەر ئەپەکە
+  window.addEventListener('focus', tryEnterFullscreen);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      tryEnterFullscreen();
+    }
+  });
+}
 
 let deferredPrompt = null;
 
@@ -4182,6 +4282,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNetworkStatusMonitor();
   initPwaInstallPrompt();
   initShareModal();
+  initAutoFullScreenOnMobile();
 
   window.addEventListener('online', () => {
     syncFromCloud(true);

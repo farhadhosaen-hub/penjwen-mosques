@@ -4,11 +4,10 @@
   "description": "سیستەمی فەرمی مزگەوتەکانی قەزای پێنجوێن، کاتەکانی بانگ و وتاری هەینی",
   "start_url": "./index.html",
   "scope": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "display_override": [
     "fullscreen",
-    "standalone",
-    "minimal-ui"
+    "standalone"
   ],
   "orientation": "portrait-primary",
   "background_color": "#f2fbf5",

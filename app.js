@@ -135,35 +135,6 @@
   }
 })();
 
-// ==============================================================
-// ڕێگریکردن لە زووم (Disable Pinch & Double-tap Zoom) و پاراستنی سکرۆڵ
-// ==============================================================
-(function() {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return;
-
-  // 1. ڕێگری لە زوومی دوو پەنجە (Pinch zoom) لە شاشەی مۆبایل
-  document.addEventListener('touchstart', function(event) {
-    if (event.touches && event.touches.length > 1) {
-      event.preventDefault();
-    }
-  }, { passive: false });
-
-  // 2. ڕێگری لە زووم بە دوو جار لێدانی پەنجە (Double-tap to zoom)
-  var lastTouchEnd = 0;
-  document.addEventListener('touchend', function(event) {
-    var now = Date.now();
-    if (now - lastTouchEnd <= 300) {
-      event.preventDefault();
-    }
-    lastTouchEnd = now;
-  }, { passive: false });
-
-  // 3. ڕێگری لە زوومی iOS / Safari Gestures
-  document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
-  document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
-  document.addEventListener('gestureend', function(e) { e.preventDefault(); }, { passive: false });
-})();
-
 // داتای ئەو دوو مزگەوتەی تۆمار کرابوون (مزگەوتی گەیلانی پێنجوێن و مزگەوتی مەلا عباس)
 const DEFAULT_MOSQUES = [
   {

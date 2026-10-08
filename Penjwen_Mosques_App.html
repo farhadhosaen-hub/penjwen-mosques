@@ -2,7 +2,7 @@
 <html lang="ku" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
   <title>ئەپی مزگەوتەکانی پێنجوێن | Penjwen Mosques</title>
   <!-- PWA & Mobile Meta Tags (کارکردن بە ئۆفلاین و ئۆنلاین ڕاستەوخۆ وەک ئەپ) -->
   <link rel="manifest" href="manifest.json">
@@ -71,6 +71,11 @@ html {
   min-height: 100dvh;
   min-height: -webkit-fill-available;
   width: 100%;
+  touch-action: pan-y;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overscroll-behavior-y: contain;
+  overflow-x: hidden;
 }
 
 body {
@@ -79,6 +84,11 @@ body {
   min-height: 100dvh;
   min-height: -webkit-fill-available;
   width: 100%;
+  touch-action: pan-y;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overscroll-behavior-y: contain;
+  overflow-x: hidden;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: env(safe-area-inset-left, 0px);
@@ -542,7 +552,11 @@ body {
         </div>
       </div>
       <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end shrink-0">
-        <button onclick="triggerPwaInstall()" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 font-black text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md transition-all cursor-pointer">
+        <a href="Penjwen_Mosques.apk" download="Penjwen_Mosques.apk" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md transition-all cursor-pointer" title="داگرتنی ڕاستەوخۆی فایلی APK بۆ ئەندرۆید">
+          <i class="fa-brands fa-android text-base"></i>
+          <span>داگرتنی APK</span>
+        </a>
+        <button onclick="triggerPwaInstall()" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md transition-all cursor-pointer">
           <i class="fa-solid fa-download"></i>
           <span>داگرتنی ئەپ</span>
         </button>
@@ -576,6 +590,12 @@ body {
           <i class="fa-solid fa-arrows-rotate text-blue-200 text-base"></i>
           <span>هاوکاتکردنی داتاکان</span>
         </button>
+
+        <!-- دووگمەی فەرمی داگرتنی APK بۆ هەموو مۆبایلەکانی ئەندرۆید -->
+        <a id="downloadApkBtn" href="Penjwen_Mosques.apk" download="Penjwen_Mosques.apk" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-700 to-emerald-800 hover:from-green-800 hover:to-emerald-900 active:bg-green-950 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="داگرتنی فایلی فەرمی APK بۆ هەموو مۆبایلەکانی ئەندرۆید (Android 5.0+)">
+          <i class="fa-brands fa-android text-amber-300 text-lg"></i>
+          <span>داگرتنی APK (ئەندرۆید)</span>
+        </a>
 
         <!-- دووگمەی داگرتنی ئەپ لەسەر مۆبایل و کۆمپیوتەر (PWA Install Button) -->
         <button id="pwaInstallBtn" onclick="triggerPwaInstall()" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-4 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer text-sm" title="دابەزاندنی بەرنامەکە وەک ئەپێکی سەربەخۆ لەسەر مۆبایل و کۆمپیوتەر">
@@ -1058,6 +1078,10 @@ body {
             دەتوانیت فایلی تەواوی ئەپەکە بە یەک کلیک دابەزێنیت و لە تێلێگرام یان واتسئاپ وەک دۆکیومێنت (Document) بینێریت بۆ مامۆستایان؛ لای هەموویان دەکرێتەوە و کاردەکات:
           </p>
           <div class="flex flex-wrap gap-2.5 pt-1">
+            <a href="Penjwen_Mosques.apk" download="Penjwen_Mosques.apk" class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 active:bg-green-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-md transition-colors cursor-pointer" title="داگرتنی فایلی APK بۆ ئەندرۆید">
+              <i class="fa-brands fa-android text-base text-amber-300"></i>
+              <span>داگرتنی ئەپی فەرمی ئەندرۆید (APK)</span>
+            </a>
             <a href="Penjwen_Mosques_App.html" download="ئەپی_مزگەوتەکانی_پێنجوێن.html" class="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-sm transition-colors cursor-pointer">
               <i class="fa-solid fa-file-arrow-down text-base text-blue-200"></i>
               <span>داگرتنی فایلی تەواوی ئەپ (HTML) بە یەک کلیک</span>
@@ -1535,6 +1559,35 @@ body {
       });
     };
   }
+})();
+
+// ==============================================================
+// ڕێگریکردن لە زووم (Disable Pinch & Double-tap Zoom) و پاراستنی سکرۆڵ
+// ==============================================================
+(function() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+  // 1. ڕێگری لە زوومی دوو پەنجە (Pinch zoom) لە شاشەی مۆبایل
+  document.addEventListener('touchstart', function(event) {
+    if (event.touches && event.touches.length > 1) {
+      event.preventDefault();
+    }
+  }, { passive: false });
+
+  // 2. ڕێگری لە زووم بە دوو جار لێدانی پەنجە (Double-tap to zoom)
+  var lastTouchEnd = 0;
+  document.addEventListener('touchend', function(event) {
+    var now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, { passive: false });
+
+  // 3. ڕێگری لە زوومی iOS / Safari Gestures
+  document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
+  document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
+  document.addEventListener('gestureend', function(e) { e.preventDefault(); }, { passive: false });
 })();
 
 // داتای ئەو دوو مزگەوتەی تۆمار کرابوون (مزگەوتی گەیلانی پێنجوێن و مزگەوتی مەلا عباس)

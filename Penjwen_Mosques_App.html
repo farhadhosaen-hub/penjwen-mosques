@@ -1693,6 +1693,33 @@ const DEFAULT_MOSQUES = [
     createdAt: 1791464818247,
     updatedAt: 1791464818247,
     isUserAdded: true
+  },
+  {
+    id: "mosque_rawgan",
+    name: "ڕاوگان",
+    location: "گەڕەکی ڕاوگانەکان",
+    notes: "",
+    sermons: [
+      {
+        id: "srm_1791488977396",
+        date: "2026-10-02",
+        topic: "ڕزق و ڕۆزی",
+        speaker: "عبداللە",
+        hasAudio: false
+      }
+    ],
+    khutbahDate: "2026-10-02",
+    khutbahTopic: "ڕزق و ڕۆزی",
+    khutbahSpeaker: "عبداللە",
+    staff: [
+      { id: "s_1791488977396_0", name: "مامۆستا عبداللە", role: "ووتاربێژ", phone: "" },
+      { id: "s_1791488977396_1", name: "مامۆستا عبداللە", role: "پێش نوێژ", phone: "" },
+      { id: "s_1791488977396_2", name: "مامۆستا عبداللە", role: "بانگ بێژ", phone: "" },
+      { id: "s_1791488977396_3", name: "کاک عبداللە", role: "کارگووزار", phone: "" }
+    ],
+    createdAt: 1791488977396,
+    updatedAt: 1791488977396,
+    isUserAdded: true
   }
 ];
 
@@ -4262,55 +4289,44 @@ async function syncFromCloud(silent = false) {
   let cloudData = null;
   let cloudUpdatedAt = null;
 
-  // ١. سەرەتا لە Gist API وەردەگیرێت بە ڕاستەوخۆیی بێ دواکەوتنی کەش
-  try {
-    const gistResp = await fetch(`https://api.github.com/gists/${GIST_SYNC_ID}?t=${Date.now()}`, {
-      headers: {
-        'Authorization': `Bearer ${GIST_SYNC_TOKEN}`,
-        'Accept': 'application/vnd.github+json'
-      }
-    });
-    if (gistResp.ok) {
-      const gData = await gistResp.json();
-      cloudUpdatedAt = gData.updated_at;
+  // ١. سەرەتا لە بەستەری خێرا و سەربەخۆی کڵاود (Raw CDN) وەردەگیرێت بەبێ هیچ کۆتوبەندێکی سنووری پەیوەندی
+  const syncUrls = [
+    `https://gist.githubusercontent.com/farhadhosaen-hub/${GIST_SYNC_ID}/raw/penjwen_mosques_data.json?t=${Date.now()}`,
+    `${CLOUD_SYNC_PRIMARY}?t=${Date.now()}`,
+    `${CLOUD_SYNC_FALLBACK}?t=${Date.now()}`
+  ];
 
-      // ئەگەر کاتی نوێکاری کڵاود وەک کۆتا کاتی وەرگیراو بوو، هیچ کارێک پێویست نییە
-      if (lastKnownCloudUpdatedAt && cloudUpdatedAt && lastKnownCloudUpdatedAt === cloudUpdatedAt) {
-        if (icon) icon.classList.remove('animate-spin');
-        isSyncingFromCloud = false;
-        updateSyncUIStatus(true, 0);
-        return;
+  for (const url of syncUrls) {
+    try {
+      const resp = await fetch(url, { cache: 'no-store' });
+      if (resp.ok) {
+        const json = await resp.json();
+        if (Array.isArray(json) && json.length > 0) {
+          cloudData = json;
+          break;
+        }
       }
-
-      if (gData.files && gData.files['penjwen_mosques_data.json'] && gData.files['penjwen_mosques_data.json'].content) {
-        cloudData = JSON.parse(gData.files['penjwen_mosques_data.json'].content);
-      }
-    }
-  } catch (err) {
-    console.warn('Gist API direct fetch failed, trying fallbacks', err);
+    } catch (err) {}
   }
 
-  // ٢. ئەگەر بە فەرمی لە Gist API نەهات، لە سەرچاوە دابەشکراوەکانی تر وەردەگیرێت
+  // ٢. ئەگەر لە بەستەرەکانی سەرەوە نەهات، لە Gist API ڕاستەوخۆ وەردەگیرێت
   if (!cloudData) {
-    const urls = [
-      `https://gist.githubusercontent.com/farhadhosaen-hub/${GIST_SYNC_ID}/raw/penjwen_mosques_data.json?t=${Date.now()}`,
-      `${CLOUD_SYNC_PRIMARY}?t=${Date.now()}`,
-      `${CLOUD_SYNC_FALLBACK}?t=${Date.now()}`
-    ];
-
-    for (const url of urls) {
-      try {
-        const resp = await fetch(url, { cache: 'no-store' });
-        if (resp.ok) {
-          const json = await resp.json();
-          if (Array.isArray(json) && json.length > 0) {
-            cloudData = json;
-            break;
-          }
+    try {
+      const gistResp = await fetch(`https://api.github.com/gists/${GIST_SYNC_ID}?t=${Date.now()}`, {
+        headers: {
+          'Authorization': `Bearer ${GIST_SYNC_TOKEN}`,
+          'Accept': 'application/vnd.github+json'
         }
-      } catch (err) {
-        console.warn('Fallback sync failed for', url);
+      });
+      if (gistResp.ok) {
+        const gData = await gistResp.json();
+        cloudUpdatedAt = gData.updated_at;
+        if (gData.files && gData.files['penjwen_mosques_data.json'] && gData.files['penjwen_mosques_data.json'].content) {
+          cloudData = JSON.parse(gData.files['penjwen_mosques_data.json'].content);
+        }
       }
+    } catch (err) {
+      console.warn('Gist API direct fetch failed:', err);
     }
   }
 

@@ -60,24 +60,25 @@
 <body class="font-kurdish bg-emerald-50/70 text-slate-800 min-h-screen flex flex-col selection:bg-brand-200 selection:text-brand-900">
 
   <!-- ================= TOP HEADER (بەشی سەرەوە) ================= -->
-  <header class="w-full bg-white/85 backdrop-blur-md border-b border-emerald-100 shadow-xs sticky top-0 z-30 transition-all no-print">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-      <div class="flex items-center justify-between gap-2 sm:gap-4">
+  <!-- ================= TOP HEADER (شریتی سەرەوەی ئەپ بۆ مۆبایل و کۆمپیوتەر) ================= -->
+  <header id="mainTopHeader" class="w-full bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-xs sticky top-0 z-40 transition-all no-print">
+    <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-3.5">
+      <div class="flex items-center justify-between gap-1.5 sm:gap-4 overflow-x-auto no-scrollbar">
         
         <!-- لای ڕاست: پلەی گەرما ڕاستەوخۆ (Top Right: Live Temperature) -->
-        <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200/80 rounded-2xl px-3.5 py-2 shadow-xs hover:border-emerald-300 transition-all">
-          <div id="weatherIcon" class="text-emerald-700 text-2xl animate-pulse">
+        <div class="flex items-center gap-1.5 sm:gap-3 bg-emerald-50 border border-emerald-200/80 rounded-2xl px-2 sm:px-3.5 py-1.5 sm:py-2 shadow-xs hover:border-emerald-300 transition-all shrink-0">
+          <div id="weatherIcon" class="text-emerald-700 text-base sm:text-2xl animate-pulse">
             <i class="fa-solid fa-cloud-sun"></i>
           </div>
           <div class="flex flex-col">
-            <div class="flex items-center gap-1.5">
-              <span id="tempValue" class="text-lg sm:text-xl font-bold text-emerald-900">--°C</span>
-              <button id="refreshWeatherBtn" title="نوێکردنەوەی کەشوهەوا" class="text-xs text-emerald-600 hover:text-emerald-800 transition-transform active:rotate-180">
+            <div class="flex items-center gap-1 sm:gap-1.5">
+              <span id="tempValue" class="text-xs sm:text-xl font-bold text-emerald-900">--°C</span>
+              <button id="refreshWeatherBtn" title="نوێکردنەوەی کەشوهەوا" class="text-[10px] sm:text-xs text-emerald-600 hover:text-emerald-800 transition-transform active:rotate-180">
                 <i class="fa-solid fa-rotate-right"></i>
               </button>
             </div>
-            <div class="flex items-center gap-1 text-[11px] sm:text-xs text-emerald-700/90 font-medium">
-              <i class="fa-solid fa-location-dot text-emerald-600 text-[10px]"></i>
+            <div class="flex items-center gap-1 text-[9px] sm:text-xs text-emerald-700/90 font-medium">
+              <i class="fa-solid fa-location-dot text-emerald-600 text-[8px] sm:text-[10px]"></i>
               <span id="locationName">پێنجوێن</span>
               <span class="text-emerald-400">|</span>
               <span id="weatherDesc">چاوەڕوانی...</span>
@@ -86,42 +87,42 @@
         </div>
 
         <!-- ناوەڕاست: بسم الله الرحمن الرحیم (Center: Bismillah) -->
-        <div class="text-center px-2 flex-1 max-w-md">
+        <div class="text-center px-1 sm:px-2 shrink-0">
           <div class="inline-block relative group">
-            <h1 class="font-quran text-xl sm:text-2xl md:text-3xl text-emerald-900 tracking-wide font-bold select-none drop-shadow-xs">
+            <h1 class="font-quran text-xs sm:text-2xl md:text-3xl text-emerald-900 tracking-wide font-bold select-none drop-shadow-xs whitespace-nowrap">
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </h1>
-            <div class="h-0.5 w-16 sm:w-24 bg-gradient-to-r from-transparent via-emerald-500 to-transparent mx-auto mt-1 rounded-full"></div>
+            <div class="h-0.5 w-10 sm:w-24 bg-gradient-to-r from-transparent via-emerald-500 to-transparent mx-auto mt-0.5 sm:mt-1 rounded-full"></div>
           </div>
         </div>
 
         <!-- لای چەپ: کات و بەروار (Top Left: Time & Date) -->
-        <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200/80 rounded-2xl px-3.5 py-2 shadow-xs text-left">
-          <div class="text-emerald-700 text-xl hidden sm:block">
+        <div class="flex items-center gap-1.5 sm:gap-3 bg-emerald-50 border border-emerald-200/80 rounded-2xl px-2 sm:px-3.5 py-1.5 sm:py-2 shadow-xs text-left shrink-0">
+          <div class="text-emerald-700 text-sm sm:text-xl">
             <i class="fa-regular fa-clock"></i>
           </div>
           <div class="flex flex-col items-end sm:items-start text-right">
-            <div class="flex items-center gap-2">
-              <div id="liveClock" class="text-lg sm:text-xl font-bold text-emerald-900 tracking-wider font-mono">
+            <div class="flex items-center gap-1 sm:gap-2">
+              <div id="liveClock" class="text-xs sm:text-xl font-bold text-emerald-900 tracking-wider font-mono">
                 00:00:00
               </div>
               <!-- دۆخی ئۆنلاین / ئۆفلاین (Offline & Online indicator) -->
-              <span id="networkStatusBadge" class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300" title="دۆخی پەیوەندی هێڵ">
+              <span id="networkStatusBadge" class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300" title="دۆخی پەیوەندی هێڵ">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span id="networkStatusText">سەرهێڵ</span>
               </span>
               <!-- دۆخی هاوکاتکردنی کڵاود (Cloud Sync Status) -->
-              <button id="cloudSyncStatusBadge" onclick="syncFromCloud(false)" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300 hover:bg-blue-200 transition-colors cursor-pointer" title="هاوکاتکردنی ڕاستەوخۆ لەگەڵ کڵاود">
-                <i id="cloudSyncIcon" class="fa-solid fa-arrows-rotate text-[9px]"></i>
+              <button id="cloudSyncStatusBadge" onclick="syncFromCloud(false)" class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300 hover:bg-blue-200 transition-colors cursor-pointer" title="هاوکاتکردنی ڕاستەوخۆ لەگەڵ کڵاود">
+                <i id="cloudSyncIcon" class="fa-solid fa-arrows-rotate text-[8px] sm:text-[9px]"></i>
                 <span id="cloudSyncText">هاوکاتە</span>
               </button>
               <!-- دوگمەی پڕکردنی تەواوی شاشە (Fullscreen Toggle) -->
-              <button id="fullScreenToggleBtn" onclick="toggleFullScreen()" class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-100/80 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 shadow-2xs transition-colors cursor-pointer" title="پڕکردنی تەواوی شاشە (Fullscreen)">
-                <i id="fullScreenIcon" class="fa-solid fa-expand text-[10px]"></i>
+              <button id="fullScreenToggleBtn" onclick="toggleFullScreen()" class="inline-flex items-center justify-center w-5 sm:w-6 h-5 sm:h-6 rounded-lg bg-emerald-100/80 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 shadow-2xs transition-colors cursor-pointer" title="پڕکردنی تەواوی شاشە (Fullscreen)">
+                <i id="fullScreenIcon" class="fa-solid fa-expand text-[9px] sm:text-[10px]"></i>
               </button>
             </div>
-            <div class="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-700 font-medium">
-              <i class="fa-regular fa-calendar-days text-[10px] text-emerald-600"></i>
+            <div class="flex items-center gap-1 text-[9px] sm:text-xs text-emerald-700 font-medium">
+              <i class="fa-regular fa-calendar-days text-[8px] sm:text-[10px] text-emerald-600"></i>
               <span id="kurdishDate">-- / -- / ----</span>
             </div>
           </div>

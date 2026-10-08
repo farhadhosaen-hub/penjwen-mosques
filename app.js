@@ -3004,6 +3004,10 @@ function checkIncomingSyncParam() {
 // ١٤. دەستپێکردن لە کاتی بارکردنی پەڕە (App Initialization)
 // ==============================================================
 document.addEventListener('DOMContentLoaded', () => {
+  try {
+    window.scrollTo(0, 0);
+  } catch(e) {}
+
   updateLiveClockAndDate();
   setInterval(updateLiveClockAndDate, 1000);
 

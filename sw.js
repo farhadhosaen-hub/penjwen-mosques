@@ -1,5 +1,5 @@
 // Service Worker بۆ ئەپی مزگەوتەکانی پێنجوێن (Offline & Online PWA)
-const CACHE_NAME = 'penjwen-mosques-v25';
+const CACHE_NAME = 'penjwen-mosques-v26';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -47,8 +47,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // For GitHub Gist / Cloud Sync APIs: Bypass Service Worker completely (Network Only)
-  if (url.hostname.includes('github.com') || url.hostname.includes('githubusercontent.com')) {
+  // For GitHub Gist / Real-time Sync APIs: Bypass Service Worker completely (Network Only)
+  if (url.hostname.includes('github.com') || url.hostname.includes('githubusercontent.com') || url.hostname.includes('ntfy.sh')) {
     return;
   }
 

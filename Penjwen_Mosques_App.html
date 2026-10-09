@@ -2296,6 +2296,11 @@ window.handleDirectAudioUpload = async function(mosqueId, sermonDate, inputElem)
     }
   }
   saveMosquesData();
+  broadcastRealtimeEvent({
+    type: 'mosque_saved',
+    mosque: mosque,
+    updatedAt: Date.now()
+  });
   showToast('فایلی دەنگی وتار بە سەرکەوتوویی بە MP3 خەزن کرا', 'success');
 
   const container = document.getElementById(`sermon-display-${mosqueId}`);
@@ -2320,6 +2325,11 @@ window.deleteCardAudio = async function(mosqueId, sermonDate) {
     }
   }
   saveMosquesData();
+  broadcastRealtimeEvent({
+    type: 'mosque_saved',
+    mosque: mosque,
+    updatedAt: Date.now()
+  });
   showToast('فایلی دەنگی وتار سڕایەوە', 'success');
 
   const container = document.getElementById(`sermon-display-${mosqueId}`);
@@ -2884,8 +2894,16 @@ function saveMosquesData(triggerCloud = true) {
   if (typeof updateSyncBadgeOnLocalChange === 'function') {
     updateSyncBadgeOnLocalChange();
   }
-  if (triggerCloud && typeof pushToCloud === 'function') {
-    pushToCloud();
+  if (triggerCloud) {
+    if (typeof broadcastRealtimeEvent === 'function') {
+      broadcastRealtimeEvent({
+        type: 'sync_trigger',
+        updatedAt: Date.now()
+      });
+    }
+    if (typeof pushToCloud === 'function') {
+      pushToCloud();
+    }
   }
 }
 
@@ -3322,6 +3340,11 @@ async function handleFormSubmit(e) {
 
       // پاراستنی دەستبەجێ لە هەموو کۆگاکان
       saveMosqueToVault(updatedMosque);
+      broadcastRealtimeEvent({
+        type: 'mosque_saved',
+        mosque: updatedMosque,
+        updatedAt: now
+      });
       showToast(`گۆڕانکارییەکانی (${name}) بە سەرکەوتوویی پاشەکەوت کران`, 'success');
     }
   } else {
@@ -3366,6 +3389,11 @@ async function handleFormSubmit(e) {
 
     // پاراستنی هەمیشەیی مزگەوتی نوێ لە هەموو کۆگاکان
     saveMosqueToVault(newMosque);
+    broadcastRealtimeEvent({
+      type: 'mosque_saved',
+      mosque: newMosque,
+      updatedAt: now
+    });
     showToast(`مزگەوتی (${name}) بە سەرکەوتوویی تۆمار کرا`, 'success');
   }
 
@@ -3434,6 +3462,11 @@ window.deleteMosque = function(id) {
     mosques = mosques.filter(m => m.id !== id);
     removeMosqueFromVault(id);
     saveMosquesData();
+    broadcastRealtimeEvent({
+      type: 'mosque_deleted',
+      mosqueId: id,
+      updatedAt: Date.now()
+    });
     showToast('مزگەوتەکە سڕایەوە', 'success');
   }
 };
@@ -4242,11 +4275,114 @@ function updateSyncBadgeOnLocalChange() {
   }
 }
 
-// داتابەیسی کڵاود بۆ هاوکاتکردنی ڕاستەوخۆی سەرجەم ئەپەکان
+// ==============================================================
+// داتابەیسی کڵاود و بزوێنەری هاوکاتکردنی ڕاستەوخۆ (Real-time Instant Mesh Sync)
+// خێرایی ناردن و وەرگرتن: کەمتر لە نیو چرکە لەنێوان هەموو مۆبایل و کۆمپیوتەرەکاندا
+// ==============================================================
 const GIST_SYNC_ID = '9b18968be25d035720961c94841a02a9';
 const GIST_SYNC_TOKEN = [96, 111, 104, 88, 99, 55, 97, 98, 118, 109, 102, 53, 95, 118, 82, 109, 55, 79, 127, 53, 80, 109, 64, 70, 86, 70, 68, 96, 85, 81, 85, 49, 99, 75, 55, 65, 127, 77, 108, 99].map(c => String.fromCharCode(c ^ 7)).join('');
 const CLOUD_SYNC_PRIMARY = 'https://raw.githubusercontent.com/farhadhosaen-hub/penjwen-mosques/main/penjwen_mosques_data.json';
 const CLOUD_SYNC_FALLBACK = 'https://farhadhosaen-hub.github.io/penjwen-mosques/penjwen_mosques_data.json';
+
+const REALTIME_CLIENT_ID = 'cli_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now().toString(36);
+const REALTIME_TOPIC = 'penjwen_mosques_live_sync_v2';
+const REALTIME_PUB_URL = `https://ntfy.sh/${REALTIME_TOPIC}`;
+const REALTIME_SUB_SSE = `https://ntfy.sh/${REALTIME_TOPIC}/sse`;
+
+let localBroadcastChannel = null;
+let realtimeEventSource = null;
+
+try {
+  if ('BroadcastChannel' in window) {
+    localBroadcastChannel = new BroadcastChannel('penjwen_realtime_sync');
+    localBroadcastChannel.onmessage = (e) => {
+      handleRealtimeIncomingPacket(e.data);
+    };
+  }
+} catch(e) {}
+
+// ناردنی دەستبەجێی گۆڕانکارییەکان بۆ هەموو مۆبایل و ئەپەکان لە کەمتر لە نیو چرکەدا
+function broadcastRealtimeEvent(packet) {
+  if (!packet || typeof packet !== 'object') return;
+  packet.senderId = REALTIME_CLIENT_ID;
+  packet.timestamp = Date.now();
+
+  // ١. دەستبەجێ بۆ هەموو تابات و پەنجەرەکانی هەمان ئامێر بە کاتی سفر (0ms)
+  try {
+    if (localBroadcastChannel) {
+      localBroadcastChannel.postMessage(packet);
+    }
+  } catch(e) {}
+
+  // ٢. ناردنی ڕاستەوخۆ بۆ تۆڕی جیهانی بە کەمتر لە نیو چرکە بۆ سەرجەم مۆبایل و کۆمپیوتەرەکانی تر
+  try {
+    fetch(REALTIME_PUB_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(packet),
+      keepalive: true
+    }).catch(() => {});
+  } catch(e) {}
+}
+window.broadcastRealtimeEvent = broadcastRealtimeEvent;
+
+// وەرگرتن و کارپێکردنی ڕاستەوخۆی هەر نوێکارییەک لە هەر ئامێرێکی ترەوە هات
+function handleRealtimeIncomingPacket(packet) {
+  if (!packet || typeof packet !== 'object') return;
+  if (packet.senderId === REALTIME_CLIENT_ID) return; // پاراستن لە خۆ-دەنگدانەوە
+
+  if (packet.type === 'mosque_saved' && packet.mosque) {
+    const changes = mergeIncomingMosques([packet.mosque]);
+    if (changes > 0) {
+      showToast(`⚡ دەستبەجێ زانیاری نوێی (${packet.mosque.name}) لە ئامێرێکی ترەوە هاوتا کرا`, 'success');
+    }
+  } else if (packet.type === 'mosque_deleted' && packet.mosqueId) {
+    markMosqueDeleted(packet.mosqueId);
+    mosques = mosques.filter(m => m.id !== packet.mosqueId);
+    saveMosquesDataLocally();
+    renderMosques();
+    updateStats();
+    showToast('⚡ مزگەوتێک لە ئامێرێکی ترەوە سڕایەوە و هاوتاکرا', 'info');
+  } else if (packet.type === 'sync_trigger' || packet.type === 'full_sync_trigger') {
+    syncFromCloud(true);
+  }
+}
+
+// دامەزراندنی کەناڵی بەردەوامی گوێگرتن لە نێوان هەموو ئەپەکاندا بە شێوەی ڕاستەوخۆ
+function initRealtimeSyncEngine() {
+  if (!('EventSource' in window)) return;
+  if (realtimeEventSource) {
+    try { realtimeEventSource.close(); } catch(e){}
+  }
+
+  try {
+    realtimeEventSource = new EventSource(REALTIME_SUB_SSE);
+    realtimeEventSource.onopen = () => {
+      const badge = document.getElementById('cloudSyncStatusBadge');
+      const text = document.getElementById('cloudSyncText');
+      if (text) text.textContent = 'هاوکاتە (ڕاستەوخۆ)';
+      if (badge) {
+        badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300 hover:bg-blue-200 transition-colors cursor-pointer';
+      }
+    };
+    realtimeEventSource.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.event === 'message' && payload.message) {
+          const packet = JSON.parse(payload.message);
+          handleRealtimeIncomingPacket(packet);
+        }
+      } catch(err) {}
+    };
+    realtimeEventSource.onerror = () => {
+      try { realtimeEventSource.close(); } catch(e){}
+      setTimeout(initRealtimeSyncEngine, 3500);
+    };
+  } catch(err) {
+    setTimeout(initRealtimeSyncEngine, 4000);
+  }
+}
+window.initRealtimeSyncEngine = initRealtimeSyncEngine;
 
 let isPushingToCloud = false;
 let pendingPush = false;
@@ -4274,7 +4410,8 @@ async function pushToCloud() {
         headers: {
           'Authorization': `Bearer ${GIST_SYNC_TOKEN}`,
           'Accept': 'application/vnd.github+json'
-        }
+        },
+        cache: 'no-store'
       });
       if (preResp.ok) {
         const preData = await preResp.json();
@@ -4336,11 +4473,14 @@ async function pushToCloud() {
       renderMosques();
       updateStats();
       localStorage.setItem('penjwen_last_sync_time', Date.now().toString());
-      if (text) text.textContent = 'هاوکاتە';
+      if (text) text.textContent = 'هاوکاتە (ڕاستەوخۆ)';
       if (badge) {
         badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300 hover:bg-blue-200 transition-colors cursor-pointer';
       }
       showToast('هاوکاتکرا! گۆڕانکارییەکان بۆ هەموو مۆبایل و ئەپەکان بڵاوکرانەوە', 'success');
+
+      // ئاگادارکردنەوەی هەموو مۆبایل و ئەپەکان لە کەمتر لە نیو چرکەدا بۆ نوێبوونەوە
+      broadcastRealtimeEvent({ type: 'sync_trigger', updatedAt: Date.now() });
     } else {
       updateSyncUIStatus(false);
     }
@@ -4375,44 +4515,45 @@ async function syncFromCloud(silent = false) {
   let cloudData = null;
   let cloudUpdatedAt = null;
 
-  // ١. سەرەتا لە بەستەری خێرا و سەربەخۆی کڵاود (Raw CDN) وەردەگیرێت بەبێ هیچ کۆتوبەندێکی سنووری پەیوەندی
-  const syncUrls = [
-    `https://gist.githubusercontent.com/farhadhosaen-hub/${GIST_SYNC_ID}/raw/penjwen_mosques_data.json?t=${Date.now()}`,
-    `${CLOUD_SYNC_PRIMARY}?t=${Date.now()}`,
-    `${CLOUD_SYNC_FALLBACK}?t=${Date.now()}`
-  ];
-
-  for (const url of syncUrls) {
-    try {
-      const resp = await fetch(url, { cache: 'no-store' });
-      if (resp.ok) {
-        const json = await resp.json();
-        if (Array.isArray(json) && json.length > 0) {
-          cloudData = json;
-          break;
-        }
+  // ١. سەرەتا هێنانەوەی ڕاستەوخۆ لە Gist API بە کاتی ڕاستەقینە (Zero CDN Cache)
+  try {
+    const gistResp = await fetch(`https://api.github.com/gists/${GIST_SYNC_ID}?t=${Date.now()}`, {
+      headers: {
+        'Authorization': `Bearer ${GIST_SYNC_TOKEN}`,
+        'Accept': 'application/vnd.github+json'
+      },
+      cache: 'no-store'
+    });
+    if (gistResp.ok) {
+      const gData = await gistResp.json();
+      cloudUpdatedAt = gData.updated_at;
+      if (gData.files && gData.files['penjwen_mosques_data.json'] && gData.files['penjwen_mosques_data.json'].content) {
+        cloudData = JSON.parse(gData.files['penjwen_mosques_data.json'].content);
       }
-    } catch (err) {}
+    }
+  } catch (err) {
+    console.warn('Gist API direct fetch failed, trying fallbacks:', err);
   }
 
-  // ٢. ئەگەر لە بەستەرەکانی سەرەوە نەهات، لە Gist API ڕاستەوخۆ وەردەگیرێت
+  // ٢. ئەگەر لە سەرەوە داتا نەهاتبوو، بەستەرە خێراکانی تر بەکاردێن وەک یەدەگ
   if (!cloudData) {
-    try {
-      const gistResp = await fetch(`https://api.github.com/gists/${GIST_SYNC_ID}?t=${Date.now()}`, {
-        headers: {
-          'Authorization': `Bearer ${GIST_SYNC_TOKEN}`,
-          'Accept': 'application/vnd.github+json'
+    const syncUrls = [
+      `https://gist.githubusercontent.com/farhadhosaen-hub/${GIST_SYNC_ID}/raw/penjwen_mosques_data.json?t=${Date.now()}`,
+      `${CLOUD_SYNC_PRIMARY}?t=${Date.now()}`,
+      `${CLOUD_SYNC_FALLBACK}?t=${Date.now()}`
+    ];
+
+    for (const url of syncUrls) {
+      try {
+        const resp = await fetch(url, { cache: 'no-store' });
+        if (resp.ok) {
+          const json = await resp.json();
+          if (Array.isArray(json) && json.length > 0) {
+            cloudData = json;
+            break;
+          }
         }
-      });
-      if (gistResp.ok) {
-        const gData = await gistResp.json();
-        cloudUpdatedAt = gData.updated_at;
-        if (gData.files && gData.files['penjwen_mosques_data.json'] && gData.files['penjwen_mosques_data.json'].content) {
-          cloudData = JSON.parse(gData.files['penjwen_mosques_data.json'].content);
-        }
-      }
-    } catch (err) {
-      console.warn('Gist API direct fetch failed:', err);
+      } catch (err) {}
     }
   }
 
@@ -4633,6 +4774,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // پشکنینی بەستەری هاوکاتکردنی ڕاستەوخۆ
   checkIncomingSyncParam();
 
+  // دەستپێکردنی بزوێنەری پەیوەندی خێرا و ڕاستەوخۆ (Real-time Instant Mesh Sync)
+  initRealtimeSyncEngine();
+
   // کێشانی خودکار لە کڵاود لە کاتی کردنەوە
   syncFromCloud(true);
 
@@ -4644,6 +4788,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAutoFullScreenOnMobile();
 
   window.addEventListener('online', () => {
+    initRealtimeSyncEngine();
     syncFromCloud(true);
   });
 
@@ -4652,14 +4797,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.visibilityState === 'visible') {
       syncFromCloud(true);
     }
-  }, 3500); // پشکنین و هاوکاتکردنی خودکار لەگەڵ کڵاود هەر ٣.٥ چرکە جارێک
+  }, 2500); // پشکنین و هاوکاتکردنی خودکار لەگەڵ کڵاود هەر ٢.٥ چرکە جارێک
 
   window.addEventListener('focus', () => {
+    initRealtimeSyncEngine();
     syncFromCloud(true);
   });
 
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
+      initRealtimeSyncEngine();
       syncFromCloud(true);
     }
   });
@@ -4668,7 +4815,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastTouchCheck = Date.now();
   document.addEventListener('pointerdown', () => {
     const t = Date.now();
-    if (t - lastTouchCheck > 3000) {
+    if (t - lastTouchCheck > 2000) {
       lastTouchCheck = t;
       syncFromCloud(true);
     }

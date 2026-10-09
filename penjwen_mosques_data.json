@@ -57,7 +57,7 @@
       }
     ],
     "createdAt": 1791099916289,
-    "updatedAt": 1791552856073
+    "updatedAt": 1791560000000
   },
   {
     "id": "mosque_mala_abbas",
@@ -116,7 +116,7 @@
       }
     ],
     "createdAt": 1791100239418,
-    "updatedAt": 1791553098853
+    "updatedAt": 1791560000000
   },
   {
     "id": "mosque_1791290705595",
@@ -162,7 +162,7 @@
       }
     ],
     "createdAt": 1791290705595,
-    "updatedAt": 1791553238540
+    "updatedAt": 1791560000000
   },
   {
     "id": "mosque_1791464818247",
@@ -208,13 +208,12 @@
       }
     ],
     "createdAt": 1791464818247,
-    "updatedAt": 1791464818247,
+    "updatedAt": 1791560000000,
     "isUserAdded": true
   },
   {
     "id": "test",
     "name": "ڕاوگان",
-    "updatedAt": 1791552952091,
     "location": "گەڕەکی ڕاوگانەکان",
     "notes": "",
     "sermons": [
@@ -254,6 +253,9 @@
         "role": "کارگووزار",
         "phone": ""
       }
-    ]
+    ],
+    "createdAt": 1791488977396,
+    "updatedAt": 1791560000000,
+    "isUserAdded": true
   }
 ]

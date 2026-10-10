@@ -352,7 +352,7 @@ let mosques = [];
 let currentPrayerTimes = null;
 
 // وەشانی داتابەیس و پشکنینی هاوتاکردنی سەرەتایی لە هەموو ئەپ و ئامێرەکاندا
-const CURRENT_SCHEMA_VERSION = '20261010_sermons_v33';
+const CURRENT_SCHEMA_VERSION = '20261010_sermons_v34';
 
 try {
   const storedVersion = localStorage.getItem('penjwen_schema_version');
@@ -1570,6 +1570,275 @@ window.openEditSermonForDate = function(mosqueId, targetDate) {
   openSermonModal(mosqueId, targetDate);
 };
 
+// ==============================================================
+// سیستەمی تقویمی مانگانەی وتارەکان (Monthly Sermons Calendar System)
+// ڕەنگکردنی ئەو ڕۆژانەی وتاریان تێدایە بە سەوزی دیار
+// ==============================================================
+let currentCalendarState = {
+  mosqueId: null,
+  year: 2026,
+  month: 9 // 0-indexed (9 = October)
+};
+
+const CALENDAR_MONTHS_KURDISH = [
+  'کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان',
+  'ئایار', 'حوزەیران', 'تەممووز', 'ئاب',
+  'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'
+];
+
+const KURDISH_WEEKDAYS = [
+  { name: 'شەممە', short: 'شەممە', isFriday: false },
+  { name: 'یەکشەممە', short: '١شەم', isFriday: false },
+  { name: 'دووشەممە', short: '٢شەم', isFriday: false },
+  { name: 'سێشەممە', short: '٣شەم', isFriday: false },
+  { name: 'چوارشەممە', short: '٤شەم', isFriday: false },
+  { name: 'پێنجشەممە', short: '٥شەم', isFriday: false },
+  { name: 'هەینی', short: 'هەینی', isFriday: true }
+];
+
+window.openMosqueCalendarModal = function(mosqueId, year = null, month = null) {
+  const mosque = mosques.find(m => m.id === mosqueId);
+  if (!mosque) return;
+
+  const now = new Date();
+  if (year === null || month === null) {
+    if (mosque.sermons && mosque.sermons.length > 0) {
+      const parts = mosque.sermons[0].date.split('-');
+      year = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10) - 1;
+    } else {
+      year = now.getFullYear();
+      month = now.getMonth();
+    }
+  }
+
+  currentCalendarState.mosqueId = mosqueId;
+  currentCalendarState.year = year;
+  currentCalendarState.month = month;
+
+  const nameEl = document.getElementById('mosqueCalendarModalMosqueName');
+  if (nameEl) nameEl.textContent = mosque.name;
+
+  renderMosqueCalendarView(mosque, year, month);
+
+  const modal = document.getElementById('mosqueCalendarModal');
+  if (modal) showModal(modal);
+};
+
+window.closeMosqueCalendarModal = function() {
+  const modal = document.getElementById('mosqueCalendarModal');
+  if (modal) hideModal(modal);
+};
+
+window.changeCalendarMonth = function(offset) {
+  let { mosqueId, year, month } = currentCalendarState;
+  month += offset;
+  if (month < 0) {
+    month = 11;
+    year -= 1;
+  } else if (month > 11) {
+    month = 0;
+    year += 1;
+  }
+  currentCalendarState.year = year;
+  currentCalendarState.month = month;
+  const mosque = mosques.find(m => m.id === mosqueId);
+  if (mosque) renderMosqueCalendarView(mosque, year, month);
+};
+
+window.resetCalendarToToday = function() {
+  const now = new Date();
+  currentCalendarState.year = now.getFullYear();
+  currentCalendarState.month = now.getMonth();
+  const mosque = mosques.find(m => m.id === currentCalendarState.mosqueId);
+  if (mosque) renderMosqueCalendarView(mosque, currentCalendarState.year, currentCalendarState.month);
+};
+
+window.selectSermonDateFromCalendar = function(mosqueId, dateStr) {
+  closeMosqueCalendarModal();
+  handleSermonDateChange(mosqueId, dateStr);
+};
+
+function renderMosqueCalendarView(mosque, year, month) {
+  const container = document.getElementById('mosqueCalendarModalBody');
+  if (!container) return;
+
+  const firstDayJs = new Date(year, month, 1).getDay(); // 0 is Sun
+  const firstDayKurdish = (firstDayJs + 1) % 7; // 0 is Sat, 6 is Fri
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  const sermons = mosque.sermons || [];
+  const sermonsMap = {};
+  sermons.forEach(s => {
+    if (s.date) sermonsMap[s.date] = s;
+  });
+
+  const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+  const sermonsInThisMonth = sermons.filter(s => s.date && s.date.startsWith(monthPrefix));
+
+  let daysHtml = '';
+
+  for (let i = 0; i < firstDayKurdish; i++) {
+    daysHtml += `<div class="p-2 min-h-[64px] bg-stone-50/50 rounded-xl border border-dashed border-stone-200/50 opacity-40"></div>`;
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const jsDay = new Date(year, month, day).getDay();
+    const kurdishDay = (jsDay + 1) % 7;
+    const isFriday = kurdishDay === 6;
+    const isToday = dateStr === todayStr;
+    const sermon = sermonsMap[dateStr];
+
+    if (sermon) {
+      // ڕۆژێکی خاوەن وتار -> سەوزی تۆخی گەش و دیار لەگەڵ هێمای مزگەوت
+      daysHtml += `
+        <button 
+          type="button" 
+          onclick="selectSermonDateFromCalendar('${mosque.id}', '${dateStr}')" 
+          class="calendar-day-cell group relative p-2 min-h-[68px] sm:min-h-[74px] rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white border-2 border-emerald-400 shadow-md ring-2 ring-emerald-500/40 hover:scale-[1.04] transition-all flex flex-col justify-between text-right cursor-pointer"
+          title="«${escapeHtml(sermon.topic)}» - وتاربێژ: ${escapeHtml(sermon.speaker || 'مامۆستا')}"
+        >
+          <div class="flex items-center justify-between w-full">
+            <span class="text-sm sm:text-base font-black text-white leading-none">${day}</span>
+            <span class="inline-flex items-center gap-0.5 bg-amber-400 text-emerald-950 font-black text-[9px] px-1.5 py-0.5 rounded-full shadow-xs">
+              <i class="fa-solid fa-mosque text-[8px]"></i>
+              <span>وتار</span>
+            </span>
+          </div>
+          <div class="text-[10px] font-bold text-emerald-100 line-clamp-2 leading-tight mt-1 group-hover:text-amber-200 transition-colors">
+            «${escapeHtml(sermon.topic)}»
+          </div>
+          <div class="text-[9px] text-amber-300 font-semibold truncate pt-0.5">
+            ${escapeHtml(sermon.speaker || '')}
+          </div>
+        </button>
+      `;
+    } else if (isFriday) {
+      // ڕۆژی هەینی بێ وتار -> زەرد/قاوەیی کاڵ
+      daysHtml += `
+        <button 
+          type="button" 
+          onclick="closeMosqueCalendarModal(); openAddSermonForDate('${mosque.id}', '${dateStr}');" 
+          class="calendar-day-cell group relative p-2 min-h-[68px] sm:min-h-[74px] rounded-2xl bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-300 hover:border-amber-400 text-amber-950 shadow-2xs hover:scale-[1.02] transition-all flex flex-col justify-between text-right cursor-pointer"
+          title="ڕۆژی هەینی - کلیک بکە بۆ تۆمارکردنی وتار بۆ ئەم بەروارە"
+        >
+          <div class="flex items-center justify-between w-full">
+            <span class="text-sm font-bold text-amber-950">${day}</span>
+            <span class="text-[9px] font-bold text-amber-800 bg-amber-200/70 px-1.5 py-0.2 rounded-md">هەینی</span>
+          </div>
+          <div class="text-[10px] text-amber-700 font-semibold text-center py-1 opacity-80 group-hover:opacity-100 flex items-center justify-center gap-1">
+            <i class="fa-solid fa-plus text-[8px]"></i>
+            <span>تۆمارکردن</span>
+          </div>
+          <div class="text-[8px] text-amber-600/80 text-center">بێ وتار</div>
+        </button>
+      `;
+    } else {
+      // ڕۆژانی ئاسایی
+      daysHtml += `
+        <div class="p-2 min-h-[68px] sm:min-h-[74px] rounded-2xl bg-white border border-stone-200/80 text-stone-700 flex flex-col justify-between ${isToday ? 'ring-2 ring-blue-500 bg-blue-50/40' : ''}">
+          <div class="flex items-center justify-between w-full">
+            <span class="text-xs sm:text-sm font-bold text-stone-800">${day}</span>
+            ${isToday ? `<span class="text-[8px] font-bold bg-blue-600 text-white px-1 py-0.2 rounded-full">ئەمڕۆ</span>` : ''}
+          </div>
+          <div></div>
+        </div>
+      `;
+    }
+  }
+
+  container.innerHTML = `
+    <!-- بەشی سەرەوەی کۆنترۆڵی مانگ و ساڵ -->
+    <div class="flex items-center justify-between gap-2 p-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200 shadow-2xs">
+      <button 
+        type="button" 
+        onclick="changeCalendarMonth(1)" 
+        class="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl font-bold text-xs shadow-2xs transition-all cursor-pointer"
+        title="مانگی دواتر"
+      >
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span>دواتر</span>
+      </button>
+
+      <div class="flex items-center gap-2 text-center">
+        <span class="text-sm sm:text-base font-black text-emerald-950">
+          ${CALENDAR_MONTHS_KURDISH[month]} ${year}
+        </span>
+        <button 
+          type="button" 
+          onclick="resetCalendarToToday()" 
+          class="text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-0.5 rounded-lg shadow-2xs transition-colors cursor-pointer"
+          title="گەڕانەوە بۆ مانگی ئێستا"
+        >
+          ئەم مانگە
+        </button>
+      </div>
+
+      <button 
+        type="button" 
+        onclick="changeCalendarMonth(-1)" 
+        class="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl font-bold text-xs shadow-2xs transition-all cursor-pointer"
+        title="مانگی پێشوو"
+      >
+        <span>پێشوو</span>
+        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+      </button>
+    </div>
+
+    <!-- هێمای دیاریکەر (Legend) -->
+    <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold px-2 py-1.5 bg-stone-50 rounded-xl border border-stone-200">
+      <div class="flex items-center gap-1.5 text-emerald-900">
+        <span class="w-3.5 h-3.5 rounded-md bg-gradient-to-br from-emerald-600 to-teal-800 border border-emerald-400 shadow-xs flex items-center justify-center text-amber-300 text-[8px]"><i class="fa-solid fa-mosque"></i></span>
+        <span>سەوز: وتاری هەینی تێدایە (${sermonsInThisMonth.length} وتار لەم مانگەدا)</span>
+      </div>
+      <div class="flex items-center gap-1.5 text-amber-900">
+        <span class="w-3.5 h-3.5 rounded-md bg-amber-100 border border-amber-300"></span>
+        <span>قاوەیی: ڕۆژی هەینی (ئامادە بۆ تۆمارکردن)</span>
+      </div>
+      <div class="flex items-center gap-1.5 text-stone-600">
+        <span class="w-3.5 h-3.5 rounded-md bg-white border border-stone-300"></span>
+        <span>ڕۆژانی تر</span>
+      </div>
+    </div>
+
+    <!-- خشتەی ڕۆژانی هەفتە (Weekday Headers) -->
+    <div class="grid grid-cols-7 gap-1.5 text-center text-xs font-black">
+      ${KURDISH_WEEKDAYS.map(w => `
+        <div class="py-1.5 rounded-xl ${w.isFriday ? 'bg-amber-400 text-amber-950 border border-amber-500 shadow-2xs' : 'bg-stone-200/70 text-stone-700'}">
+          <span>${w.short}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- تۆڕی ڕۆژەکان (Calendar Grid) -->
+    <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
+      ${daysHtml}
+    </div>
+
+    <!-- دوگمەی خێرای زیادکردنی وتاری نوێ بۆ ئەم مزگەوتە -->
+    <div class="pt-2 border-t border-stone-200 flex items-center justify-between gap-2 flex-wrap">
+      <div class="text-xs font-bold text-emerald-900">
+        <i class="fa-solid fa-book-quran text-emerald-700 ml-1"></i>
+        <span>کۆی وتارە خەزنکراوەکانی ئەم مزگەوتە: </span>
+        <span class="bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-lg border border-emerald-300 font-black">${sermons.length} وتار</span>
+      </div>
+      <button 
+        type="button" 
+        onclick="closeMosqueCalendarModal(); openSermonModal('${mosque.id}');" 
+        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer"
+      >
+        <i class="fa-solid fa-plus text-[10px]"></i>
+        <span>تۆمارکردنی وتاری نوێ</span>
+      </button>
+    </div>
+  `;
+}
+
+
 async function handleSaveQuickSermon(e) {
   e.preventDefault();
 
@@ -2412,28 +2681,66 @@ function createMosqueCard(mosque) {
       <!-- خانەی وتاری هەینی لەگەڵ خانەی بەروار و MP3 -->
       <div class="khutbah-box bg-gradient-to-br from-amber-50 to-amber-100/70 border border-amber-200/90 rounded-2xl p-4 mb-4 text-xs shadow-2xs">
         
-        <!-- Top Row: ناوی وتاری هەینی + خانەی بەروار لەبەرامبەری -->
-        <div class="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-amber-200/70">
+        <!-- Top Row: ناوی وتاری هەینی + دوگمەی تقویم و خانەی بەروار لەبەرامبەری -->
+        <div class="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-amber-200/70 flex-wrap">
           <div class="flex items-center gap-2 text-amber-900 font-bold text-sm shrink-0">
             <i class="fa-solid fa-book-quran text-amber-600"></i>
             <span>وتاری هەینی</span>
           </div>
 
-          <!-- خانەی بەروار لەبەرامبەر ناوی وتار -->
-          <div class="flex items-center gap-1.5">
-            <label for="picker-${mosque.id}" class="text-xs font-bold text-amber-900 shrink-0">
-              <i class="fa-regular fa-calendar-days text-amber-700 text-xs ml-0.5"></i>بەروار:
-            </label>
-            <input 
-              type="date" 
-              id="picker-${mosque.id}" 
-              value="${initialDate}"
-              onchange="handleSermonDateChange('${mosque.id}', this.value)"
-              class="sermon-date-picker px-3 py-1 bg-white rounded-xl border border-amber-300 text-xs font-bold text-amber-950 shadow-2xs cursor-pointer focus:ring-2 focus:ring-amber-500 focus:outline-none"
-              title="بەروارێک هەڵبژێرە بۆ بینینی ناونیشانی وتار و ناوی وتاربێژی ئەو هەفتەیە"
+          <!-- دوگمەی تقویم و خانەی بەروار -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <button 
+              type="button" 
+              onclick="openMosqueCalendarModal('${mosque.id}')" 
+              class="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white rounded-xl text-xs font-black shadow-2xs cursor-pointer transition-all border border-emerald-600 hover:scale-[1.02]"
+              title="کردنەوەی تقویمی وتارەکان بە ڕەنگکراوی"
             >
+              <i class="fa-solid fa-calendar-days text-amber-300 text-xs"></i>
+              <span>تقویم</span>
+              ${mosque.sermons && mosque.sermons.length > 0 ? `
+                <span class="bg-amber-400 text-emerald-950 text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-2xs">${mosque.sermons.length}</span>
+              ` : ''}
+            </button>
+
+            <div class="flex items-center gap-1.5">
+              <label for="picker-${mosque.id}" class="text-xs font-bold text-amber-900 shrink-0">
+                <i class="fa-regular fa-calendar-days text-amber-700 text-xs ml-0.5"></i>بەروار:
+              </label>
+              <input 
+                type="date" 
+                id="picker-${mosque.id}" 
+                value="${initialDate}"
+                onchange="handleSermonDateChange('${mosque.id}', this.value)"
+                class="sermon-date-picker px-3 py-1 bg-white rounded-xl border border-amber-300 text-xs font-bold text-amber-950 shadow-2xs cursor-pointer focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                title="بەروارێک هەڵبژێرە بۆ بینینی ناونیشانی وتار و ناوی وتاربێژی ئەو هەفتەیە"
+              >
+            </div>
           </div>
         </div>
+
+        ${mosque.sermons && mosque.sermons.length > 0 ? `
+          <!-- شریتی ڕۆژانی خاوەن وتار لە تقویم بە ڕەنگی سەوزی دیار -->
+          <div class="mb-2.5 pb-2 border-b border-amber-200/60 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <span class="text-[11px] font-black text-emerald-900 shrink-0 flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>ڕۆژانی خاوەن وتار:</span>
+            </span>
+            <div class="flex items-center gap-1 flex-nowrap">
+              ${mosque.sermons.map(s => `
+                <button 
+                  type="button" 
+                  onclick="handleSermonDateChange('${mosque.id}', '${s.date}')" 
+                  class="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-black border transition-all cursor-pointer flex items-center gap-1 ${s.date === initialDate ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm ring-2 ring-emerald-300' : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border-emerald-300'}"
+                  title="«${escapeHtml(s.topic)}» - ${escapeHtml(s.speaker || '')}"
+                >
+                  <i class="fa-solid fa-mosque text-[10px] ${s.date === initialDate ? 'text-amber-300' : 'text-emerald-700'}"></i>
+                  <span>${s.date}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
 
         <!-- ناوەڕۆکی ناونیشانی وتار و وتاربێژ و MP3 -->
         <div id="sermon-display-${mosque.id}">

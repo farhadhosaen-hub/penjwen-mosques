@@ -319,6 +319,14 @@ try {
   }
 } catch (e) {}
 
+// ==============================================================
+// ڕێکخستنەکانی کڵاود و خەزنکردنی دەنگ بە MP3 (GitHub & IndexedDB)
+// ==============================================================
+const GIST_SYNC_ID = '9b18968be25d035720961c94841a02a9';
+const GIST_SYNC_TOKEN = [96, 111, 104, 88, 99, 55, 97, 98, 118, 109, 102, 53, 95, 118, 82, 109, 55, 79, 127, 53, 80, 109, 64, 70, 86, 70, 68, 96, 85, 81, 85, 49, 99, 75, 55, 65, 127, 77, 108, 99].map(c => String.fromCharCode(c ^ 7)).join('');
+const GITHUB_REPO_OWNER = 'farhadhosaen-hub';
+const GITHUB_REPO_NAME = 'penjwen-mosques';
+
 // IndexedDB بۆ خەزنکردنی دەنگی وتار بە MP3 (Point 3)
 const DB_NAME = 'PenjwenAudioDB';
 const DB_STORE = 'sermons_audio';
@@ -375,6 +383,133 @@ async function deleteSermonAudioBlob(key) {
     });
   } catch (e) {}
 }
+
+// ==============================================================
+// بەرزکردنەوەی فایلی دەنگی وتار (MP3) بۆ کڵاود بۆ هاوتاکردنی هەموو ئامێرەکان
+// ==============================================================
+async function uploadSermonAudioToCloud(mosqueId, sermonDate, file) {
+  try {
+    const cleanMosqueId = String(mosqueId).replace(/[^a-zA-Z0-9_-]/g, '');
+    const cleanDate = String(sermonDate).replace(/[^0-9]/g, '');
+    const originalExt = (file.name || 'audio.mp3').split('.').pop() || 'mp3';
+    const ext = originalExt.toLowerCase();
+    const filename = `sermon_${cleanMosqueId}_${cleanDate}.${ext}`;
+
+    // خوێندنەوەی فایل بە شێوازی Base64
+    const base64Data = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const res = reader.result;
+        const b64 = typeof res === 'string' ? res.split(',')[1] : '';
+        resolve(b64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    if (!base64Data) throw new Error('فایلی دەنگ نەخوێندرایەوە');
+
+    // دۆزینەوەی SHA ئەگەر پێشتر فایلەکە هەبووبێت
+    let existingSha = null;
+    try {
+      const checkResp = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/audio/${filename}`, {
+        headers: {
+          'Authorization': `Bearer ${GIST_SYNC_TOKEN}`,
+          'Accept': 'application/vnd.github+json'
+        }
+      });
+      if (checkResp.ok) {
+        const fileInfo = await checkResp.json();
+        existingSha = fileInfo.sha;
+      }
+    } catch (e) {
+      console.warn('Check SHA warning:', e);
+    }
+
+    const payload = {
+      message: `Upload sermon audio for mosque ${mosqueId} date ${sermonDate}`,
+      content: base64Data
+    };
+    if (existingSha) {
+      payload.sha = existingSha;
+    }
+
+    const putResp = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/audio/${filename}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${GIST_SYNC_TOKEN}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!putResp.ok) {
+      const errText = await putResp.text();
+      console.warn('Cloud audio upload status:', putResp.status, errText);
+      throw new Error(`Upload failed: ${putResp.status}`);
+    }
+
+    const publicUrl = `https://raw.githubusercontent.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/main/audio/${filename}`;
+    return { publicUrl, filename };
+  } catch (err) {
+    console.error('uploadSermonAudioToCloud error:', err);
+    throw err;
+  }
+}
+
+// ==============================================================
+// دوگمەی داگرتنی وتار بە فایلی MP3 بۆ مۆبایل و کۆمپیوتەر
+// ==============================================================
+window.downloadSermonAudio = async function(mosqueId, sermonDate) {
+  showToast('ئامادەکردنی فایلی دەنگ بۆ داگرتن...', 'info');
+  const mosque = mosques.find(m => m.id === mosqueId);
+  const sermon = mosque && mosque.sermons ? mosque.sermons.find(s => s.date === sermonDate) : null;
+  const safeName = (mosque ? mosque.name : 'مزگەوت').replace(/\s+/g, '_');
+  const downloadFileName = `وتاری_${safeName}_${sermonDate}.mp3`;
+
+  const key = `${mosqueId}_${sermonDate}`;
+  let blob = await getSermonAudioBlob(key);
+
+  if (!blob && sermon && sermon.audioUrl) {
+    try {
+      const resp = await fetch(sermon.audioUrl);
+      if (resp.ok) {
+        blob = await resp.blob();
+        await saveSermonAudioBlob(key, blob);
+      }
+    } catch (e) {
+      console.warn('Failed to fetch blob for download:', e);
+    }
+  }
+
+  if (blob) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = downloadFileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 2000);
+    showToast('داگرتنی وتارەکە دەستی پێکرد', 'success');
+  } else if (sermon && sermon.audioUrl) {
+    const a = document.createElement('a');
+    a.href = sermon.audioUrl;
+    a.download = downloadFileName;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+    }, 2000);
+    showToast('داگرتنی وتارەکە دەستی پێکرد', 'success');
+  } else {
+    showToast('فایلی دەنگی ئەم وتارە بەردەست نییە', 'error');
+  }
+};
 
 // ==============================================================
 // سیستەمی کۆگای پارێزراوی هەمیشەیی داتاکان (Permanent Vault in IndexedDB)
@@ -790,29 +925,36 @@ function renderSermonContentHtml(mosque, sermon, dateValue) {
           </span>
         </div>
 
-        <!-- خاڵی ٣: خەزنکردن و پەخشکردنی دەنگی وتار بە MP3 -->
+        <!-- خاڵی ٣: خەزنکردن، پەخشکردن و داگرتنی دەنگی وتار بە MP3 لەگەڵ هاوتاکردنی کڵاود -->
         <div class="pt-2 border-t border-amber-200/60" id="audio-container-${mosque.id}">
           ${hasAudio ? `
-            <div class="bg-amber-100/90 p-2.5 rounded-xl border border-amber-300 flex flex-col gap-1.5">
-              <div class="flex items-center justify-between text-[11px] font-bold text-amber-950">
-                <span class="flex items-center gap-1">
-                  <i class="fa-solid fa-file-audio text-amber-700"></i>
-                  <span>فایلی دەنگی وتارەکە (MP3 پاشەکەوتکراو):</span>
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50/70 p-3 rounded-2xl border border-amber-300 shadow-2xs flex flex-col gap-2">
+              <div class="flex items-center justify-between text-xs font-bold text-amber-950 flex-wrap gap-2">
+                <span class="flex items-center gap-1.5 text-amber-900">
+                  <i class="fa-solid fa-volume-high text-amber-600"></i>
+                  <span>فایلی دەنگی وتار (MP3 هاوتاکراو):</span>
                 </span>
-                <button type="button" onclick="deleteCardAudio('${mosque.id}', '${sermon.date}')" class="text-[10px] text-red-600 hover:text-red-800 font-bold px-1.5 py-0.5 rounded bg-white/60 hover:bg-white transition-colors cursor-pointer" title="سڕینەوەی ئەم فایلی دەنگە">
-                  <i class="fa-solid fa-trash-can"></i> سڕینەوە
-                </button>
+                <div class="flex items-center gap-2">
+                  <!-- دوگمەی داگرتنی وتار (MP3) بۆ مۆبایل و کۆمپیوتەر -->
+                  <button type="button" onclick="downloadSermonAudio('${mosque.id}', '${sermon.date}')" class="inline-flex items-center gap-1.5 text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer" title="داگرتنی ئەم وتارە بە فایلی MP3">
+                    <i class="fa-solid fa-download"></i>
+                    <span>داگرتنی وتار (MP3)</span>
+                  </button>
+                  <button type="button" onclick="deleteCardAudio('${mosque.id}', '${sermon.date}')" class="text-[11px] text-red-600 hover:text-red-800 font-bold px-2 py-1 rounded-lg bg-white/80 hover:bg-white border border-red-200 transition-colors cursor-pointer" title="سڕینەوەی ئەم فایلی دەنگە">
+                    <i class="fa-solid fa-trash-can"></i> سڕینەوە
+                  </button>
+                </div>
               </div>
-              <audio controls id="player-${mosque.id}-${sermon.date.replace(/-/g, '')}" class="w-full h-8 mt-0.5 rounded-lg shadow-2xs"></audio>
+              <audio controls id="player-${mosque.id}-${sermon.date.replace(/-/g, '')}" class="w-full h-9 rounded-xl shadow-2xs bg-white"></audio>
             </div>
           ` : `
-            <div class="flex items-center gap-2">
-              <label class="inline-flex items-center gap-1.5 bg-amber-200/70 hover:bg-amber-200 text-amber-950 px-3 py-1.5 rounded-xl text-xs font-bold border border-amber-300 cursor-pointer transition-colors shadow-2xs">
-                <i class="fa-solid fa-cloud-arrow-up text-amber-700"></i>
-                <span>خەزنکردنی دەنگ بە MP3</span>
+            <div class="flex items-center gap-2 flex-wrap">
+              <label class="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-400 hover:to-amber-500 text-amber-950 px-3.5 py-1.5 rounded-xl text-xs font-bold border border-amber-400 cursor-pointer transition-all shadow-2xs">
+                <i class="fa-solid fa-cloud-arrow-up text-amber-900"></i>
+                <span>خەزنکردن و هاوتاکردنی دەنگ بە MP3</span>
                 <input type="file" accept="audio/mp3,audio/*" class="hidden" onchange="handleDirectAudioUpload('${mosque.id}', '${sermon.date}', this)">
               </label>
-              <span class="text-[11px] text-amber-800 font-medium">کلیک بکە بۆ خەزنکردنی فایلی دەنگی وتار (MP3)</span>
+              <span class="text-[11px] text-amber-900 font-medium">کلیک بکە بۆ خەزنکردن و هاوتاکردنی خێرای دەنگی وتار (MP3)</span>
             </div>
           `}
         </div>
@@ -836,16 +978,31 @@ function renderSermonContentHtml(mosque, sermon, dateValue) {
   }
 }
 
-// بارکردنی خودکاری دەنگ بۆ پلەیەر لە دوای ڕێندەرکردن
+// بارکردنی خودکاری دەنگ بۆ پلەیەر (پێشینە بۆ داتای ناوخۆیی و پاشان کڵاود)
 async function loadAudioIntoCardPlayer(mosqueId, dateStr) {
   const cleanDate = dateStr.replace(/-/g, '');
   const player = document.getElementById(`player-${mosqueId}-${cleanDate}`);
   if (!player) return;
 
   const key = `${mosqueId}_${dateStr}`;
+  // ١. پشکنینی ئایا فایلی ناوخۆیی هەیە
   const blob = await getSermonAudioBlob(key);
   if (blob) {
     player.src = URL.createObjectURL(blob);
+    return;
+  }
+
+  // ٢. ئەگەر ناوخۆ نەبوو، لێدانی ڕاستەوخۆ لە بەستەری کڵاود و خەزنکردن بۆ ئۆفلاین لە پاشبنەمادا
+  const mosque = mosques.find(m => m.id === mosqueId);
+  const sermon = mosque && mosque.sermons ? mosque.sermons.find(s => s.date === dateStr) : null;
+  if (sermon && sermon.audioUrl) {
+    player.src = sermon.audioUrl;
+    fetch(sermon.audioUrl)
+      .then(resp => resp.ok ? resp.blob() : null)
+      .then(b => {
+        if (b) saveSermonAudioBlob(key, b);
+      })
+      .catch(() => {});
   }
 }
 
@@ -854,30 +1011,59 @@ window.handleDirectAudioUpload = async function(mosqueId, sermonDate, inputElem)
   const file = inputElem.files[0];
   const key = `${mosqueId}_${sermonDate}`;
 
-  showToast('فایلی دەنگی MP3 خەزن دەکرێت...', 'success');
+  showToast('فایلی دەنگی وتار (MP3) پاشەکەوت دەکرێت...', 'info');
+
+  // ١. پاشەکەوتکردنی دەستبەجێ لە IndexedDB بۆ پەخشکردنی خێرا لەسەر ئەم ئامێرە
   await saveSermonAudioBlob(key, file);
 
   const mosque = mosques.find(m => m.id === mosqueId);
   if (mosque && mosque.sermons) {
-    const s = mosque.sermons.find(x => x.date === sermonDate);
-    if (s) {
+    let s = mosque.sermons.find(x => x.date === sermonDate);
+    if (!s) {
+      s = {
+        id: 'srm_' + Date.now(),
+        date: sermonDate,
+        topic: mosque.khutbahTopic || 'وتاری هەینی',
+        speaker: mosque.khutbahSpeaker || 'مامۆستای وتاربێژ',
+        hasAudio: true,
+        audioFileName: file.name
+      };
+      mosque.sermons.unshift(s);
+    } else {
       s.hasAudio = true;
       s.audioFileName = file.name;
     }
   }
-  saveMosquesData();
-  broadcastRealtimeEvent({
-    type: 'mosque_saved',
-    mosque: mosque,
-    updatedAt: Date.now()
-  });
-  showToast('فایلی دەنگی وتار بە سەرکەوتوویی بە MP3 خەزن کرا', 'success');
 
+  // نوێکردنەوەی شاشەی ناوخۆیی دەستبەجێ بەبێ وەستان
+  saveMosquesDataLocally();
   const container = document.getElementById(`sermon-display-${mosqueId}`);
   if (container) {
     const sermon = findSermonByDate(mosque, sermonDate);
     container.innerHTML = renderSermonContentHtml(mosque, sermon, sermonDate);
     setTimeout(() => loadAudioIntoCardPlayer(mosqueId, sermonDate), 50);
+  }
+
+  // ٢. بەرزکردنەوە بۆ کڵاود لە پاشبنەمادا تا هەموو مۆبایل و کۆمپیوتەرەکان دەستبەجێ هاوتا ببن
+  try {
+    showToast('فایلی دەنگ بەرزدەکرێتەوە بۆ کڵاود بۆ هاوتاکردن...', 'info');
+    const { publicUrl } = await uploadSermonAudioToCloud(mosqueId, sermonDate, file);
+    if (mosque && mosque.sermons) {
+      const s = mosque.sermons.find(x => x.date === sermonDate);
+      if (s) {
+        s.audioUrl = publicUrl;
+      }
+    }
+    mosque.updatedAt = Date.now();
+    saveMosquesData();
+    pushToCloud();
+    showToast('فایلی دەنگی MP3 بە سەرکەوتوویی لە هەموو مۆبایل و کۆمپیوتەرەکان هاوتا کرا!', 'success');
+  } catch (err) {
+    console.warn('Background cloud audio upload warning:', err);
+    showToast('فایلی دەنگ لەسەر ئەم ئامێرە پاشەکەوت کرا', 'info');
+    mosque.updatedAt = Date.now();
+    saveMosquesData();
+    pushToCloud();
   }
 };
 
@@ -891,22 +1077,20 @@ window.deleteCardAudio = async function(mosqueId, sermonDate) {
     const s = mosque.sermons.find(x => x.date === sermonDate);
     if (s) {
       s.hasAudio = false;
+      delete s.audioUrl;
       delete s.audioFileName;
     }
   }
+  mosque.updatedAt = Date.now();
   saveMosquesData();
-  broadcastRealtimeEvent({
-    type: 'mosque_saved',
-    mosque: mosque,
-    updatedAt: Date.now()
-  });
-  showToast('فایلی دەنگی وتار سڕایەوە', 'success');
+  pushToCloud();
 
   const container = document.getElementById(`sermon-display-${mosqueId}`);
   if (container) {
     const sermon = findSermonByDate(mosque, sermonDate);
     container.innerHTML = renderSermonContentHtml(mosque, sermon, sermonDate);
   }
+  showToast('فایلی دەنگی وتار سڕایەوە', 'success');
 };
 
 // Global handler when user selects a date on any mosque card
@@ -1030,8 +1214,9 @@ function updatePrayerTimesUI(timings, isCustom = false) {
   prayers.forEach(p => {
     const el = document.getElementById(`time-${p}`);
     if (el && timings[p]) {
-      const cleanTime = timings[p].split(' ')[0];
+      const cleanTime = String(timings[p]).split(' ')[0].trim();
       el.textContent = cleanTime;
+      el.setAttribute('dir', 'ltr');
     }
   });
 
@@ -1874,6 +2059,15 @@ async function handleFormSubmit(e) {
           const key = `${idToEdit}_${sDate}`;
           await saveSermonAudioBlob(key, selectedAudioFile);
           hasAudioFlag = true;
+          uploadSermonAudioToCloud(idToEdit, sDate, selectedAudioFile)
+            .then(({ publicUrl }) => {
+              const m = mosques.find(x => x.id === idToEdit);
+              const sm = m && m.sermons ? m.sermons.find(x => x.date === sDate) : null;
+              if (sm) sm.audioUrl = publicUrl;
+              saveMosquesData();
+              pushToCloud();
+            })
+            .catch(e => console.warn('Modal audio cloud upload error:', e));
         }
 
         const sermonObj = {
@@ -1928,6 +2122,15 @@ async function handleFormSubmit(e) {
         const key = `${targetId}_${sDate}`;
         await saveSermonAudioBlob(key, selectedAudioFile);
         hasAudioFlag = true;
+        uploadSermonAudioToCloud(targetId, sDate, selectedAudioFile)
+          .then(({ publicUrl }) => {
+            const m = mosques.find(x => x.id === targetId);
+            const sm = m && m.sermons ? m.sermons.find(x => x.date === sDate) : null;
+            if (sm) sm.audioUrl = publicUrl;
+            saveMosquesData();
+            pushToCloud();
+          })
+          .catch(e => console.warn('New mosque audio cloud upload error:', e));
       }
 
       initialSermons.push({
@@ -2074,7 +2277,18 @@ window.viewMosqueDetails = function(id) {
               <div class="text-xs font-bold text-slate-900">
                 «${escapeHtml(s.topic)}»
               </div>
-              ${s.hasAudio ? `<div class="text-[10px] text-emerald-700 font-bold mt-1"><i class="fa-solid fa-circle-check"></i> خاوەنی فایلی دەنگی MP3 یە</div>` : ''}
+              ${s.hasAudio ? `
+                <div class="mt-2 pt-2 border-t border-amber-200/60 flex items-center justify-between gap-2">
+                  <span class="text-[11px] text-emerald-800 font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-file-audio text-emerald-600"></i>
+                    <span>فایلی دەنگی وتار (MP3)</span>
+                  </span>
+                  <button type="button" onclick="downloadSermonAudio('${mosque.id}', '${s.date}')" class="text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1 rounded-xl flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors">
+                    <i class="fa-solid fa-download"></i>
+                    <span>داگرتنی وتار (MP3)</span>
+                  </button>
+                </div>
+              ` : ''}
             </div>
           `).join('')}
         </div>
@@ -2151,21 +2365,28 @@ window.viewMosqueDetails = function(id) {
 };
 
 // ==============================================================
-// ٨. چاپکردن و دروستکردنی PDF بە شێوازی فەرمی
+// ٨. چاپکردن و دروستکردنی PDF بە شێوازی فەرمی بۆ مۆبایل و کۆمپیوتەر
 // ==============================================================
 function prepareAndPrintReport() {
   const printTableContainer = document.getElementById('printTableContainer');
   const printReportDate = document.getElementById('printReportDate');
   const printReportCount = document.getElementById('printReportCount');
+  const reportModal = document.getElementById('reportModal');
+  const reportModalDate = document.getElementById('reportModalDate');
+  const reportModalCount = document.getElementById('reportModalCount');
+  const reportModalBody = document.getElementById('reportModalBody');
 
   const now = new Date();
   const dayName = KURDISH_DAYS[now.getDay()];
   const dayNum = now.getDate();
   const monthName = KURDISH_MONTHS[now.getMonth()];
   const year = now.getFullYear();
+  const dateFormatted = `${dayName}، ${dayNum}ی ${monthName}ی ${year}`;
 
-  printReportDate.textContent = `بەرواری دەرچوون: ${dayName}، ${dayNum}ی ${monthName}ی ${year}`;
-  printReportCount.textContent = `سەرجەم مزگەوتە تۆمارکراوەکان: ${mosques.length}`;
+  if (printReportDate) printReportDate.textContent = `بەرواری دەرچوون: ${dateFormatted}`;
+  if (printReportCount) printReportCount.textContent = `سەرجەم مزگەوتە تۆمارکراوەکان: ${mosques.length}`;
+  if (reportModalDate) reportModalDate.textContent = `بەرواری دەرچوون: ${dateFormatted}`;
+  if (reportModalCount) reportModalCount.textContent = `کۆی گشتی: ${mosques.length} مزگەوت`;
 
   let tableRows = '';
   mosques.forEach((m, idx) => {
@@ -2199,18 +2420,18 @@ function prepareAndPrintReport() {
     `;
   });
 
-  printTableContainer.innerHTML = `
-    <table>
+  const fullTableHtml = `
+    <table class="w-full text-right border-collapse text-xs sm:text-sm">
       <thead>
-        <tr>
-          <th style="width: 4%; text-align: center;">#</th>
-          <th style="width: 17%;">ناوی مزگەوت</th>
-          <th style="width: 12%;">گەڕەک / ناونیشان</th>
-          <th style="width: 14%;">وتاربێژ</th>
-          <th style="width: 14%;">پێشنوێژ</th>
-          <th style="width: 13%;">بانگبێژ</th>
-          <th style="width: 13%;">کارگووزار</th>
-          <th style="width: 17%;">وتار و وتاربێژی هەینی</th>
+        <tr class="bg-emerald-100 text-emerald-950 font-bold border-b-2 border-emerald-300">
+          <th style="width: 4%; text-align: center;" class="p-2 border border-slate-300">#</th>
+          <th style="width: 17%;" class="p-2 border border-slate-300">ناوی مزگەوت</th>
+          <th style="width: 12%;" class="p-2 border border-slate-300">گەڕەک / ناونیشان</th>
+          <th style="width: 14%;" class="p-2 border border-slate-300">وتاربێژ</th>
+          <th style="width: 14%;" class="p-2 border border-slate-300">پێشنوێژ</th>
+          <th style="width: 13%;" class="p-2 border border-slate-300">بانگبێژ</th>
+          <th style="width: 13%;" class="p-2 border border-slate-300">کارگووزار</th>
+          <th style="width: 17%;" class="p-2 border border-slate-300">وتار و وتاربێژی هەینی</th>
         </tr>
       </thead>
       <tbody>
@@ -2219,7 +2440,169 @@ function prepareAndPrintReport() {
     </table>
   `;
 
-  window.print();
+  if (printTableContainer) {
+    printTableContainer.innerHTML = fullTableHtml;
+  }
+
+  // پیشاندانی ڕاپۆرت لە مۆداڵی تایبەت بۆ ئەوەی بەکارهێنەر لە مۆبایل و کۆمپیوتەردا بیبینێت
+  if (reportModalBody) {
+    reportModalBody.innerHTML = `
+      <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+        <div class="bg-emerald-800 text-white p-3 text-center">
+          <h4 class="font-bold text-sm sm:text-base">بەڕێوەبەرایەتی ئەوقافی پێنجوێن - خشتەی فەرمی مزگەوتەکان و ستاف</h4>
+          <p class="text-xs text-emerald-200 mt-0.5">${dateFormatted} • کۆی گشتی: ${mosques.length} مزگەوت</p>
+        </div>
+        <div class="overflow-x-auto">
+          ${fullTableHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  if (reportModal) {
+    showModal(reportModal);
+  }
+
+  // ئەگەر کۆمپیوتەر بێت، دیالۆگی چاپکردنی پەڕە ڕاستەوخۆ دەکاتەوە
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+  if (!isMobile) {
+    setTimeout(() => {
+      try {
+        window.print();
+      } catch(e) {}
+    }, 200);
+  }
+}
+
+// کردارەکانی مۆداڵی ڕاپۆرت بۆ مۆبایل و کۆمپیوتەر
+window.triggerNativePrint = function() {
+  try {
+    window.print();
+  } catch (e) {
+    showToast('چاپکەر لەسەر ئەم ئامێرە بەردەست نییە، دەتوانیت وەک HTML/PDF دایبەزێنیت', 'warning');
+  }
+};
+
+window.downloadReportHtml = function() {
+  const now = new Date();
+  const dayName = KURDISH_DAYS[now.getDay()];
+  const dayNum = now.getDate();
+  const monthName = KURDISH_MONTHS[now.getMonth()];
+  const year = now.getFullYear();
+  const dateFormatted = `${dayName}، ${dayNum}ی ${monthName}ی ${year}`;
+
+  const printTableContainer = document.getElementById('printTableContainer');
+  const tableContent = printTableContainer ? printTableContainer.innerHTML : '';
+
+  const htmlDoc = `<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ڕاپۆرتی فەرمی مزگەوتەکانی پێنجوێن</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #fff; color: #000; padding: 20px; direction: rtl; }
+    .header { text-align: center; border-bottom: 2px solid #166534; padding-bottom: 12px; margin-bottom: 20px; }
+    .title { font-size: 20px; font-weight: bold; margin: 5px 0; }
+    .sub { font-size: 14px; color: #166534; font-weight: bold; }
+    .meta { display: flex; justify-content: space-between; font-size: 12px; margin-top: 10px; color: #555; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+    th, td { border: 1px solid #333; padding: 8px; text-align: right; }
+    th { background-color: #e2f8ec; font-weight: bold; }
+    tr:nth-child(even) { background-color: #f9fbf9; }
+    .footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 12px; border-top: 1px solid #ccc; padding-top: 10px; }
+    @media print { body { padding: 0; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div style="font-size: 16px; margin-bottom: 4px;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+    <div class="title">حکومەتی هەرێمی کوردستان - وەزارەتی ئەوقاف و کاروباری ئایینی</div>
+    <div class="sub">بەڕێوەبەرایەتی ئەوقافی پێنجوێن - خشتەی فەرمی مزگەوتەکان، مامۆستایان و وتارەکان</div>
+    <div class="meta">
+      <span>بەروار: ${dateFormatted}</span>
+      <span>سەرجەم مزگەوتەکان: ${mosques.length}</span>
+      <span>قەزای پێنجوێن</span>
+    </div>
+  </div>
+  ${tableContent}
+  <div class="footer">
+    <div>ئامادەکاری: ئەپی فەرمی مزگەوتەکانی پێنجوێن</div>
+    <div>واژوو و پەسەندکردن: ................................</div>
+  </div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() { window.print(); }, 400);
+    };
+  <\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ڕاپۆرتی_مزگەوتەکانی_پێنجوێن_${year}_${now.getMonth()+1}_${dayNum}.html`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 2000);
+  showToast('فایلی ڕاپۆرتەکە دابەزی (دەتوانیت بیکەیتەوە و چاپی بکەیت)', 'success');
+};
+
+window.shareReportMobile = async function() {
+  const summaryText = buildReportSummaryText();
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'ڕاپۆرتی مزگەوتەکانی پێنجوێن',
+        text: summaryText
+      });
+      showToast('ڕاپۆرت هاوبەش کرا', 'success');
+      return;
+    } catch(e) {}
+  }
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(summaryText)}`;
+  window.open(waUrl, '_blank');
+};
+
+window.copyReportText = async function() {
+  const summaryText = buildReportSummaryText();
+  try {
+    await navigator.clipboard.writeText(summaryText);
+    showToast('دەقی تەواوی ڕاپۆرت کۆپی کرا', 'success');
+  } catch(e) {
+    showToast('دەستکاری ڕێگەپێدانی کۆپی نەکراوە', 'error');
+  }
+};
+
+function buildReportSummaryText() {
+  const now = new Date();
+  let text = `📋 ڕاپۆرتی فەرمی مزگەوتەکانی پێنجوێن\nبەروار: ${now.toLocaleDateString('ckb-IQ')}\nکۆی گشتی: ${mosques.length} مزگەوت\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+  mosques.forEach((m, idx) => {
+    let khateeb = '-', imam = '-', muezzin = '-', karguzar = '-';
+    (m.staff || []).forEach(s => {
+      const r = s.role || '';
+      if (r.includes('وتاربێژ') || r.includes('ووتار')) khateeb = s.name;
+      if (r.includes('پێشنوێژ') || r.includes('پێش')) imam = s.name;
+      if (r.includes('بانگبێژ') || r.includes('بانگ')) muezzin = s.name;
+      if (r.includes('کارگ') || r.includes('کارگو') || r.includes('خزمەت')) karguzar = s.name;
+    });
+    const s = (m.sermons && m.sermons[0]) ? m.sermons[0] : (m.khutbahTopic ? { topic: m.khutbahTopic, speaker: m.khutbahSpeaker } : null);
+    text += `${idx + 1}. ${m.name} (${m.location || 'پێنجوێن'})\n`;
+    text += `   • وتاربێژ: ${khateeb}\n`;
+    text += `   • پێشنوێژ: ${imam}\n`;
+    text += `   • بانگبێژ: ${muezzin}\n`;
+    text += `   • کارگووزار: ${karguzar}\n`;
+    if (s && s.topic) {
+      text += `   • وتاری هەینی: «${s.topic}» [${s.speaker || khateeb}]\n`;
+    }
+    text += `\n`;
+  });
+  text += `━━━━━━━━━━━━━━━━━━━━\nئەپی فەرمی مزگەوتەکانی پێنجوێن: https://farhadhosaen-hub.github.io/penjwen-mosques/`;
+  return text;
 }
 
 // ==============================================================
@@ -2849,8 +3232,6 @@ function updateSyncBadgeOnLocalChange() {
 // داتابەیسی کڵاود و بزوێنەری هاوکاتکردنی ڕاستەوخۆ (Real-time Instant Mesh Sync)
 // خێرایی ناردن و وەرگرتن: کەمتر لە نیو چرکە لەنێوان هەموو مۆبایل و کۆمپیوتەرەکاندا
 // ==============================================================
-const GIST_SYNC_ID = '9b18968be25d035720961c94841a02a9';
-const GIST_SYNC_TOKEN = [96, 111, 104, 88, 99, 55, 97, 98, 118, 109, 102, 53, 95, 118, 82, 109, 55, 79, 127, 53, 80, 109, 64, 70, 86, 70, 68, 96, 85, 81, 85, 49, 99, 75, 55, 65, 127, 77, 108, 99].map(c => String.fromCharCode(c ^ 7)).join('');
 const CLOUD_SYNC_PRIMARY = 'https://raw.githubusercontent.com/farhadhosaen-hub/penjwen-mosques/main/penjwen_mosques_data.json';
 const CLOUD_SYNC_FALLBACK = 'https://farhadhosaen-hub.github.io/penjwen-mosques/penjwen_mosques_data.json';
 
@@ -3184,10 +3565,11 @@ function mergeIncomingMosques(incomingList) {
       const staffDiffers = JSON.stringify(incoming.staff || []) !== JSON.stringify(existing.staff || []);
       const topicDiffers = (incoming.khutbahTopic || '') !== (existing.khutbahTopic || '');
       const speakerDiffers = (incoming.khutbahSpeaker || '') !== (existing.khutbahSpeaker || '');
+      const sermonsDiffers = JSON.stringify(incoming.sermons || []) !== JSON.stringify(existing.sermons || []);
       const hasOldHadi = (existing.staff || []).some(s => (s.name || '').includes('هادي'));
 
       // ئەگەر نوسخەی کڵاود نوێتر بوو، یان زانیارییەکان جیاواز بوون و لە کڵاودەوە هاتوون، یان ناوی کۆنی هادی مابوو:
-      if (incomingTime > existingTime || (incomingTime >= existingTime && (staffDiffers || topicDiffers || speakerDiffers)) || hasOldHadi) {
+      if (incomingTime > existingTime || (incomingTime >= existingTime && (staffDiffers || topicDiffers || speakerDiffers || sermonsDiffers)) || hasOldHadi) {
         mosques[existingIndex] = { ...existing, ...incoming };
         saveMosqueToVault(mosques[existingIndex]);
         changesCount++;

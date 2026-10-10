@@ -1667,12 +1667,12 @@ async function fetchPenjwenPrayerTimes() {
   }
 
   currentPrayerTimes = {
-    Fajr: "04:45",
-    Sunrise: "06:08",
-    Dhuhr: "12:02",
-    Asr: "15:25",
-    Maghrib: "17:58",
-    Isha: "19:18"
+    Fajr: "04:33",
+    Sunrise: "05:58",
+    Dhuhr: "11:43",
+    Asr: "14:59",
+    Maghrib: "17:28",
+    Isha: "18:47"
   };
   updatePrayerTimesUI(currentPrayerTimes, false);
 }
@@ -4186,12 +4186,19 @@ async function syncFromCloud(silent = false) {
             });
             localStorage.setItem('penjwen_deleted_sermons', JSON.stringify(curDS));
           }
-          if (cMeta && cMeta.prayerTimes) {
-            const curSaved = getSavedCustomPrayerTimes();
-            if (JSON.stringify(curSaved) !== JSON.stringify(cMeta.prayerTimes)) {
-              localStorage.setItem('penjwen_custom_prayer_times', JSON.stringify(cMeta.prayerTimes));
-              currentPrayerTimes = cMeta.prayerTimes;
-              updatePrayerTimesUI(currentPrayerTimes, true);
+          if (cMeta) {
+            if (cMeta.prayerTimes && Object.keys(cMeta.prayerTimes).length > 0) {
+              const curSaved = getSavedCustomPrayerTimes();
+              if (JSON.stringify(curSaved) !== JSON.stringify(cMeta.prayerTimes)) {
+                localStorage.setItem('penjwen_custom_prayer_times', JSON.stringify(cMeta.prayerTimes));
+                currentPrayerTimes = cMeta.prayerTimes;
+                updatePrayerTimesUI(currentPrayerTimes, true);
+              }
+            } else if (cMeta.prayerTimes === null || (cMeta.prayerTimes && Object.keys(cMeta.prayerTimes).length === 0)) {
+              if (localStorage.getItem('penjwen_custom_prayer_times')) {
+                localStorage.removeItem('penjwen_custom_prayer_times');
+                fetchPenjwenPrayerTimes();
+              }
             }
           }
         } catch(e) {}

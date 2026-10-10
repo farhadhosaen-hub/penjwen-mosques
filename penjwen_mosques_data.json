@@ -59,7 +59,7 @@
       }
     ],
     "createdAt": 1791099916289,
-    "updatedAt": 1791638688447,
+    "updatedAt": 1791658348268,
     "teacherPin": "1234",
     "creatorTeacher": "مامۆستا ملا محي الدين"
   },
@@ -122,7 +122,7 @@
       }
     ],
     "createdAt": 1791100239418,
-    "updatedAt": 1791638688447,
+    "updatedAt": 1791658348268,
     "teacherPin": "1234",
     "creatorTeacher": "مامۆستا عابد"
   },
@@ -170,7 +170,7 @@
       }
     ],
     "createdAt": 1791290705595,
-    "updatedAt": 1791638688447,
+    "updatedAt": 1791658348268,
     "teacherPin": "1234",
     "creatorTeacher": "مامۆستا ملا غفور"
   },
@@ -218,7 +218,7 @@
       }
     ],
     "createdAt": 1791464818247,
-    "updatedAt": 1791638688447,
+    "updatedAt": 1791658348268,
     "isUserAdded": true,
     "teacherPin": "1234",
     "creatorTeacher": "مامۆستا بهزاد"
@@ -226,7 +226,7 @@
   {
     "id": "test",
     "name": "ڕاوگان",
-    "updatedAt": 1791638688447,
+    "updatedAt": 1791658348268,
     "location": "گەڕەکی ڕاوگانەکان",
     "notes": "",
     "sermons": [

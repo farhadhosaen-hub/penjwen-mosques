@@ -1031,17 +1031,9 @@ function renderSermonContentHtml(mosque, sermon, dateValue) {
       <div class="space-y-2 animate-fade-in">
         <div class="flex items-center justify-between text-[11px] text-amber-900 font-semibold">
           <span>ناونیشانی وتاری ئەو هەفتەیە:</span>
-          <div class="flex items-center gap-1.5 flex-wrap">
-            <button type="button" onclick="openEditSermonForDate('${mosque.id}', '${sermon.date}')" class="text-[10px] bg-white hover:bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-md border border-amber-300 shadow-2xs transition-colors cursor-pointer" title="دەستکاریکردنی ئەم وتارە">
-              <i class="fa-regular fa-pen-to-square"></i> دەستکاری وتار
-            </button>
-            <button type="button" onclick="deleteSermon('${mosque.id}', '${sermon.date}')" class="text-[10px] bg-red-50 hover:bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-md border border-red-200 shadow-2xs transition-colors cursor-pointer" title="سڕینەوەی ئەم وتارە (تەنها مامۆستای خاوەن)">
-              <i class="fa-regular fa-trash-can"></i> سڕینەوەی وتار
-            </button>
-            <span class="bg-amber-200/90 text-amber-950 font-bold px-2 py-0.5 rounded-md text-[10px] shadow-2xs">
-              هەینی: ${escapeHtml(sermon.date)}
-            </span>
-          </div>
+          <span class="bg-amber-200/90 text-amber-950 font-bold px-2 py-0.5 rounded-md text-[10px] shadow-2xs">
+            هەینی: ${escapeHtml(sermon.date)}
+          </span>
         </div>
         <div class="sermon-topic text-slate-900 font-bold text-xs sm:text-sm leading-relaxed bg-white/95 p-2.5 rounded-xl border border-amber-200/70 shadow-2xs">
           «${escapeHtml(sermon.topic)}»
@@ -1481,6 +1473,15 @@ window.openSermonModal = function(mosqueId, targetDate) {
     if (removeAudioBtn) removeAudioBtn.classList.add('hidden');
   }
 
+  const deleteBtn = document.getElementById('sermonModalDeleteBtn');
+  if (deleteBtn) {
+    if (existingSermon) {
+      deleteBtn.classList.remove('hidden');
+    } else {
+      deleteBtn.classList.add('hidden');
+    }
+  }
+
   showModal(modal);
   if (topicInput) topicInput.focus();
 };
@@ -1488,6 +1489,14 @@ window.openSermonModal = function(mosqueId, targetDate) {
 window.closeSermonModal = function() {
   const modal = document.getElementById('sermonModal');
   if (modal) hideModal(modal);
+};
+
+window.handleQuickSermonDelete = function() {
+  const mosqueId = document.getElementById('sermonModalMosqueId').value;
+  const sDate = document.getElementById('sermonModalDate').value.trim();
+  if (!mosqueId || !sDate) return;
+  closeSermonModal();
+  deleteSermon(mosqueId, sDate);
 };
 
 window.openAddSermonForDate = function(mosqueId, targetDate) {

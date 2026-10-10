@@ -216,6 +216,7 @@ audio {
   #mosqueModal, 
   #viewModal,
   #reportModal,
+  #sermonModal,
   .no-print {
     display: none !important;
   }

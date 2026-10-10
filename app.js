@@ -1394,10 +1394,14 @@ function mergeSingleSermon(mosqueId, incomingSermon) {
   saveMosquesDataLocally();
 
   const container = document.getElementById(`sermon-display-${mosque.id}`);
+  const picker = document.getElementById(`picker-${mosque.id}`);
+  if (picker) {
+    picker.value = incomingSermon.date;
+  }
+  const activeDate = incomingSermon.date;
+  const activeSermon = findSermonByDate(mosque, activeDate);
+
   if (container) {
-    const picker = document.getElementById(`picker-${mosque.id}`);
-    const activeDate = picker ? picker.value : (incomingSermon.date || getLatestSermonDate(mosque));
-    const activeSermon = findSermonByDate(mosque, activeDate);
     container.innerHTML = renderSermonContentHtml(mosque, activeSermon, activeDate);
     container.classList.remove('sermon-update-flash');
     void container.offsetWidth;
@@ -4219,26 +4223,30 @@ async function syncFromCloud(silent = false) {
     }
   }
 
-  if (icon) icon.classList.remove('animate-spin');
-  isSyncingFromCloud = false;
-
-  if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
-    if (cloudUpdatedAt) {
-      lastKnownCloudUpdatedAt = cloudUpdatedAt;
+  try {
+    if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
+      if (cloudUpdatedAt) {
+        lastKnownCloudUpdatedAt = cloudUpdatedAt;
+      }
+      const changes = mergeIncomingMosques(cloudData);
+      localStorage.setItem('penjwen_last_sync_time', Date.now().toString());
+      updateSyncUIStatus(true, changes);
+      if (changes > 0) {
+        showToast(`هاوکاتکرا! ${changes} مزگەوت یان وتاری نوێ لە ئامێرەکانی ترەوە وەرگیرا`, 'success');
+      } else if (!silent) {
+        showToast('هەموو ئەپەکان پێکەوە هاوکات و نوێن', 'success');
+      }
+    } else {
+      updateSyncUIStatus(false);
+      if (!silent) {
+        showToast('پەیوەندی بە کڵاود نەبەسترا؛ داتای ناوخۆیی بەکاردێت', 'info');
+      }
     }
-    const changes = mergeIncomingMosques(cloudData);
-    localStorage.setItem('penjwen_last_sync_time', Date.now().toString());
-    updateSyncUIStatus(true, changes);
-    if (changes > 0) {
-      showToast(`هاوکاتکرا! ${changes} مزگەوت یان زانیاری نوێ لە ئامێرەکانی ترەوە وەرگیرا`, 'success');
-    } else if (!silent) {
-      showToast('هەموو ئەپەکان پێکەوە هاوکات و نوێن', 'success');
-    }
-  } else {
-    updateSyncUIStatus(false);
-    if (!silent) {
-      showToast('پەیوەندی بە کڵاود نەبەسترا؛ داتای ناوخۆیی بەکاردێت', 'info');
-    }
+  } catch (err) {
+    console.warn('Error merging cloud data:', err);
+  } finally {
+    if (icon) icon.classList.remove('animate-spin');
+    isSyncingFromCloud = false;
   }
 }
 window.syncFromCloud = syncFromCloud;
@@ -4492,7 +4500,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // هاوکاتکردنی بەردەوامی ئۆنلاین لە نێوان هەموو مۆبایل و ئەپەکان بە خێراترین کات
   setInterval(() => {
-    if (document.visibilityState === 'visible') {
+    if (!document.visibilityState || document.visibilityState === 'visible') {
       syncFromCloud(true);
     }
   }, 2500); // پشکنین و هاوکاتکردنی خودکار لەگەڵ کڵاود هەر ٢.٥ چرکە جارێک

@@ -1840,158 +1840,277 @@ body {
 // داتای فەرمی و سەرەتایی مزگەوتەکانی پێنجوێن
 const DEFAULT_MOSQUES = [
   {
-    id: "mosque_gaylani",
-    name: "مزگەوتی گەیلانی پێنجوێن",
-    location: "ناوبازاڕ",
-    notes: "مزگەوتی گەیلانی لە شارۆچکەی پێنجوێن، یەکێکە لە مزگەوتە دیار و سەرەکییەکان بۆ نوێژی هەینی، وانە و کۆڕە ئایینییەکان.",
-    sermons: [
+    "id": "mosque_gaylani",
+    "name": "مزگەوتی گەیلانی پێنجوێن",
+    "location": "ناوبازاڕ",
+    "notes": "مزگەوتی گەیلانی لە شارۆچکەی پێنجوێن، یەکێکە لە مزگەوتە دیار و سەرەکییەکان بۆ نوێژی هەینی، وانە و کۆڕە ئایینییەکان.",
+    "sermons": [
       {
-        id: "srm_g_1",
-        date: "2026-10-02",
-        topic: "گەورەیی پێغەمبەر (د.خ) و شوێنکەوتنی سوننەتەکانی",
-        speaker: "مامۆستا ملا محمدی گەیلانی",
-        hasAudio: false
+        "id": "srm_g_1",
+        "date": "2026-10-02",
+        "topic": "گەورەیی پێغەمبەر (د.خ) و شوێنکەوتنی سوننەتەکانی",
+        "speaker": "مامۆستا ملا محمدی گەیلانی",
+        "hasAudio": true,
+        "audioUrl": "https://raw.githubusercontent.com/farhadhosaen-hub/penjwen-mosques/main/audio/sermon_mosque_gaylani_20261002.mp3",
+        "audioFileName": "قران منشاوي.mp3"
       },
       {
-        id: "srm_g_2",
-        date: "2026-09-25",
-        topic: "برایەتی و دڵپاکی لەنێوان باوەڕداران",
-        speaker: "مامۆستا ملا محمدی گەیلانی",
-        hasAudio: false
+        "id": "srm_g_2",
+        "date": "2026-09-25",
+        "topic": "برایەتی و دڵپاکی لەنێوان باوەڕداران",
+        "speaker": "مامۆستا ملا محمدی گەیلانی",
+        "hasAudio": false
       },
       {
-        id: "srm_g_3",
-        date: "2026-09-18",
-        topic: "ڕەوشتی بەرز و دەستپاکی لە مامەڵەی ڕۆژانەدا",
-        speaker: "مامۆستا ملا محمدی گەیلانی",
-        hasAudio: false
+        "id": "srm_g_3",
+        "date": "2026-09-18",
+        "topic": "ڕەوشتی بەرز و دەستپاکی لە مامەڵەی ڕۆژانەدا",
+        "speaker": "مامۆستا ملا محمدی گەیلانی",
+        "hasAudio": false
       }
     ],
-    khutbahDate: "2026-10-02",
-    khutbahTopic: "گەورەیی پێغەمبەر (د.خ) و شوێنکەوتنی سوننەتەکانی",
-    khutbahSpeaker: "مامۆستا ملا محمدی گەیلانی",
-    staff: [
-      { id: "s_1791552856073_0", name: "مامۆستا ملا محمد", role: "ووتاربێژ", phone: "" },
-      { id: "s_1791552856073_1", name: "مامۆستا محمد", role: "پێش نوێژ", phone: "" },
-      { id: "s_1791552856073_2", name: "کاک فریق", role: "بانگ بێژ", phone: "" },
-      { id: "s_1791552856073_3", name: "کاک فریاد", role: "کارگووزار", phone: "" }
-    ],
-    createdAt: 1791099916289,
-    updatedAt: 1791560000000
-  },
-  {
-    id: "mosque_mala_abbas",
-    name: "مزگەوتی مەلا عباس",
-    location: "خوار مەلعەبەکە",
-    notes: "",
-    sermons: [
+    "khutbahDate": "2026-10-02",
+    "khutbahTopic": "گەورەیی پێغەمبەر (د.خ) و شوێنکەوتنی سوننەتەکانی",
+    "khutbahSpeaker": "مامۆستا ملا محمدی گەیلانی",
+    "staff": [
       {
-        id: "srm_abbas_1",
-        date: "2026-10-02",
-        topic: "برایەتی",
-        speaker: "مامۆستا مەلا عباس",
-        hasAudio: false
+        "id": "s_1791613287856_0",
+        "name": "مامۆستا ملا محي الدين",
+        "role": "ووتاربێژ",
+        "phone": ""
       },
       {
-        id: "srm_abbas_2",
-        date: "2026-09-25",
-        topic: "گرنگی نوێژی بەکۆمەڵ و پاراستنی مافی مسوڵمانان",
-        speaker: "مامۆستا مەلا عباس",
-        hasAudio: false
+        "id": "s_1791613287856_1",
+        "name": "مامۆستا مجيد",
+        "role": "پێش نوێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613287856_2",
+        "name": "کاک فاروق",
+        "role": "بانگ بێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613287856_3",
+        "name": "کاک فارس",
+        "role": "کارگووزار",
+        "phone": ""
       }
     ],
-    khutbahDate: "2026-10-02",
-    khutbahTopic: "برایەتی",
-    khutbahSpeaker: "مامۆستا مەلا عباس",
-    staff: [
-      { id: "s_1791553098853_0", name: "مامۆستا عباس", role: "ووتاربێژ", phone: "" },
-      { id: "s_1791553098853_1", name: "مامۆستا عباس", role: "پێش نوێژ", phone: "" },
-      { id: "s_1791553098853_2", name: "حاجی عارف", role: "بانگ بێژ", phone: "" },
-      { id: "s_1791553098853_3", name: "عمر", role: "کارگووزار", phone: "" },
-      { id: "s_1791553098853_4", name: "عزت", role: "کارگووزار", phone: "" }
-    ],
-    createdAt: 1791100239418,
-    updatedAt: 1791560000000
+    "createdAt": 1791099916289,
+    "updatedAt": 1791658348268,
+    "teacherPin": "1234",
+    "creatorTeacher": "مامۆستا ملا محي الدين"
   },
   {
-    id: "mosque_1791290705595",
-    name: "بەرکێو",
-    location: "گەڕەکی بەرکێوی پێنجوێن",
-    notes: "",
-    sermons: [
+    "id": "mosque_mala_abbas",
+    "name": "مزگەوتی مەلا عباس",
+    "location": "خوار مەلعەبەکە",
+    "notes": "",
+    "sermons": [
       {
-        id: "srm_1791290705595",
-        date: "2026-10-02",
-        topic: "تقوی الله",
-        speaker: "مامۆستا ملا غریب",
-        hasAudio: false
+        "id": "srm_abbas_1",
+        "date": "2026-10-02",
+        "topic": "برایەتی",
+        "speaker": "مامۆستا مەلا عباس",
+        "hasAudio": true,
+        "audioUrl": "https://raw.githubusercontent.com/farhadhosaen-hub/penjwen-mosques/main/audio/sermon_mosque_mala_abbas_20261002.mp3",
+        "audioFileName": "قران منشاوي.mp3"
+      },
+      {
+        "id": "srm_abbas_2",
+        "date": "2026-09-25",
+        "topic": "گرنگی نوێژی بەکۆمەڵ و پاراستنی مافی مسوڵمانان",
+        "speaker": "مامۆستا مەلا عباس",
+        "hasAudio": false
       }
     ],
-    khutbahDate: "2026-10-02",
-    khutbahTopic: "تقوی الله",
-    khutbahSpeaker: "مامۆستا ملا غریب",
-    staff: [
-      { id: "s_1791553238540_0", name: "مامۆستا ملا غریب", role: "ووتاربێژ", phone: "" },
-      { id: "s_1791553238540_1", name: "ملا غریب", role: "پێش نوێژ", phone: "" },
-      { id: "s_1791553238540_2", name: "حاجی هیوا", role: "بانگ بێژ", phone: "" },
-      { id: "s_1791553238540_3", name: "کاک هێمن", role: "کارگووزار", phone: "" }
+    "khutbahDate": "2026-10-02",
+    "khutbahTopic": "برایەتی",
+    "khutbahSpeaker": "مامۆستا مەلا عباس",
+    "staff": [
+      {
+        "id": "s_1791613343770_0",
+        "name": "مامۆستا عابد",
+        "role": "ووتاربێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613343770_1",
+        "name": "مامۆستا عمر",
+        "role": "پێش نوێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613343770_2",
+        "name": "حاجی مارف",
+        "role": "بانگ بێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613343770_3",
+        "name": "عماد",
+        "role": "کارگووزار",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613343770_4",
+        "name": "عزت",
+        "role": "کارگووزار",
+        "phone": ""
+      }
     ],
-    createdAt: 1791290705595,
-    updatedAt: 1791560000000
+    "createdAt": 1791100239418,
+    "updatedAt": 1791658348268,
+    "teacherPin": "1234",
+    "creatorTeacher": "مامۆستا عابد"
   },
   {
-    id: "mosque_1791464818247",
-    name: "مزگەوتی کێلویەکان",
-    location: "خوار بازاڕەکەوە",
-    notes: "",
-    sermons: [
+    "id": "mosque_1791290705595",
+    "name": "بەرکێو",
+    "location": "گەڕەکی بەرکێوی پێنجوێن",
+    "notes": "",
+    "sermons": [
       {
-        id: "srm_1791464818247",
-        date: "2026-10-02",
-        topic: "حق الناس",
-        speaker: "مامۆستا ملا بختێار",
-        hasAudio: false
+        "id": "srm_1791290705595",
+        "date": "2026-10-02",
+        "topic": "تقوی الله",
+        "speaker": "مامۆستا ملا غریب",
+        "hasAudio": false
       }
     ],
-    khutbahDate: "2026-10-02",
-    khutbahTopic: "حق الناس",
-    khutbahSpeaker: "مامۆستا ملا بختێار",
-    staff: [
-      { id: "s_1791464818245_0", name: "مامۆستا بختیار", role: "ووتاربێژ", phone: "" },
-      { id: "s_1791464818247_1", name: "مامۆستاعبداللە", role: "پێش نوێژ", phone: "" },
-      { id: "s_1791464818247_2", name: "حاجی محمود", role: "بانگ بێژ", phone: "" },
-      { id: "s_1791464818247_3", name: "کاک عارف", role: "کارگووزار", phone: "" }
+    "khutbahDate": "2026-10-02",
+    "khutbahTopic": "تقوی الله",
+    "khutbahSpeaker": "مامۆستا ملا غریب",
+    "staff": [
+      {
+        "id": "s_1791613491213_0",
+        "name": "مامۆستا ملا غفور",
+        "role": "ووتاربێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613491213_1",
+        "name": "ملا غريب",
+        "role": "پێش نوێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613491213_2",
+        "name": "حاجی هیمداد",
+        "role": "بانگ بێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613491213_3",
+        "name": "کاک حكيم",
+        "role": "کارگووزار",
+        "phone": ""
+      }
     ],
-    createdAt: 1791464818247,
-    updatedAt: 1791560000000,
-    isUserAdded: true
+    "createdAt": 1791290705595,
+    "updatedAt": 1791658348268,
+    "teacherPin": "1234",
+    "creatorTeacher": "مامۆستا ملا غفور"
   },
   {
-    id: "test",
-    name: "ڕاوگان",
-    location: "گەڕەکی ڕاوگانەکان",
-    notes: "",
-    sermons: [
+    "id": "mosque_1791464818247",
+    "name": "مزگەوتی کێلویەکان",
+    "location": "خوار بازاڕەکەوە",
+    "notes": "",
+    "sermons": [
       {
-        id: "srm_1791488977396",
-        date: "2026-10-02",
-        topic: "ڕزق و ڕۆزی",
-        speaker: "عبداللە",
-        hasAudio: false
+        "id": "srm_1791464818247",
+        "date": "2026-10-02",
+        "topic": "حق الناس",
+        "speaker": "مامۆستا ملا بختێار",
+        "hasAudio": false
       }
     ],
-    khutbahDate: "2026-10-02",
-    khutbahTopic: "ڕزق و ڕۆزی",
-    khutbahSpeaker: "عبداللە",
-    staff: [
-      { id: "s_1791552952091_0", name: "مامۆستا عبدالقادر", role: "ووتاربێژ", phone: "" },
-      { id: "s_1791552952091_1", name: "مامۆستا عبدالقادر", role: "پێش نوێژ", phone: "" },
-      { id: "s_1791552952091_2", name: "حاجی عارف", role: "بانگ بێژ", phone: "" },
-      { id: "s_1791552952091_3", name: "کاک عامر", role: "کارگووزار", phone: "" }
+    "khutbahDate": "2026-10-02",
+    "khutbahTopic": "حق الناس",
+    "khutbahSpeaker": "مامۆستا ملا بختێار",
+    "staff": [
+      {
+        "id": "s_1791613555407_0",
+        "name": "مامۆستا بهزاد",
+        "role": "ووتاربێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613555407_1",
+        "name": "مامۆستاعلي",
+        "role": "پێش نوێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613555407_2",
+        "name": "حاجی محمد",
+        "role": "بانگ بێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791613555407_3",
+        "name": "کاک غازي",
+        "role": "کارگووزار",
+        "phone": ""
+      }
     ],
-    createdAt: 1791488977396,
-    updatedAt: 1791560000000,
-    isUserAdded: true
+    "createdAt": 1791464818247,
+    "updatedAt": 1791658348268,
+    "isUserAdded": true,
+    "teacherPin": "1234",
+    "creatorTeacher": "مامۆستا بهزاد"
+  },
+  {
+    "id": "test",
+    "name": "ڕاوگان",
+    "updatedAt": 1791658348268,
+    "location": "گەڕەکی ڕاوگانەکان",
+    "notes": "",
+    "sermons": [
+      {
+        "id": "srm_1791488977396",
+        "date": "2026-10-02",
+        "topic": "ڕزق و ڕۆزی",
+        "speaker": "عبداللە",
+        "hasAudio": false
+      }
+    ],
+    "khutbahDate": "2026-10-02",
+    "khutbahTopic": "ڕزق و ڕۆزی",
+    "khutbahSpeaker": "عبداللە",
+    "staff": [
+      {
+        "id": "s_1791552952091_0",
+        "name": "مامۆستا عبدالقادر",
+        "role": "ووتاربێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791552952091_1",
+        "name": "مامۆستا عبدالقادر",
+        "role": "پێش نوێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791552952091_2",
+        "name": "حاجی عارف",
+        "role": "بانگ بێژ",
+        "phone": ""
+      },
+      {
+        "id": "s_1791552952091_3",
+        "name": "کاک عامر",
+        "role": "کارگووزار",
+        "phone": ""
+      }
+    ],
+    "createdAt": 1791488977396,
+    "isUserAdded": true,
+    "teacherPin": "1234",
+    "creatorTeacher": "مامۆستا عبدالقادر"
   }
 ];
 
@@ -1999,18 +2118,23 @@ const DEFAULT_MOSQUES = [
 let mosques = [];
 let currentPrayerTimes = null;
 
-// پاراستنی سەدی سەدی داتای مزگەوتەکان و ڕێگری لە هەر داتایەکی کۆن لە کاتی لۆدبووندا
+// وەشانی داتابەیس و پشکنینی هاوتاکردنی سەرەتایی لە هەموو ئەپ و ئامێرەکاندا
+const CURRENT_SCHEMA_VERSION = '20261010_sermons_v32';
+
 try {
+  const storedVersion = localStorage.getItem('penjwen_schema_version');
   let existingStore = localStorage.getItem('penjwen_mosques_data');
-  if (existingStore && existingStore.includes('هادي')) {
-    existingStore = null;
-    localStorage.removeItem('penjwen_mosques_data');
-    localStorage.removeItem('penjwen_mosques_backup');
-    localStorage.removeItem('penjwen_mosques_permanent_vault');
-  }
-  if (!existingStore) {
+  if (storedVersion !== CURRENT_SCHEMA_VERSION || (existingStore && (existingStore.includes('هادی') || existingStore.includes('هادي')))) {
+    localStorage.setItem('penjwen_schema_version', CURRENT_SCHEMA_VERSION);
+    const defStr = JSON.stringify(DEFAULT_MOSQUES);
+    localStorage.setItem('penjwen_mosques_data', defStr);
+    localStorage.setItem('penjwen_mosques_backup', defStr);
+    localStorage.setItem('penjwen_mosques_permanent_vault', defStr);
+    localStorage.removeItem('penjwen_user_mosque_vault');
+    localStorage.removeItem('penjwen_deleted_sermons_vault');
+  } else if (!existingStore) {
     existingStore = localStorage.getItem('penjwen_mosques_backup') || localStorage.getItem('penjwen_mosques_permanent_vault');
-    if (existingStore && !existingStore.includes('هادي')) {
+    if (existingStore && !existingStore.includes('هادی') && !existingStore.includes('هادي')) {
       localStorage.setItem('penjwen_mosques_data', existingStore);
     } else {
       const defStr = JSON.stringify(DEFAULT_MOSQUES);
@@ -5743,10 +5867,42 @@ async function pushToCloud() {
           const localM = mergedList[localIdx];
           const cloudTime = Number(cloudM.updatedAt) || 0;
           const localTime = Number(localM.updatedAt) || 0;
-          const localHasHadi = (localM.staff || []).some(s => (s.name || '').includes('هادي'));
+          const localHasHadi = (localM.staff || []).some(s => {
+            const n = s.name || '';
+            return n.includes('هادی') || n.includes('هادي');
+          });
 
-          const mergedSermons = mergeSermonsList(localM.sermons || [], cloudM.sermons || [], localM.id);
-          const latestSermon = mergedSermons[0] || null;
+          // هاوتاکردنی وتارەکان: بەکارھێنانی سەرچاوەی دەسەڵاتدار و پاراستنی فایلی دەنگیی تۆمارکراو
+          let sermonsToPush;
+          if (localTime >= cloudTime) {
+            sermonsToPush = (localM.sermons || []).map(ls => {
+              const cm = (cloudM.sermons || []).find(cs => cs.date === ls.date);
+              if (cm) {
+                return {
+                  ...ls,
+                  hasAudio: Boolean(ls.hasAudio || cm.hasAudio),
+                  audioUrl: ls.audioUrl || cm.audioUrl,
+                  audioFileName: ls.audioFileName || cm.audioFileName
+                };
+              }
+              return { ...ls };
+            });
+          } else {
+            sermonsToPush = (cloudM.sermons || []).map(cs => {
+              const lm = (localM.sermons || []).find(ls => ls.date === cs.date);
+              if (lm) {
+                return {
+                  ...cs,
+                  hasAudio: Boolean(cs.hasAudio || lm.hasAudio),
+                  audioUrl: cs.audioUrl || lm.audioUrl,
+                  audioFileName: cs.audioFileName || lm.audioFileName
+                };
+              }
+              return { ...cs };
+            });
+          }
+
+          const latestSermon = sermonsToPush[0] || null;
           const staffToUse = (cloudTime > localTime && !localHasHadi) ? (cloudM.staff || localM.staff) : (localM.staff || cloudM.staff);
 
           mergedList[localIdx] = {
@@ -5755,7 +5911,7 @@ async function pushToCloud() {
             teacherPin: localM.teacherPin || cloudM.teacherPin || '1234',
             creatorTeacher: localM.creatorTeacher || cloudM.creatorTeacher || '',
             staff: staffToUse,
-            sermons: mergedSermons,
+            sermons: sermonsToPush,
             khutbahDate: latestSermon ? latestSermon.date : (localM.khutbahDate || cloudM.khutbahDate),
             khutbahTopic: latestSermon ? latestSermon.topic : (localM.khutbahTopic || cloudM.khutbahTopic),
             khutbahSpeaker: latestSermon ? latestSermon.speaker : (localM.khutbahSpeaker || cloudM.khutbahSpeaker),
@@ -5994,12 +6150,32 @@ function mergeIncomingMosques(incomingList) {
       const existingTime = Number(existing.updatedAt) || 0;
 
       // یەکخستنی زیرەکی وتارەکان لە نێوان داتای ناوخۆیی و داتای گەیشتوو
-      const mergedSermons = mergeSermonsList(existing.sermons || [], incoming.sermons || [], existing.id);
+      let mergedSermons;
+      if (incomingTime >= existingTime && Array.isArray(incoming.sermons)) {
+        mergedSermons = incoming.sermons.map(incS => {
+          const locMatch = (existing.sermons || []).find(s => s.date === incS.date);
+          if (locMatch) {
+            return {
+              ...incS,
+              hasAudio: Boolean(incS.hasAudio || locMatch.hasAudio),
+              audioUrl: incS.audioUrl || locMatch.audioUrl,
+              audioFileName: incS.audioFileName || locMatch.audioFileName
+            };
+          }
+          return { ...incS };
+        });
+      } else {
+        mergedSermons = mergeSermonsList(existing.sermons || [], incoming.sermons || [], existing.id);
+      }
+
       const sermonsDiffers = JSON.stringify(existing.sermons || []) !== JSON.stringify(mergedSermons);
       const staffDiffers = JSON.stringify(incoming.staff || []) !== JSON.stringify(existing.staff || []);
       const topicDiffers = (incoming.khutbahTopic || '') !== (existing.khutbahTopic || '');
       const speakerDiffers = (incoming.khutbahSpeaker || '') !== (existing.khutbahSpeaker || '');
-      const hasOldHadi = (existing.staff || []).some(s => (s.name || '').includes('هادي'));
+      const hasOldHadi = (existing.staff || []).some(s => {
+        const n = s.name || '';
+        return n.includes('هادی') || n.includes('هادي');
+      });
 
       // ئەگەر هەر وتارێکی نوێ هەبوو، یان کڵاود نوێتر بوو، یان داتاکان جیاواز بوون:
       if (sermonsDiffers || incomingTime > existingTime || (incomingTime >= existingTime && (staffDiffers || topicDiffers || speakerDiffers)) || hasOldHadi) {

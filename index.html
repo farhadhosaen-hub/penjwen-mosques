@@ -58,7 +58,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="style.css?v=20261010_v34">
+  <link rel="stylesheet" href="style.css?v=20261010_v35">
 </head>
 <body class="font-kurdish bg-emerald-50/70 text-slate-800 min-h-screen flex flex-col selection:bg-brand-200 selection:text-brand-900">
 
@@ -841,13 +841,24 @@
           <label for="teacherAuthPinInput" class="block text-xs font-bold text-slate-800 mb-1.5">
             <i class="fa-solid fa-key text-red-700 ml-1"></i>کۆدی نهێنی مامۆستا (PIN) بنووسە:
           </label>
-          <input 
-            type="password" 
-            id="teacherAuthPinInput" 
-            placeholder="کۆدی نهێنی بنووسە..." 
-            class="w-full px-4 py-2.5 rounded-xl border-2 border-red-300 text-center text-lg font-bold tracking-widest focus:ring-2 focus:ring-red-500 focus:outline-none"
-            autocomplete="off"
-          >
+          <div class="relative">
+            <input 
+              type="password" 
+              id="teacherAuthPinInput" 
+              inputmode="numeric"
+              placeholder="کۆدی نهێنی بنووسە (بۆ نموونە: 1234)..." 
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-red-300 text-center text-lg font-bold tracking-widest focus:ring-2 focus:ring-red-500 focus:outline-none"
+              autocomplete="off"
+            >
+            <button 
+              type="button" 
+              onclick="toggleTeacherPinVisibility()" 
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer transition-colors"
+              title="پیشاندان / شاردنەوەی کۆدی نهێنی"
+            >
+              <i id="teacherPinEyeIcon" class="fa-regular fa-eye"></i>
+            </button>
+          </div>
           <p id="teacherAuthErrorMsg" class="hidden text-xs text-red-600 font-bold mt-1.5 flex items-center gap-1">
             <i class="fa-solid fa-triangle-exclamation"></i>
             <span>کۆدی نهێنی هەڵەیە! تکایە کۆدی دروستی مامۆستا بنووسە.</span>
@@ -865,6 +876,7 @@
           <button 
             type="button" 
             id="teacherAuthConfirmBtn" 
+            onclick="handleTeacherAuthConfirm()"
             class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
           >
             <i class="fa-solid fa-trash-can"></i>
@@ -1373,6 +1385,6 @@
     <span id="toastMsg">کردارەکە سەرکەوتووبوو</span>
   </div>
 
-  <script src="app.js?v=20261010_v34"></script>
+  <script src="app.js?v=20261010_v35"></script>
 </body>
 </html>

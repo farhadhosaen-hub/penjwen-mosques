@@ -748,23 +748,34 @@
         </div>
 
 
-        <!-- دوگمەکانی خەزنکردن -->
-        <div class="pt-2 border-t border-slate-200 flex items-center justify-end gap-2.5">
+        <!-- دوگمەکانی خەزنکردن و سڕینەوە -->
+        <div class="pt-2 border-t border-slate-200 flex items-center justify-between gap-2.5">
           <button 
             type="button" 
-            onclick="closeSermonModal()" 
-            class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
+            id="sermonModalDeleteBtn"
+            onclick="handleQuickSermonDelete()"
+            class="hidden px-3.5 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs border border-red-200 transition-colors cursor-pointer"
+            title="سڕینەوەی ئەم وتارە (تەنها مامۆستای خاوەن مزگەوت)"
           >
-            پاشگەزبوونەوە
+            <i class="fa-regular fa-trash-can ml-1"></i> سڕینەوەی وتار
           </button>
-          <button 
-            type="submit" 
-            id="sermonModalSubmitBtn" 
-            class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
-          >
-            <i class="fa-solid fa-bolt"></i>
-            <span>پاشەکەوتکردن و هاوتاکردنی دەستبەجێ</span>
-          </button>
+          <div class="flex items-center gap-2 mr-auto">
+            <button 
+              type="button" 
+              onclick="closeSermonModal()" 
+              class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
+            >
+              پاشگەزبوونەوە
+            </button>
+            <button 
+              type="submit" 
+              id="sermonModalSubmitBtn" 
+              class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
+            >
+              <i class="fa-solid fa-bolt"></i>
+              <span>پاشەکەوتکردن و هاوتاکردنی دەستبەجێ</span>
+            </button>
+          </div>
         </div>
       </form>
 

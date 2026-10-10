@@ -1044,19 +1044,44 @@ window.handleDirectAudioUpload = async function(mosqueId, sermonDate, inputElem)
     setTimeout(() => loadAudioIntoCardPlayer(mosqueId, sermonDate), 50);
   }
 
+  // پەخشی دەستبەجێ بە کەمتر لە نیو چرکە بۆ هەموو ئامێرەکان
+  if (mosque && mosque.sermons) {
+    const currentS = mosque.sermons.find(x => x.date === sermonDate);
+    if (currentS) {
+      broadcastRealtimeEvent({
+        type: 'sermon_saved',
+        mosqueId: mosque.id,
+        mosqueName: mosque.name,
+        sermon: currentS,
+        updatedAt: Date.now()
+      });
+    }
+  }
+
   // ٢. بەرزکردنەوە بۆ کڵاود لە پاشبنەمادا تا هەموو مۆبایل و کۆمپیوتەرەکان دەستبەجێ هاوتا ببن
   try {
     showToast('فایلی دەنگ بەرزدەکرێتەوە بۆ کڵاود بۆ هاوتاکردن...', 'info');
     const { publicUrl } = await uploadSermonAudioToCloud(mosqueId, sermonDate, file);
+    let updatedSermon = null;
     if (mosque && mosque.sermons) {
       const s = mosque.sermons.find(x => x.date === sermonDate);
       if (s) {
         s.audioUrl = publicUrl;
+        updatedSermon = s;
       }
     }
     mosque.updatedAt = Date.now();
     saveMosquesData();
     pushToCloud();
+    if (mosque && updatedSermon) {
+      broadcastRealtimeEvent({
+        type: 'sermon_saved',
+        mosqueId: mosque.id,
+        mosqueName: mosque.name,
+        sermon: updatedSermon,
+        updatedAt: mosque.updatedAt
+      });
+    }
     showToast('فایلی دەنگی MP3 بە سەرکەوتوویی لە هەموو مۆبایل و کۆمپیوتەرەکان هاوتا کرا!', 'success');
   } catch (err) {
     console.warn('Background cloud audio upload warning:', err);
@@ -1073,17 +1098,28 @@ window.deleteCardAudio = async function(mosqueId, sermonDate) {
   await deleteSermonAudioBlob(key);
 
   const mosque = mosques.find(m => m.id === mosqueId);
+  let updatedS = null;
   if (mosque && mosque.sermons) {
     const s = mosque.sermons.find(x => x.date === sermonDate);
     if (s) {
       s.hasAudio = false;
       delete s.audioUrl;
       delete s.audioFileName;
+      updatedS = s;
     }
   }
   mosque.updatedAt = Date.now();
   saveMosquesData();
   pushToCloud();
+  if (mosque && updatedS) {
+    broadcastRealtimeEvent({
+      type: 'sermon_saved',
+      mosqueId: mosque.id,
+      mosqueName: mosque.name,
+      sermon: updatedS,
+      updatedAt: mosque.updatedAt
+    });
+  }
 
   const container = document.getElementById(`sermon-display-${mosqueId}`);
   if (container) {
@@ -1117,36 +1153,290 @@ window.handleSermonDateChange = function(mosqueId, dateValue) {
   }
 };
 
-window.openAddSermonForDate = function(mosqueId, targetDate) {
+// ==============================================================
+// سیستەمی یەکگرتنی زیرەکی وتارەکان (Sermons Smart Merge)
+// ڕێگری تەواو لە سڕینەوە یان ونبوونی وتاری هیچ مامۆستایەک
+// ==============================================================
+function mergeSermonsList(listA = [], listB = []) {
+  const map = new Map();
+
+  (Array.isArray(listA) ? listA : []).forEach(s => {
+    if (s && s.date) map.set(s.date, { ...s });
+  });
+
+  (Array.isArray(listB) ? listB : []).forEach(s => {
+    if (!s || !s.date) return;
+    if (!map.has(s.date)) {
+      map.set(s.date, { ...s });
+    } else {
+      const existing = map.get(s.date);
+      const preferredTopic = (s.topic && s.topic.trim()) || existing.topic || '';
+      const preferredSpeaker = (s.speaker && s.speaker.trim()) || existing.speaker || '';
+      const preferredAudio = Boolean(s.hasAudio || existing.hasAudio);
+      const preferredAudioUrl = s.audioUrl || existing.audioUrl;
+      const preferredAudioFile = s.audioFileName || existing.audioFileName;
+
+      map.set(s.date, {
+        ...existing,
+        ...s,
+        topic: preferredTopic,
+        speaker: preferredSpeaker,
+        hasAudio: preferredAudio,
+        audioUrl: preferredAudioUrl,
+        audioFileName: preferredAudioFile
+      });
+    }
+  });
+
+  const result = Array.from(map.values());
+  result.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  return result;
+}
+
+// هاوتاکردنی دەستبەجێی تەنها یەک وتار لە کاتی هاتنی لە ئامێرێکی ترەوە
+function mergeSingleSermon(mosqueId, incomingSermon) {
+  if (!mosqueId || !incomingSermon || !incomingSermon.date) return false;
+  const mosque = mosques.find(m => m.id === mosqueId || (m.name && incomingSermon.mosqueName && m.name.trim() === incomingSermon.mosqueName.trim()));
+  if (!mosque) return false;
+
+  const existingSermons = mosque.sermons || [];
+  mosque.sermons = mergeSermonsList(existingSermons, [incomingSermon]);
+
+  const latest = mosque.sermons[0];
+  if (latest) {
+    mosque.khutbahDate = latest.date;
+    mosque.khutbahTopic = latest.topic;
+    mosque.khutbahSpeaker = latest.speaker;
+  }
+  mosque.updatedAt = Math.max(Number(mosque.updatedAt) || 0, Date.now());
+
+  saveMosqueToVault(mosque);
+  saveMosquesDataLocally();
+
+  const container = document.getElementById(`sermon-display-${mosque.id}`);
+  if (container) {
+    const picker = document.getElementById(`picker-${mosque.id}`);
+    const activeDate = picker ? picker.value : (incomingSermon.date || getLatestSermonDate(mosque));
+    const activeSermon = findSermonByDate(mosque, activeDate);
+    container.innerHTML = renderSermonContentHtml(mosque, activeSermon, activeDate);
+    container.classList.remove('sermon-update-flash');
+    void container.offsetWidth;
+    container.classList.add('sermon-update-flash');
+    if (activeSermon && activeSermon.hasAudio) {
+      setTimeout(() => loadAudioIntoCardPlayer(mosque.id, activeSermon.date), 50);
+    }
+  } else {
+    renderMosques();
+  }
+
+  return true;
+}
+
+// ==============================================================
+// سیستەمی تایبەتی تۆمارکردن و هاوتاکردنی خێرای وتاری هەینی (Quick Sermon Modal)
+// ==============================================================
+let quickSermonSelectedAudio = null;
+
+window.openSermonModal = function(mosqueId, targetDate) {
   const mosque = mosques.find(m => m.id === mosqueId);
   if (!mosque) return;
 
-  window.editMosque(mosqueId);
-  if (khutbahDateInput) khutbahDateInput.value = targetDate;
-  if (khutbahTopicInput) {
-    khutbahTopicInput.value = '';
-    khutbahTopicInput.focus();
+  const modal = document.getElementById('sermonModal');
+  const mosqueNameEl = document.getElementById('sermonModalMosqueName');
+  const mosqueIdInput = document.getElementById('sermonModalMosqueId');
+  const sermonIdInput = document.getElementById('sermonModalSermonId');
+  const dateInput = document.getElementById('sermonModalDate');
+  const speakerInput = document.getElementById('sermonModalSpeaker');
+  const topicInput = document.getElementById('sermonModalTopic');
+  const teacherPillsContainer = document.getElementById('sermonModalTeacherPills');
+  const audioInput = document.getElementById('sermonModalAudioInput');
+  const audioStatus = document.getElementById('sermonModalAudioStatus');
+  const audioBtnText = document.getElementById('sermonModalAudioBtnText');
+  const removeAudioBtn = document.getElementById('sermonModalRemoveAudioBtn');
+
+  if (mosqueNameEl) mosqueNameEl.textContent = mosque.name;
+  if (mosqueIdInput) mosqueIdInput.value = mosque.id;
+
+  const chosenDate = targetDate || getLatestSermonDate(mosque) || new Date().toISOString().split('T')[0];
+  if (dateInput) dateInput.value = chosenDate;
+
+  // گەڕان بەدوای وتاری پێشوودا
+  const existingSermon = (mosque.sermons || []).find(x => x.date === chosenDate);
+  if (sermonIdInput) sermonIdInput.value = existingSermon ? existingSermon.id : '';
+  if (topicInput) topicInput.value = existingSermon ? (existingSermon.topic || '') : '';
+  
+  // دوگمەکانی هەڵبژاردنی خێرای ناوی مامۆستا
+  if (teacherPillsContainer) {
+    teacherPillsContainer.innerHTML = '';
+    const staffTeachers = (mosque.staff || []).filter(s => {
+      const r = (s.role || '').toLowerCase();
+      return r.includes('وتار') || r.includes('ووتار') || r.includes('پێش') || r.includes('بانگ');
+    });
+
+    const uniqueTeachers = Array.from(new Set(staffTeachers.map(s => (s.name || '').trim()))).filter(Boolean);
+    if (uniqueTeachers.length > 0) {
+      uniqueTeachers.forEach(name => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'text-[11px] font-bold bg-amber-100 hover:bg-amber-200 text-amber-950 px-2.5 py-1 rounded-lg border border-amber-300 transition-colors cursor-pointer shadow-2xs';
+        btn.innerHTML = `<i class="fa-solid fa-user-tie text-[10px] ml-1"></i>${escapeHtml(name)}`;
+        btn.onclick = () => {
+          if (speakerInput) {
+            speakerInput.value = name;
+            if (topicInput && !topicInput.value) topicInput.focus();
+          }
+        };
+        teacherPillsContainer.appendChild(btn);
+      });
+    }
   }
+
+  // دانانی پێشوەختەی ناوی مامۆستا
+  if (speakerInput) {
+    if (existingSermon && existingSermon.speaker) {
+      speakerInput.value = existingSermon.speaker;
+    } else {
+      const defaultSpeaker = (mosque.staff && mosque.staff[0]) ? mosque.staff[0].name : (mosque.khutbahSpeaker || '');
+      speakerInput.value = defaultSpeaker;
+    }
+  }
+
+  // کۆنترۆڵی دەنگ
+  quickSermonSelectedAudio = null;
+  if (audioInput) audioInput.value = '';
+  if (existingSermon && (existingSermon.hasAudio || existingSermon.audioUrl)) {
+    if (audioStatus) audioStatus.textContent = 'خاوەنی فایلی دەنگە (MP3)';
+    if (audioBtnText) audioBtnText.textContent = 'گۆڕینی فایلی دەنگ';
+    if (removeAudioBtn) removeAudioBtn.classList.remove('hidden');
+  } else {
+    if (audioStatus) audioStatus.textContent = 'هیچ فایلێک دانەنراوە';
+    if (audioBtnText) audioBtnText.textContent = 'دیاریکردنی دەنگی MP3';
+    if (removeAudioBtn) removeAudioBtn.classList.add('hidden');
+  }
+
+  showModal(modal);
+  if (topicInput) topicInput.focus();
+};
+
+window.closeSermonModal = function() {
+  const modal = document.getElementById('sermonModal');
+  if (modal) hideModal(modal);
+};
+
+window.openAddSermonForDate = function(mosqueId, targetDate) {
+  openSermonModal(mosqueId, targetDate);
 };
 
 window.openEditSermonForDate = function(mosqueId, targetDate) {
+  openSermonModal(mosqueId, targetDate);
+};
+
+async function handleSaveQuickSermon(e) {
+  e.preventDefault();
+
+  const mosqueId = document.getElementById('sermonModalMosqueId').value;
   const mosque = mosques.find(m => m.id === mosqueId);
   if (!mosque) return;
 
-  window.editMosque(mosqueId);
-  if (khutbahDateInput) khutbahDateInput.value = targetDate;
-  const s = (mosque.sermons || []).find(x => x.date === targetDate);
-  if (s) {
-    if (khutbahTopicInput) khutbahTopicInput.value = s.topic || '';
-    if (khutbahSpeakerInput) khutbahSpeakerInput.value = s.speaker || '';
+  const sDate = document.getElementById('sermonModalDate').value.trim();
+  const sSpeaker = document.getElementById('sermonModalSpeaker').value.trim();
+  const sTopic = document.getElementById('sermonModalTopic').value.trim();
+
+  if (!sDate || !sTopic) {
+    showToast('تکایە بەروار و ناونیشانی وتارەکە بنووسە', 'warning');
+    return;
+  }
+
+  const existingSermons = mosque.sermons ? [...mosque.sermons] : [];
+  const sIdx = existingSermons.findIndex(x => x.date === sDate);
+  let hasAudio = sIdx !== -1 ? Boolean(existingSermons[sIdx].hasAudio) : false;
+  let audioUrl = sIdx !== -1 ? (existingSermons[sIdx].audioUrl || null) : null;
+  let audioFileName = sIdx !== -1 ? (existingSermons[sIdx].audioFileName || null) : null;
+
+  if (quickSermonSelectedAudio) {
+    const key = `${mosqueId}_${sDate}`;
+    await saveSermonAudioBlob(key, quickSermonSelectedAudio);
+    hasAudio = true;
+    audioFileName = quickSermonSelectedAudio.name;
+  }
+
+  const sermonObj = {
+    id: sIdx !== -1 ? existingSermons[sIdx].id : ('srm_' + Date.now()),
+    date: sDate,
+    topic: sTopic,
+    speaker: sSpeaker || 'مامۆستای وتاربێژ',
+    hasAudio: hasAudio,
+    audioUrl: audioUrl,
+    audioFileName: audioFileName
+  };
+
+  if (sIdx !== -1) {
+    existingSermons[sIdx] = sermonObj;
   } else {
-    if (khutbahTopicInput) khutbahTopicInput.value = '';
-    if (khutbahSpeakerInput) khutbahSpeakerInput.value = (mosque.staff && mosque.staff[0]) ? mosque.staff[0].name : '';
+    existingSermons.unshift(sermonObj);
   }
-  if (khutbahTopicInput) {
-    khutbahTopicInput.focus();
+  existingSermons.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  mosque.sermons = existingSermons;
+  if (existingSermons[0].date === sDate) {
+    mosque.khutbahDate = sDate;
+    mosque.khutbahTopic = sTopic;
+    mosque.khutbahSpeaker = sSpeaker || mosque.khutbahSpeaker;
   }
-};
+  mosque.updatedAt = Date.now();
+
+  // ١. پاشەکەوتکردنی دەستبەجێ لەسەر ئەم ئامێرە (0ms)
+  saveMosqueToVault(mosque);
+  saveMosquesDataLocally();
+
+  const container = document.getElementById(`sermon-display-${mosque.id}`);
+  if (container) {
+    container.innerHTML = renderSermonContentHtml(mosque, sermonObj, sDate);
+    container.classList.remove('sermon-update-flash');
+    void container.offsetWidth;
+    container.classList.add('sermon-update-flash');
+    if (sermonObj.hasAudio) {
+      setTimeout(() => loadAudioIntoCardPlayer(mosque.id, sDate), 50);
+    }
+  } else {
+    renderMosques();
+  }
+
+  closeSermonModal();
+  showToast(`وتاری مامۆستا (${sermonObj.speaker}) بە سەرکەوتوویی خەزن کرا و لە هەموو ئەپەکان هاوتاکرا!`, 'success');
+
+  // ٢. پەخشی ڕاستەوخۆ بە کەمتر لە نیو چرکە بۆ هەموو مۆبایل و کۆمپیوتەرەکان
+  broadcastRealtimeEvent({
+    type: 'sermon_saved',
+    mosqueId: mosque.id,
+    mosqueName: mosque.name,
+    sermon: sermonObj,
+    updatedAt: mosque.updatedAt
+  });
+
+  // ٣. بەرزکردنەوەی فایلی دەنگ لە پاشبنەمادا
+  if (quickSermonSelectedAudio) {
+    uploadSermonAudioToCloud(mosque.id, sDate, quickSermonSelectedAudio)
+      .then(({ publicUrl }) => {
+        sermonObj.audioUrl = publicUrl;
+        mosque.updatedAt = Date.now();
+        saveMosqueToVault(mosque);
+        saveMosquesDataLocally();
+        pushToCloud();
+        broadcastRealtimeEvent({
+          type: 'sermon_saved',
+          mosqueId: mosque.id,
+          mosqueName: mosque.name,
+          sermon: sermonObj,
+          updatedAt: mosque.updatedAt
+        });
+      })
+      .catch(err => console.warn('Audio cloud upload warning:', err));
+  }
+
+  // ٤. نوێکردنەوەی داتابەیسی گشتی کڵاود
+  pushToCloud();
+}
 
 // ==============================================================
 // ٢. کاتەکانی بانگی پێنجوێن و دەستکاریکردنی (Point 2)
@@ -1868,6 +2158,10 @@ function createMosqueCard(mosque) {
           <div class="flex items-center gap-2 text-amber-900 font-bold text-sm shrink-0">
             <i class="fa-solid fa-book-quran text-amber-600"></i>
             <span>وتاری هەینی</span>
+            <button type="button" onclick="openSermonModal('${mosque.id}', document.getElementById('picker-${mosque.id}') ? document.getElementById('picker-${mosque.id}').value : '${initialDate}')" class="inline-flex items-center gap-1 text-[11px] bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold px-2.5 py-1 rounded-xl shadow-xs transition-all cursor-pointer mr-1" title="تۆمارکردن یان گۆڕینی خێرای وتاری ئەم مزگەوتە">
+              <i class="fa-solid fa-feather-pointed text-[10px]"></i>
+              <span>تۆمارکردنی وتار</span>
+            </button>
           </div>
 
           <!-- خانەی بەروار لەبەرامبەر ناوی وتار -->
@@ -2066,6 +2360,15 @@ async function handleFormSubmit(e) {
               if (sm) sm.audioUrl = publicUrl;
               saveMosquesData();
               pushToCloud();
+              if (m && sm) {
+                broadcastRealtimeEvent({
+                  type: 'sermon_saved',
+                  mosqueId: m.id,
+                  mosqueName: m.name,
+                  sermon: sm,
+                  updatedAt: Date.now()
+                });
+              }
             })
             .catch(e => console.warn('Modal audio cloud upload error:', e));
         }
@@ -2109,6 +2412,18 @@ async function handleFormSubmit(e) {
         mosque: updatedMosque,
         updatedAt: now
       });
+      if (sTopic) {
+        const savedSermon = updatedMosque.sermons.find(s => s.date === sDate);
+        if (savedSermon) {
+          broadcastRealtimeEvent({
+            type: 'sermon_saved',
+            mosqueId: updatedMosque.id,
+            mosqueName: updatedMosque.name,
+            sermon: savedSermon,
+            updatedAt: now
+          });
+        }
+      }
       showToast(`گۆڕانکارییەکانی (${name}) بە سەرکەوتوویی پاشەکەوت کران`, 'success');
     }
   } else {
@@ -2129,6 +2444,15 @@ async function handleFormSubmit(e) {
             if (sm) sm.audioUrl = publicUrl;
             saveMosquesData();
             pushToCloud();
+            if (m && sm) {
+              broadcastRealtimeEvent({
+                type: 'sermon_saved',
+                mosqueId: m.id,
+                mosqueName: m.name,
+                sermon: sm,
+                updatedAt: Date.now()
+              });
+            }
           })
           .catch(e => console.warn('New mosque audio cloud upload error:', e));
       }
@@ -2167,6 +2491,15 @@ async function handleFormSubmit(e) {
       mosque: newMosque,
       updatedAt: now
     });
+    if (sTopic && initialSermons.length > 0) {
+      broadcastRealtimeEvent({
+        type: 'sermon_saved',
+        mosqueId: newMosque.id,
+        mosqueName: newMosque.name,
+        sermon: initialSermons[0],
+        updatedAt: now
+      });
+    }
     showToast(`مزگەوتی (${name}) بە سەرکەوتوویی تۆمار کرا`, 'success');
   }
 
@@ -2716,6 +3049,37 @@ function initEvents() {
 
   if (printReportBtn) {
     printReportBtn.addEventListener('click', prepareAndPrintReport);
+  }
+
+  // گوێگرتن لە فۆڕمی خێرای وتاری هەینی
+  const sermonQuickForm = document.getElementById('sermonQuickForm');
+  if (sermonQuickForm) sermonQuickForm.addEventListener('submit', handleSaveQuickSermon);
+
+  const sermonModalAudioInput = document.getElementById('sermonModalAudioInput');
+  const sermonModalAudioStatus = document.getElementById('sermonModalAudioStatus');
+  const sermonModalAudioBtnText = document.getElementById('sermonModalAudioBtnText');
+  const sermonModalRemoveAudioBtn = document.getElementById('sermonModalRemoveAudioBtn');
+
+  if (sermonModalAudioInput) {
+    sermonModalAudioInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        quickSermonSelectedAudio = e.target.files[0];
+        const sizeMb = (quickSermonSelectedAudio.size / (1024 * 1024)).toFixed(1);
+        if (sermonModalAudioStatus) sermonModalAudioStatus.textContent = `${quickSermonSelectedAudio.name} (${sizeMb} MB)`;
+        if (sermonModalAudioBtnText) sermonModalAudioBtnText.textContent = 'فایل هەڵبژێردرا';
+        if (sermonModalRemoveAudioBtn) sermonModalRemoveAudioBtn.classList.remove('hidden');
+      }
+    });
+  }
+
+  if (sermonModalRemoveAudioBtn) {
+    sermonModalRemoveAudioBtn.addEventListener('click', () => {
+      quickSermonSelectedAudio = null;
+      if (sermonModalAudioInput) sermonModalAudioInput.value = '';
+      if (sermonModalAudioStatus) sermonModalAudioStatus.textContent = 'هیچ فایلێک دانەنراوە';
+      if (sermonModalAudioBtnText) sermonModalAudioBtnText.textContent = 'دیاریکردنی دەنگی MP3';
+      sermonModalRemoveAudioBtn.classList.add('hidden');
+    });
   }
 
   const filterKhutbahBtn = document.getElementById('filterKhutbahBtn');
@@ -3282,7 +3646,12 @@ function handleRealtimeIncomingPacket(packet) {
   if (!packet || typeof packet !== 'object') return;
   if (packet.senderId === REALTIME_CLIENT_ID) return; // پاراستن لە خۆ-دەنگدانەوە
 
-  if (packet.type === 'mosque_saved' && packet.mosque) {
+  if (packet.type === 'sermon_saved' && packet.mosqueId && packet.sermon) {
+    const success = mergeSingleSermon(packet.mosqueId, packet.sermon);
+    if (success) {
+      showToast(`⚡ ڕاستەوخۆ: وتاری مامۆستا (${packet.sermon.speaker || ''}) بۆ بەرواری (${packet.sermon.date}) هاوتا کرا!`, 'success');
+    }
+  } else if (packet.type === 'mosque_saved' && packet.mosque) {
     const changes = mergeIncomingMosques([packet.mosque]);
     if (changes > 0) {
       showToast(`⚡ دەستبەجێ زانیاری نوێی (${packet.mosque.name}) لە ئامێرێکی ترەوە هاوتا کرا`, 'success');
@@ -3385,14 +3754,26 @@ async function pushToCloud() {
           // مزگەوتێکی تر لە ئامێرێکی ترەوە زیاد کراوە -> دەهێندرێت
           mergedList.push(cloudM);
         } else {
-          // ئەگەر نوسخەی کڵاود نوێتر بوو، یان ئامێری ناوخۆیی ناوی کۆنی هادی تێدابوو، کڵاود دەسەپێنرێت
+          // هاوتاکردن و تێکەڵکردنی زیرەکانەی وتارەکان بەبێ لەدەستچوونی هیچ وتارێک
           const localM = mergedList[localIdx];
           const cloudTime = Number(cloudM.updatedAt) || 0;
           const localTime = Number(localM.updatedAt) || 0;
           const localHasHadi = (localM.staff || []).some(s => (s.name || '').includes('هادي'));
-          if (cloudTime > localTime || localHasHadi) {
-            mergedList[localIdx] = { ...localM, ...cloudM };
-          }
+
+          const mergedSermons = mergeSermonsList(localM.sermons || [], cloudM.sermons || []);
+          const latestSermon = mergedSermons[0] || null;
+          const staffToUse = (cloudTime > localTime && !localHasHadi) ? (cloudM.staff || localM.staff) : (localM.staff || cloudM.staff);
+
+          mergedList[localIdx] = {
+            ...cloudM,
+            ...localM,
+            staff: staffToUse,
+            sermons: mergedSermons,
+            khutbahDate: latestSermon ? latestSermon.date : (localM.khutbahDate || cloudM.khutbahDate),
+            khutbahTopic: latestSermon ? latestSermon.topic : (localM.khutbahTopic || cloudM.khutbahTopic),
+            khutbahSpeaker: latestSermon ? latestSermon.speaker : (localM.khutbahSpeaker || cloudM.khutbahSpeaker),
+            updatedAt: Math.max(cloudTime, localTime, Date.now())
+          };
         }
       });
     }
@@ -3562,15 +3943,27 @@ function mergeIncomingMosques(incomingList) {
       let existing = mosques[existingIndex];
       const incomingTime = Number(incoming.updatedAt) || 0;
       const existingTime = Number(existing.updatedAt) || 0;
+
+      // یەکخستنی زیرەکی وتارەکان لە نێوان داتای ناوخۆیی و داتای گەیشتوو
+      const mergedSermons = mergeSermonsList(existing.sermons || [], incoming.sermons || []);
+      const sermonsDiffers = JSON.stringify(existing.sermons || []) !== JSON.stringify(mergedSermons);
       const staffDiffers = JSON.stringify(incoming.staff || []) !== JSON.stringify(existing.staff || []);
       const topicDiffers = (incoming.khutbahTopic || '') !== (existing.khutbahTopic || '');
       const speakerDiffers = (incoming.khutbahSpeaker || '') !== (existing.khutbahSpeaker || '');
-      const sermonsDiffers = JSON.stringify(incoming.sermons || []) !== JSON.stringify(existing.sermons || []);
       const hasOldHadi = (existing.staff || []).some(s => (s.name || '').includes('هادي'));
 
-      // ئەگەر نوسخەی کڵاود نوێتر بوو، یان زانیارییەکان جیاواز بوون و لە کڵاودەوە هاتوون، یان ناوی کۆنی هادی مابوو:
-      if (incomingTime > existingTime || (incomingTime >= existingTime && (staffDiffers || topicDiffers || speakerDiffers || sermonsDiffers)) || hasOldHadi) {
-        mosques[existingIndex] = { ...existing, ...incoming };
+      // ئەگەر هەر وتارێکی نوێ هەبوو، یان کڵاود نوێتر بوو، یان داتاکان جیاواز بوون:
+      if (sermonsDiffers || incomingTime > existingTime || (incomingTime >= existingTime && (staffDiffers || topicDiffers || speakerDiffers)) || hasOldHadi) {
+        const latestSermon = mergedSermons[0] || null;
+        mosques[existingIndex] = {
+          ...existing,
+          ...incoming,
+          sermons: mergedSermons,
+          khutbahDate: latestSermon ? latestSermon.date : (incoming.khutbahDate || existing.khutbahDate),
+          khutbahTopic: latestSermon ? latestSermon.topic : (incoming.khutbahTopic || existing.khutbahTopic),
+          khutbahSpeaker: latestSermon ? latestSermon.speaker : (incoming.khutbahSpeaker || existing.khutbahSpeaker),
+          updatedAt: Math.max(incomingTime, existingTime, Date.now())
+        };
         saveMosqueToVault(mosques[existingIndex]);
         changesCount++;
       }

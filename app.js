@@ -142,34 +142,10 @@ const DEFAULT_MOSQUES = [
     "name": "مزگەوتی گەیلانی پێنجوێن",
     "location": "ناوبازاڕ",
     "notes": "مزگەوتی گەیلانی لە شارۆچکەی پێنجوێن، یەکێکە لە مزگەوتە دیار و سەرەکییەکان بۆ نوێژی هەینی، وانە و کۆڕە ئایینییەکان.",
-    "sermons": [
-      {
-        "id": "srm_g_1",
-        "date": "2026-10-02",
-        "topic": "گەورەیی پێغەمبەر (د.خ) و شوێنکەوتنی سوننەتەکانی",
-        "speaker": "مامۆستا ملا محمدی گەیلانی",
-        "hasAudio": true,
-        "audioUrl": "https://raw.githubusercontent.com/farhadhosaen-hub/penjwen-mosques/main/audio/sermon_mosque_gaylani_20261002.mp3",
-        "audioFileName": "قران منشاوي.mp3"
-      },
-      {
-        "id": "srm_g_2",
-        "date": "2026-09-25",
-        "topic": "برایەتی و دڵپاکی لەنێوان باوەڕداران",
-        "speaker": "مامۆستا ملا محمدی گەیلانی",
-        "hasAudio": false
-      },
-      {
-        "id": "srm_g_3",
-        "date": "2026-09-18",
-        "topic": "ڕەوشتی بەرز و دەستپاکی لە مامەڵەی ڕۆژانەدا",
-        "speaker": "مامۆستا ملا محمدی گەیلانی",
-        "hasAudio": false
-      }
-    ],
-    "khutbahDate": "2026-10-02",
-    "khutbahTopic": "گەورەیی پێغەمبەر (د.خ) و شوێنکەوتنی سوننەتەکانی",
-    "khutbahSpeaker": "مامۆستا ملا محمدی گەیلانی",
+    "sermons": [],
+    "khutbahDate": "",
+    "khutbahTopic": "",
+    "khutbahSpeaker": "",
     "staff": [
       {
         "id": "s_1791613287856_0",
@@ -197,7 +173,7 @@ const DEFAULT_MOSQUES = [
       }
     ],
     "createdAt": 1791099916289,
-    "updatedAt": 1791658348268,
+    "updatedAt": 1791661182898,
     "teacherPin": "1234",
     "creatorTeacher": "مامۆستا ملا محي الدين"
   },
@@ -206,27 +182,10 @@ const DEFAULT_MOSQUES = [
     "name": "مزگەوتی مەلا عباس",
     "location": "خوار مەلعەبەکە",
     "notes": "",
-    "sermons": [
-      {
-        "id": "srm_abbas_1",
-        "date": "2026-10-02",
-        "topic": "برایەتی",
-        "speaker": "مامۆستا مەلا عباس",
-        "hasAudio": true,
-        "audioUrl": "https://raw.githubusercontent.com/farhadhosaen-hub/penjwen-mosques/main/audio/sermon_mosque_mala_abbas_20261002.mp3",
-        "audioFileName": "قران منشاوي.mp3"
-      },
-      {
-        "id": "srm_abbas_2",
-        "date": "2026-09-25",
-        "topic": "گرنگی نوێژی بەکۆمەڵ و پاراستنی مافی مسوڵمانان",
-        "speaker": "مامۆستا مەلا عباس",
-        "hasAudio": false
-      }
-    ],
-    "khutbahDate": "2026-10-02",
-    "khutbahTopic": "برایەتی",
-    "khutbahSpeaker": "مامۆستا مەلا عباس",
+    "sermons": [],
+    "khutbahDate": "",
+    "khutbahTopic": "",
+    "khutbahSpeaker": "",
     "staff": [
       {
         "id": "s_1791613343770_0",
@@ -260,7 +219,7 @@ const DEFAULT_MOSQUES = [
       }
     ],
     "createdAt": 1791100239418,
-    "updatedAt": 1791658348268,
+    "updatedAt": 1791661182898,
     "teacherPin": "1234",
     "creatorTeacher": "مامۆستا عابد"
   },
@@ -269,18 +228,10 @@ const DEFAULT_MOSQUES = [
     "name": "بەرکێو",
     "location": "گەڕەکی بەرکێوی پێنجوێن",
     "notes": "",
-    "sermons": [
-      {
-        "id": "srm_1791290705595",
-        "date": "2026-10-02",
-        "topic": "تقوی الله",
-        "speaker": "مامۆستا ملا غریب",
-        "hasAudio": false
-      }
-    ],
-    "khutbahDate": "2026-10-02",
-    "khutbahTopic": "تقوی الله",
-    "khutbahSpeaker": "مامۆستا ملا غریب",
+    "sermons": [],
+    "khutbahDate": "",
+    "khutbahTopic": "",
+    "khutbahSpeaker": "",
     "staff": [
       {
         "id": "s_1791613491213_0",
@@ -308,7 +259,7 @@ const DEFAULT_MOSQUES = [
       }
     ],
     "createdAt": 1791290705595,
-    "updatedAt": 1791658348268,
+    "updatedAt": 1791661182898,
     "teacherPin": "1234",
     "creatorTeacher": "مامۆستا ملا غفور"
   },
@@ -317,18 +268,10 @@ const DEFAULT_MOSQUES = [
     "name": "مزگەوتی کێلویەکان",
     "location": "خوار بازاڕەکەوە",
     "notes": "",
-    "sermons": [
-      {
-        "id": "srm_1791464818247",
-        "date": "2026-10-02",
-        "topic": "حق الناس",
-        "speaker": "مامۆستا ملا بختێار",
-        "hasAudio": false
-      }
-    ],
-    "khutbahDate": "2026-10-02",
-    "khutbahTopic": "حق الناس",
-    "khutbahSpeaker": "مامۆستا ملا بختێار",
+    "sermons": [],
+    "khutbahDate": "",
+    "khutbahTopic": "",
+    "khutbahSpeaker": "",
     "staff": [
       {
         "id": "s_1791613555407_0",
@@ -356,7 +299,7 @@ const DEFAULT_MOSQUES = [
       }
     ],
     "createdAt": 1791464818247,
-    "updatedAt": 1791658348268,
+    "updatedAt": 1791661182898,
     "isUserAdded": true,
     "teacherPin": "1234",
     "creatorTeacher": "مامۆستا بهزاد"
@@ -364,21 +307,13 @@ const DEFAULT_MOSQUES = [
   {
     "id": "test",
     "name": "ڕاوگان",
-    "updatedAt": 1791658348268,
+    "updatedAt": 1791661182898,
     "location": "گەڕەکی ڕاوگانەکان",
     "notes": "",
-    "sermons": [
-      {
-        "id": "srm_1791488977396",
-        "date": "2026-10-02",
-        "topic": "ڕزق و ڕۆزی",
-        "speaker": "عبداللە",
-        "hasAudio": false
-      }
-    ],
-    "khutbahDate": "2026-10-02",
-    "khutbahTopic": "ڕزق و ڕۆزی",
-    "khutbahSpeaker": "عبداللە",
+    "sermons": [],
+    "khutbahDate": "",
+    "khutbahTopic": "",
+    "khutbahSpeaker": "",
     "staff": [
       {
         "id": "s_1791552952091_0",
@@ -417,7 +352,7 @@ let mosques = [];
 let currentPrayerTimes = null;
 
 // وەشانی داتابەیس و پشکنینی هاوتاکردنی سەرەتایی لە هەموو ئەپ و ئامێرەکاندا
-const CURRENT_SCHEMA_VERSION = '20261010_sermons_v32';
+const CURRENT_SCHEMA_VERSION = '20261010_sermons_v33';
 
 try {
   const storedVersion = localStorage.getItem('penjwen_schema_version');
@@ -1143,7 +1078,7 @@ function getLatestSermonDate(mosque) {
   if (mosque && mosque.sermons && mosque.sermons.length > 0) {
     return mosque.sermons[0].date;
   }
-  return mosque.khutbahDate || "2026-10-02";
+  return mosque.khutbahDate || new Date().toISOString().split('T')[0];
 }
 
 function renderSermonContentHtml(mosque, sermon, dateValue) {

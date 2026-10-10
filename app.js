@@ -1453,30 +1453,9 @@ window.openSermonModal = function(mosqueId, targetDate) {
   if (sermonIdInput) sermonIdInput.value = existingSermon ? existingSermon.id : '';
   if (topicInput) topicInput.value = existingSermon ? (existingSermon.topic || '') : '';
   
-  // دوگمەکانی هەڵبژاردنی خێرای ناوی مامۆستا
+  // دوگمەکانی هەڵبژاردنی خێرای ناوی مامۆستا بە داواکاری بەکارهێنەر لابرا
   if (teacherPillsContainer) {
     teacherPillsContainer.innerHTML = '';
-    const staffTeachers = (mosque.staff || []).filter(s => {
-      const r = (s.role || '').toLowerCase();
-      return r.includes('وتار') || r.includes('ووتار') || r.includes('پێش') || r.includes('بانگ');
-    });
-
-    const uniqueTeachers = Array.from(new Set(staffTeachers.map(s => (s.name || '').trim()))).filter(Boolean);
-    if (uniqueTeachers.length > 0) {
-      uniqueTeachers.forEach(name => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'text-[11px] font-bold bg-amber-100 hover:bg-amber-200 text-amber-950 px-2.5 py-1 rounded-lg border border-amber-300 transition-colors cursor-pointer shadow-2xs';
-        btn.innerHTML = `<i class="fa-solid fa-user-tie text-[10px] ml-1"></i>${escapeHtml(name)}`;
-        btn.onclick = () => {
-          if (speakerInput) {
-            speakerInput.value = name;
-            if (topicInput && !topicInput.value) topicInput.focus();
-          }
-        };
-        teacherPillsContainer.appendChild(btn);
-      });
-    }
   }
 
   // دانانی پێشوەختەی ناوی مامۆستا

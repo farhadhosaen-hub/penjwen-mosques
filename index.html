@@ -58,7 +58,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="style.css?v=20261010_v33">
+  <link rel="stylesheet" href="style.css?v=20261010_v34">
 </head>
 <body class="font-kurdish bg-emerald-50/70 text-slate-800 min-h-screen flex flex-col selection:bg-brand-200 selection:text-brand-900">
 
@@ -785,6 +785,34 @@
     </div>
   </div>
 
+  <!-- ================= MODAL: تقویمی مانگانەی وتارەکان بە ڕەنگکراوی (Mosque Monthly Sermons Calendar Modal) ================= -->
+  <div id="mosqueCalendarModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border-2 border-emerald-500 overflow-hidden transform scale-95 transition-all duration-300 flex flex-col max-h-[92vh]">
+      
+      <!-- سەرپەڕەی مۆداڵ -->
+      <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-5 py-4 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center text-amber-300 text-lg shadow-inner">
+            <i class="fa-solid fa-calendar-days"></i>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold">تقویمی وتارەکانی هەینی</h3>
+            <p id="mosqueCalendarModalMosqueName" class="text-xs text-emerald-200 font-semibold">مزگەوت</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeMosqueCalendarModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer" title="داخستن">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- ناوەڕۆکی مۆداڵ -->
+      <div id="mosqueCalendarModalBody" class="p-4 sm:p-6 overflow-y-auto space-y-4">
+        <!-- Calendar Grid will be rendered dynamically -->
+      </div>
+
+    </div>
+  </div>
+
   <!-- ================= MODAL: دڵنیابوونەوەی کۆدی نهێنی مامۆستا بۆ سڕینەوە (Teacher Auth Modal) ================= -->
   <div id="teacherAuthModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
     <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border-2 border-red-500 overflow-hidden transform scale-95 transition-all duration-300 flex flex-col">
@@ -1345,6 +1373,6 @@
     <span id="toastMsg">کردارەکە سەرکەوتووبوو</span>
   </div>
 
-  <script src="app.js?v=20261010_v33"></script>
+  <script src="app.js?v=20261010_v34"></script>
 </body>
 </html>

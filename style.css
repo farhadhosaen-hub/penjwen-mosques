@@ -215,6 +215,7 @@ audio {
   #toast, 
   #mosqueModal, 
   #viewModal,
+  #reportModal,
   .no-print {
     display: none !important;
   }

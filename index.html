@@ -156,36 +156,37 @@
         </div>
 
         <!-- Prayer Times Grid (بەیانی، خۆرهەڵات، نیوەڕۆ، عەسر، مەغریب، عیشا) -->
-        <div class="grid grid-cols-6 gap-1.5 sm:gap-2.5 w-full lg:w-auto text-center" id="prayerTimesCards">
+        <!-- بە شێوازی ٢ ڕیز لە مۆبایل (grid-cols-3) تا ژمارەکان تێکەڵ نەبن و تەواو ڕوون بن -->
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-2.5 w-full lg:w-auto text-center" id="prayerTimesCards">
           
-          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Fajr">
-            <div class="text-[10px] sm:text-xs text-emerald-200">بەیانی</div>
-            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Fajr">--:--</div>
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2.5 py-2 border border-emerald-700/60 transition-all flex flex-col items-center justify-center min-w-0" id="card-Fajr">
+            <div class="text-[11px] sm:text-xs text-emerald-200 font-semibold mb-0.5">بەیانی</div>
+            <div class="text-sm sm:text-base font-extrabold font-mono text-white tracking-wider whitespace-nowrap tabular-nums" dir="ltr" id="time-Fajr">--:--</div>
           </div>
 
-          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60 opacity-80" id="card-Sunrise">
-            <div class="text-[10px] sm:text-xs text-emerald-200">خۆرهەڵات</div>
-            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Sunrise">--:--</div>
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2.5 py-2 border border-emerald-700/60 opacity-80 transition-all flex flex-col items-center justify-center min-w-0" id="card-Sunrise">
+            <div class="text-[11px] sm:text-xs text-emerald-200 font-semibold mb-0.5">خۆرهەڵات</div>
+            <div class="text-sm sm:text-base font-extrabold font-mono text-white tracking-wider whitespace-nowrap tabular-nums" dir="ltr" id="time-Sunrise">--:--</div>
           </div>
 
-          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Dhuhr">
-            <div class="text-[10px] sm:text-xs text-emerald-200">نیوەڕۆ</div>
-            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Dhuhr">--:--</div>
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2.5 py-2 border border-emerald-700/60 transition-all flex flex-col items-center justify-center min-w-0" id="card-Dhuhr">
+            <div class="text-[11px] sm:text-xs text-emerald-200 font-semibold mb-0.5">نیوەڕۆ</div>
+            <div class="text-sm sm:text-base font-extrabold font-mono text-white tracking-wider whitespace-nowrap tabular-nums" dir="ltr" id="time-Dhuhr">--:--</div>
           </div>
 
-          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Asr">
-            <div class="text-[10px] sm:text-xs text-emerald-200">عەسر</div>
-            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Asr">--:--</div>
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2.5 py-2 border border-emerald-700/60 transition-all flex flex-col items-center justify-center min-w-0" id="card-Asr">
+            <div class="text-[11px] sm:text-xs text-emerald-200 font-semibold mb-0.5">عەسر</div>
+            <div class="text-sm sm:text-base font-extrabold font-mono text-white tracking-wider whitespace-nowrap tabular-nums" dir="ltr" id="time-Asr">--:--</div>
           </div>
 
-          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Maghrib">
-            <div class="text-[10px] sm:text-xs text-emerald-200">مەغریب</div>
-            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Maghrib">--:--</div>
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2.5 py-2 border border-emerald-700/60 transition-all flex flex-col items-center justify-center min-w-0" id="card-Maghrib">
+            <div class="text-[11px] sm:text-xs text-emerald-200 font-semibold mb-0.5">مەغریب</div>
+            <div class="text-sm sm:text-base font-extrabold font-mono text-white tracking-wider whitespace-nowrap tabular-nums" dir="ltr" id="time-Maghrib">--:--</div>
           </div>
 
-          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2 sm:px-3 py-1.5 border border-emerald-700/60" id="card-Isha">
-            <div class="text-[10px] sm:text-xs text-emerald-200">عیشا</div>
-            <div class="text-xs sm:text-sm font-bold font-mono text-white" id="time-Isha">--:--</div>
+          <div class="prayer-card bg-emerald-800/80 hover:bg-emerald-700/90 rounded-xl px-2.5 py-2 border border-emerald-700/60 transition-all flex flex-col items-center justify-center min-w-0" id="card-Isha">
+            <div class="text-[11px] sm:text-xs text-emerald-200 font-semibold mb-0.5">عیشا</div>
+            <div class="text-sm sm:text-base font-extrabold font-mono text-white tracking-wider whitespace-nowrap tabular-nums" dir="ltr" id="time-Isha">--:--</div>
           </div>
 
         </div>
@@ -580,6 +581,59 @@
       </div>
       <div class="p-6 overflow-y-auto flex-1 space-y-5" id="viewModalBody">
         <!-- Content filled dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: پێشاندان و چاپکردنی فەرمی ڕاپۆرت بۆ مۆبایل و کۆمپیوتەر (Report Modal) ================= -->
+  <div id="reportModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl border-2 border-emerald-600 overflow-hidden transform scale-95 transition-all duration-300 max-h-[92vh] flex flex-col">
+      <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-900 text-white p-4 sm:p-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-emerald-200 text-lg">
+            <i class="fa-solid fa-file-invoice"></i>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold">ڕاپۆرتی فەرمی مزگەوتەکانی پێنجوێن</h3>
+            <p class="text-xs text-emerald-200" id="reportModalDate">بەرواری دەرچوون: --</p>
+          </div>
+        </div>
+        <button type="button" onclick="hideModal(document.getElementById('reportModal'))" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- کردارەکانی خێرای ڕاپۆرت (چاپکردن، داگرتن، هاوبەشکردن، کۆپیکردن) -->
+      <div class="p-3 bg-emerald-50/70 border-b border-emerald-200 flex flex-wrap items-center gap-2">
+        <button type="button" onclick="triggerNativePrint()" class="inline-flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-xs transition-colors cursor-pointer">
+          <i class="fa-solid fa-print"></i>
+          <span>چاپکردن (Print)</span>
+        </button>
+        <button type="button" onclick="downloadReportHtml()" class="inline-flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-xs transition-colors cursor-pointer">
+          <i class="fa-solid fa-file-arrow-down"></i>
+          <span>داگرتن وەک HTML / PDF</span>
+        </button>
+        <button type="button" onclick="shareReportMobile()" class="inline-flex items-center gap-1.5 bg-green-700 hover:bg-green-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-xs transition-colors cursor-pointer">
+          <i class="fa-brands fa-whatsapp text-sm"></i>
+          <span>هاوبەشکردن (WhatsApp)</span>
+        </button>
+        <button type="button" onclick="copyReportText()" class="inline-flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-xs transition-colors cursor-pointer">
+          <i class="fa-solid fa-copy"></i>
+          <span>کۆپیکردنی دەق</span>
+        </button>
+      </div>
+
+      <!-- ناوەڕۆکی خشتەی ڕاپۆرت بۆ مۆبایل و کۆمپیوتەر -->
+      <div class="p-3 sm:p-5 overflow-y-auto flex-1 space-y-4" id="reportModalBody">
+        <!-- Generated by JavaScript dynamically -->
+      </div>
+
+      <!-- ژێرپەڕەی مۆداڵ -->
+      <div class="p-3 bg-slate-100 border-t border-slate-200 flex justify-between items-center text-xs text-slate-600">
+        <span id="reportModalCount" class="font-bold">سەرجەم: -- مزگەوت</span>
+        <button type="button" onclick="hideModal(document.getElementById('reportModal'))" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-lg transition-colors cursor-pointer">
+          داخستن
+        </button>
       </div>
     </div>
   </div>

@@ -339,3 +339,13 @@ body {
   color: #7f4f24 !important;
 }
 
+/* Shake Animation for incorrect PIN entry */
+@keyframes shakeKeyframe {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shake {
+  animation: shakeKeyframe 0.4s ease-in-out;
+}

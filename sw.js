@@ -1,5 +1,5 @@
 // Service Worker بۆ ئەپی مزگەوتەکانی پێنجوێن (Offline & Online PWA)
-const CACHE_NAME = 'penjwen-mosques-v32';
+const CACHE_NAME = 'penjwen-mosques-v33';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

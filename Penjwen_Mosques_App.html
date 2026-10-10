@@ -55,6 +55,9 @@
       }
     }
   </script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <style>
 /* Penjwen Mosques App Bundle Styles */
 /* Custom Styling for Penjwen Mosques App */
@@ -5185,10 +5188,24 @@ function registerServiceWorker() {
       navigator.serviceWorker.register('./sw.js')
         .then((reg) => {
           console.log('[PWA] Service Worker بە سەرکەوتوویی تۆمار کرا:', reg.scope);
+          try {
+            reg.update();
+            setInterval(() => {
+              if (navigator.onLine) reg.update();
+            }, 30000); // هەموو 30 چرکە جارێک پشکنین دەکات بۆ دڵنیابوون لە وەشانی نوێ
+          } catch(e) {}
         })
         .catch((err) => {
           console.warn('[PWA] کێشە لە تۆمارکردنی Service Worker:', err);
         });
+
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
     });
   }
 }

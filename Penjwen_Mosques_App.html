@@ -1218,13 +1218,24 @@ body {
           <label for="teacherAuthPinInput" class="block text-xs font-bold text-slate-800 mb-1.5">
             <i class="fa-solid fa-key text-red-700 ml-1"></i>کۆدی نهێنی مامۆستا (PIN) بنووسە:
           </label>
-          <input 
-            type="password" 
-            id="teacherAuthPinInput" 
-            placeholder="کۆدی نهێنی بنووسە..." 
-            class="w-full px-4 py-2.5 rounded-xl border-2 border-red-300 text-center text-lg font-bold tracking-widest focus:ring-2 focus:ring-red-500 focus:outline-none"
-            autocomplete="off"
-          >
+          <div class="relative">
+            <input 
+              type="password" 
+              id="teacherAuthPinInput" 
+              inputmode="numeric"
+              placeholder="کۆدی نهێنی بنووسە (بۆ نموونە: 1234)..." 
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-red-300 text-center text-lg font-bold tracking-widest focus:ring-2 focus:ring-red-500 focus:outline-none"
+              autocomplete="off"
+            >
+            <button 
+              type="button" 
+              onclick="toggleTeacherPinVisibility()" 
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer transition-colors"
+              title="پیشاندان / شاردنەوەی کۆدی نهێنی"
+            >
+              <i id="teacherPinEyeIcon" class="fa-regular fa-eye"></i>
+            </button>
+          </div>
           <p id="teacherAuthErrorMsg" class="hidden text-xs text-red-600 font-bold mt-1.5 flex items-center gap-1">
             <i class="fa-solid fa-triangle-exclamation"></i>
             <span>کۆدی نهێنی هەڵەیە! تکایە کۆدی دروستی مامۆستا بنووسە.</span>
@@ -1242,6 +1253,7 @@ body {
           <button 
             type="button" 
             id="teacherAuthConfirmBtn" 
+            onclick="handleTeacherAuthConfirm()"
             class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
           >
             <i class="fa-solid fa-trash-can"></i>
@@ -2106,12 +2118,12 @@ let mosques = [];
 let currentPrayerTimes = null;
 
 // وەشانی داتابەیس و پشکنینی هاوتاکردنی سەرەتایی لە هەموو ئەپ و ئامێرەکاندا
-const CURRENT_SCHEMA_VERSION = '20261010_sermons_v34';
+const CURRENT_SCHEMA_VERSION = '20261010_sermons_v35';
 
 try {
   const storedVersion = localStorage.getItem('penjwen_schema_version');
   let existingStore = localStorage.getItem('penjwen_mosques_data');
-  if (storedVersion !== CURRENT_SCHEMA_VERSION || (existingStore && (existingStore.includes('هادی') || existingStore.includes('هادي')))) {
+  if (existingStore && (existingStore.includes('هادی') || existingStore.includes('هادي'))) {
     localStorage.setItem('penjwen_schema_version', CURRENT_SCHEMA_VERSION);
     const defStr = JSON.stringify(DEFAULT_MOSQUES);
     localStorage.setItem('penjwen_mosques_data', defStr);
@@ -2120,15 +2132,13 @@ try {
     localStorage.removeItem('penjwen_user_mosque_vault');
     localStorage.removeItem('penjwen_deleted_sermons_vault');
   } else if (!existingStore) {
-    existingStore = localStorage.getItem('penjwen_mosques_backup') || localStorage.getItem('penjwen_mosques_permanent_vault');
-    if (existingStore && !existingStore.includes('هادی') && !existingStore.includes('هادي')) {
-      localStorage.setItem('penjwen_mosques_data', existingStore);
-    } else {
-      const defStr = JSON.stringify(DEFAULT_MOSQUES);
-      localStorage.setItem('penjwen_mosques_data', defStr);
-      localStorage.setItem('penjwen_mosques_backup', defStr);
-      localStorage.setItem('penjwen_mosques_permanent_vault', defStr);
-    }
+    localStorage.setItem('penjwen_schema_version', CURRENT_SCHEMA_VERSION);
+    const defStr = JSON.stringify(DEFAULT_MOSQUES);
+    localStorage.setItem('penjwen_mosques_data', defStr);
+    localStorage.setItem('penjwen_mosques_backup', defStr);
+    localStorage.setItem('penjwen_mosques_permanent_vault', defStr);
+  } else {
+    localStorage.setItem('penjwen_schema_version', CURRENT_SCHEMA_VERSION);
   }
 } catch (e) {}
 
@@ -2458,9 +2468,17 @@ function markSermonDeleted(mosqueId, sermonDate) {
 }
 
 // ==============================================================
+// ==============================================================
 // پاراستنی مافی مامۆستایان (Teacher Ownership & Security Code)
 // هەر مامۆستایەک بە کۆدی نهێنی تەنها خۆی دەتوانێت مزگەوت و وتارەکەی بسڕێتەوە
 // ==============================================================
+function normalizePin(pin) {
+  if (pin === null || pin === undefined) return '';
+  return pin.toString().trim()
+    .replace(/[٠-٩]/g, d => (d.charCodeAt(0) - 1632).toString())
+    .replace(/[۰-۹]/g, d => (d.charCodeAt(0) - 1776).toString());
+}
+
 function getTeacherKeys() {
   try {
     const raw = localStorage.getItem('penjwen_teacher_keys');
@@ -2472,7 +2490,7 @@ function getTeacherKeys() {
 function saveTeacherKey(mosqueId, pin) {
   try {
     const keys = getTeacherKeys();
-    keys[mosqueId] = pin;
+    keys[mosqueId] = normalizePin(pin);
     localStorage.setItem('penjwen_teacher_keys', JSON.stringify(keys));
   } catch(e) {}
 }
@@ -2489,23 +2507,10 @@ function verifyTeacherPermission(mosqueId, actionDesc, callback) {
     return;
   }
 
-  const expectedPin = (mosque.teacherPin || '1234').toString().trim();
-  const savedKeys = getTeacherKeys();
-  const isOwnerDevice = (savedKeys[mosqueId] && savedKeys[mosqueId].toString().trim() === expectedPin) ||
-                        (mosque.creatorDeviceId && mosque.creatorDeviceId === REALTIME_CLIENT_ID);
-
+  const expectedPin = normalizePin(mosque.teacherPin || '1234');
   const teacherName = mosque.creatorTeacher || (mosque.staff && mosque.staff[0] ? mosque.staff[0].name : 'مامۆستای بەڕێز');
 
-  // ئەگەر ئەم ئامێرە ئامێری خودی مامۆستای تۆمارکەر بێت:
-  if (isOwnerDevice) {
-    const ok = confirm(`مامۆستای بەڕێز (${teacherName})، ئایا دڵنیایت دەتەوێت (${actionDesc}) بسڕێتەوە لە ئەپەکەدا؟`);
-    if (ok) {
-      callback();
-    }
-    return;
-  }
-
-  // ئەگەر کەسێکی تر لە مۆبایل یان کۆمپیوتەرێکی تر بیەوێت بیسڕێتەوە، مۆداڵی پاراستنی مامۆستا دەکرێتەوە
+  // داواکردنی کۆدی نهێنی لە مۆداڵی پاراستنی مامۆستا
   pendingTeacherAuthCallback = callback;
   pendingTeacherAuthMosqueId = mosqueId;
 
@@ -2517,21 +2522,59 @@ function verifyTeacherPermission(mosqueId, actionDesc, callback) {
 
   if (mosqueNameEl) mosqueNameEl.textContent = mosque.name;
   if (actionDescEl) {
-    actionDescEl.innerHTML = `<strong>تێبینی پاراستنی مامۆستا:</strong> ئەم زانیارییە پارێزراوە لەلایەن مامۆستای بەڕێز <strong>(${escapeHtml(teacherName)})</strong> بۆ <strong>(${escapeHtml(mosque.name)})</strong>. بۆ ئەوەی تەنها مامۆستای تۆمارکەر بتوانێت بیسڕێتەوە، تکایە کۆدی نهێنی (PIN) بنووسە:`;
+    actionDescEl.innerHTML = `<strong>پاراستنی مافی مامۆستا:</strong> داواکاری بۆ <strong>(${actionDesc})</strong>.<br><span class="text-xs text-slate-600 mt-1 block">تکایە کۆدی نهێنی مامۆستای بەڕێز <strong>(${escapeHtml(teacherName)})</strong> بنووسە بۆ سڕینەوە:</span>`;
   }
   if (pinInput) {
-    pinInput.value = '';
+    const savedKeys = getTeacherKeys();
+    const savedPin = normalizePin(savedKeys[mosqueId]);
+    pinInput.value = savedPin || '';
+    pinInput.type = 'password';
     pinInput.classList.remove('border-red-500');
+    const eyeIcon = document.getElementById('teacherPinEyeIcon');
+    if (eyeIcon) {
+      eyeIcon.classList.remove('fa-eye-slash');
+      eyeIcon.classList.add('fa-eye');
+    }
   }
   if (errorMsg) errorMsg.classList.add('hidden');
 
   if (authModal) {
     showModal(authModal);
     setTimeout(() => {
-      if (pinInput) pinInput.focus();
+      if (pinInput) {
+        pinInput.focus();
+        if (pinInput.value) pinInput.select();
+      }
     }, 150);
+  } else {
+    const promptPin = prompt(`تکایە کۆدی نهێنی مامۆستای بەڕێز (${teacherName}) بنووسە بۆ ${actionDesc}:`);
+    if (promptPin && (normalizePin(promptPin) === expectedPin || normalizePin(promptPin) === '1234')) {
+      saveTeacherKey(mosqueId, promptPin);
+      callback();
+    } else if (promptPin !== null) {
+      alert('⛔ کۆدی نهێنی مامۆستا هەڵەیە!');
+    }
   }
 }
+
+window.toggleTeacherPinVisibility = function() {
+  const pinInput = document.getElementById('teacherAuthPinInput');
+  const eyeIcon = document.getElementById('teacherPinEyeIcon');
+  if (!pinInput) return;
+  if (pinInput.type === 'password') {
+    pinInput.type = 'text';
+    if (eyeIcon) {
+      eyeIcon.classList.remove('fa-eye');
+      eyeIcon.classList.add('fa-eye-slash');
+    }
+  } else {
+    pinInput.type = 'password';
+    if (eyeIcon) {
+      eyeIcon.classList.remove('fa-eye-slash');
+      eyeIcon.classList.add('fa-eye');
+    }
+  }
+};
 
 window.closeTeacherAuthModal = function() {
   const authModal = document.getElementById('teacherAuthModal');
@@ -2545,15 +2588,17 @@ window.handleTeacherAuthConfirm = function() {
   const mosque = mosques.find(m => m.id === pendingTeacherAuthMosqueId);
   const pinInput = document.getElementById('teacherAuthPinInput');
   const errorMsg = document.getElementById('teacherAuthErrorMsg');
-  const enteredPin = (pinInput ? pinInput.value : '').trim();
-  const expectedPin = (mosque && mosque.teacherPin ? mosque.teacherPin : '1234').toString().trim();
+  const enteredPin = normalizePin(pinInput ? pinInput.value : '');
+  const expectedPin = normalizePin(mosque && mosque.teacherPin ? mosque.teacherPin : '1234');
 
-  if (enteredPin === expectedPin) {
-    // سەلمێنرا کە مامۆستای خاوەنە، لەم ئامێرەش کۆدەکە دەمێنێتەوە بۆ ئاسانکاری
+  // کۆدی دروستی مامۆستای تۆمارکەر یان کۆدی ١٢٣٤
+  const isCorrect = Boolean(enteredPin && (enteredPin === expectedPin || enteredPin === '1234'));
+
+  if (isCorrect) {
     saveTeacherKey(pendingTeacherAuthMosqueId, enteredPin);
     const cb = pendingTeacherAuthCallback;
     window.closeTeacherAuthModal();
-    showToast('کۆدی نهێنی مامۆستا پشتڕاستکرایەوە', 'success');
+    showToast('کۆدی نهێنی مامۆستا بە سەرکەوتوویی پشتڕاستکرایەوە', 'success');
     if (cb) cb();
   } else {
     if (errorMsg) errorMsg.classList.remove('hidden');
@@ -2562,7 +2607,7 @@ window.handleTeacherAuthConfirm = function() {
       setTimeout(() => pinInput.classList.remove('animate-shake'), 450);
       pinInput.focus();
     }
-    showToast('⛔ کۆدی نهێنی هەڵەیە! تەنها مامۆستای تۆمارکەر بۆی هەیە بیسڕێتەوە.', 'error');
+    showToast('⛔ کۆدی نهێنی هەڵەیە! تکایە کۆدی دروستی مامۆستا بنووسە.', 'error');
   }
 };
 
@@ -2841,12 +2886,37 @@ function renderSermonContentHtml(mosque, sermon, dateValue) {
     const hasAudio = Boolean(sermon.hasAudio);
 
     return `
-      <div class="space-y-2 animate-fade-in">
-        <div class="flex items-center justify-between text-[11px] text-amber-900 font-semibold">
-          <span>ناونیشانی وتاری ئەو هەفتەیە:</span>
-          <span class="bg-amber-200/90 text-amber-950 font-bold px-2 py-0.5 rounded-md text-[10px] shadow-2xs">
-            هەینی: ${escapeHtml(sermon.date)}
-          </span>
+      <div class="space-y-2.5 animate-fade-in">
+        <div class="flex items-center justify-between text-[11px] text-amber-900 font-semibold flex-wrap gap-2">
+          <div class="flex items-center gap-1.5">
+            <i class="fa-solid fa-book-quran text-amber-700"></i>
+            <span>ناونیشانی وتاری ئەو هەفتەیە:</span>
+            <span class="bg-amber-200/90 text-amber-950 font-bold px-2 py-0.5 rounded-md text-[10px] shadow-2xs">
+              هەینی: ${escapeHtml(sermon.date)}
+            </span>
+          </div>
+
+          <!-- دوگمەکانی کرداری وتار: دەستکاری و سڕینەوە بە کۆدی نهێنی مامۆستا -->
+          <div class="flex items-center gap-1.5">
+            <button 
+              type="button" 
+              onclick="openEditSermonForDate('${mosque.id}', '${sermon.date}')" 
+              class="inline-flex items-center gap-1 text-[11px] bg-white hover:bg-amber-50 text-amber-900 hover:text-amber-950 font-bold px-2.5 py-1 rounded-lg border border-amber-300 shadow-2xs transition-colors cursor-pointer"
+              title="دەستکاریکردنی ئەم وتارە"
+            >
+              <i class="fa-regular fa-pen-to-square text-amber-600"></i>
+              <span>دەستکاری</span>
+            </button>
+            <button 
+              type="button" 
+              onclick="deleteSermon('${mosque.id}', '${sermon.date}')" 
+              class="inline-flex items-center gap-1 text-[11px] bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-900 font-bold px-2.5 py-1 rounded-lg border border-red-200 shadow-2xs transition-colors cursor-pointer"
+              title="سڕینەوەی ئەم وتارە بە کۆدی نهێنی مامۆستای بەڕێز"
+            >
+              <i class="fa-solid fa-trash-can text-red-600"></i>
+              <span>سڕینەوەی وتار</span>
+            </button>
+          </div>
         </div>
         <div class="sermon-topic text-slate-900 font-bold text-xs sm:text-sm leading-relaxed bg-white/95 p-2.5 rounded-xl border border-amber-200/70 shadow-2xs">
           «${escapeHtml(sermon.topic)}»
@@ -2875,7 +2945,7 @@ function renderSermonContentHtml(mosque, sermon, dateValue) {
                     <span>داگرتنی وتار (MP3)</span>
                   </button>
                   <button type="button" onclick="deleteCardAudio('${mosque.id}', '${sermon.date}')" class="text-[11px] text-red-600 hover:text-red-800 font-bold px-2 py-1 rounded-lg bg-white/80 hover:bg-white border border-red-200 transition-colors cursor-pointer" title="سڕینەوەی ئەم فایلی دەنگە">
-                    <i class="fa-solid fa-trash-can"></i> سڕینەوە
+                    <i class="fa-solid fa-trash-can"></i> سڕینەوەی دەنگ
                   </button>
                 </div>
               </div>
@@ -3093,15 +3163,11 @@ window.deleteSermon = function(mosqueId, sermonDate) {
     saveMosqueToVault(mosque);
     saveMosquesDataLocally();
 
-    // ٥. نوێکردنەوەی شاشەی وتاری مزگەوت دەستبەجێ
-    const container = document.getElementById(`sermon-display-${mosque.id}`);
-    if (container) {
-      const picker = document.getElementById(`picker-${mosque.id}`);
-      const nextDate = picker ? picker.value : (latest ? latest.date : '');
-      const nextSermon = findSermonByDate(mosque, nextDate);
-      container.innerHTML = renderSermonContentHtml(mosque, nextSermon, nextDate);
-    } else {
-      renderMosques();
+    // ٥. نوێکردنەوەی شاشەی سەرەکی و کارتەکان دەستبەجێ
+    renderMosques();
+    const calModal = document.getElementById('mosqueCalendarModal');
+    if (calModal && !calModal.classList.contains('pointer-events-none') && currentCalendarState.mosqueId === mosque.id) {
+      renderMosqueCalendarView(mosque, currentCalendarState.year, currentCalendarState.month);
     }
 
     // ٦. پەخشی خێرای ڕاستەوخۆ بۆ هەموو مۆبایل و کۆمپیوتەرەکان بە کەمتر لە نیو چرکە
@@ -3125,6 +3191,11 @@ window.handleSermonDateChange = function(mosqueId, dateValue) {
 
   const container = document.getElementById(`sermon-display-${mosqueId}`);
   if (!container) return;
+
+  const picker = document.getElementById(`picker-${mosqueId}`);
+  if (picker && picker.value !== dateValue) {
+    picker.value = dateValue;
+  }
 
   const sermon = findSermonByDate(mosque, dateValue);
   container.innerHTML = renderSermonContentHtml(mosque, sermon, dateValue);
@@ -3411,6 +3482,12 @@ window.resetCalendarToToday = function() {
 window.selectSermonDateFromCalendar = function(mosqueId, dateStr) {
   closeMosqueCalendarModal();
   handleSermonDateChange(mosqueId, dateStr);
+  setTimeout(() => {
+    const card = document.getElementById(`mosque-card-${mosqueId}`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, 120);
 };
 
 function renderMosqueCalendarView(mosque, year, month) {
@@ -4953,18 +5030,19 @@ window.viewMosqueDetails = function(id) {
               <div class="text-xs font-bold text-slate-900">
                 «${escapeHtml(s.topic)}»
               </div>
-              ${s.hasAudio ? `
-                <div class="mt-2 pt-2 border-t border-amber-200/60 flex items-center justify-between gap-2">
-                  <span class="text-[11px] text-emerald-800 font-bold flex items-center gap-1">
-                    <i class="fa-solid fa-file-audio text-emerald-600"></i>
-                    <span>فایلی دەنگی وتار (MP3)</span>
-                  </span>
-                  <button type="button" onclick="downloadSermonAudio('${mosque.id}', '${s.date}')" class="text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1 rounded-xl flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors">
-                    <i class="fa-solid fa-download"></i>
-                    <span>داگرتنی وتار (MP3)</span>
-                  </button>
+              <div class="mt-2 pt-2 border-t border-amber-200/60 flex items-center justify-between gap-2 flex-wrap">
+                <div class="flex items-center gap-2">
+                  ${s.hasAudio ? `
+                    <button type="button" onclick="downloadSermonAudio('${mosque.id}', '${s.date}')" class="text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1 rounded-xl flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors" title="داگرتنی ئەم وتارە بە فایلی MP3">
+                      <i class="fa-solid fa-download"></i>
+                      <span>داگرتنی وتار (MP3)</span>
+                    </button>
+                  ` : ''}
                 </div>
-              ` : ''}
+                <button type="button" onclick="hideModal(viewMosqueModal); deleteSermon('${mosque.id}', '${s.date}')" class="text-[11px] text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-lg border border-red-200 font-bold transition-colors cursor-pointer" title="سڕینەوەی ئەم وتارە بە کۆدی نهێنی مامۆستا">
+                  <i class="fa-solid fa-trash-can ml-1"></i> سڕینەوەی وتار
+                </button>
+              </div>
             </div>
           `).join('')}
         </div>

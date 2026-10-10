@@ -547,6 +547,49 @@
           </div>
         </div>
 
+        <!-- Section: پاراستنی تایبەتی مامۆستا (Teacher Security & Ownership) -->
+        <div class="border-t border-slate-100 pt-5">
+          <div class="bg-amber-50/80 border border-amber-300 rounded-2xl p-3.5 space-y-3">
+            <div class="flex items-center gap-2.5 text-amber-950 font-bold text-xs sm:text-sm">
+              <div class="w-8 h-8 rounded-xl bg-amber-200 text-amber-800 flex items-center justify-center text-sm shadow-xs shrink-0">
+                <i class="fa-solid fa-user-shield"></i>
+              </div>
+              <div>
+                <span>پاراستنی مافی مامۆستا (تەنها مامۆستای تۆمارکەر بتوانێت بیسڕێتەوە)</span>
+                <p class="text-[11px] text-amber-800 font-normal mt-0.5">بە دانانی کۆدی نهێنی، هیچ کەسێک لە مۆبایل و کۆمپیوتەری تر ناتوانێت ئەم مزگەوتە و وتارەکانی بسڕێتەوە.</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div>
+                <label for="mosqueTeacherPinInput" class="block text-xs font-bold text-amber-950 mb-1">
+                  <i class="fa-solid fa-key text-amber-700 ml-1"></i>کۆدی نهێنی مامۆستا (PIN):
+                </label>
+                <input 
+                  type="text" 
+                  id="mosqueTeacherPinInput" 
+                  placeholder="نموونە: 1234"
+                  maxlength="10"
+                  class="w-full px-3 py-2 rounded-xl border border-amber-300 bg-white text-slate-900 font-bold text-sm tracking-wider focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                >
+                <span class="text-[10px] text-amber-800 font-medium">کۆدێکی نهێنی دابنێ بۆ سڕینەوە و پاراستنی مزگەوت</span>
+              </div>
+              <div>
+                <label for="mosqueCreatorTeacherInput" class="block text-xs font-bold text-amber-950 mb-1">
+                  <i class="fa-solid fa-user text-amber-700 ml-1"></i>ناوی مامۆستای خاوەن / تۆمارکەر:
+                </label>
+                <input 
+                  type="text" 
+                  id="mosqueCreatorTeacherInput" 
+                  placeholder="ناوی مامۆستای وتاربێژ..."
+                  class="w-full px-3 py-2 rounded-xl border border-amber-300 bg-white text-slate-900 font-bold text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                >
+                <span class="text-[10px] text-amber-800 font-medium">ناوی ئەو مامۆستایەی ئەم مزگەوتەی تۆمارکردووە</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Modal Footer Actions -->
         <div class="border-t border-slate-100 pt-4 flex items-center justify-end gap-3">
           <button 
@@ -752,6 +795,68 @@
         </div>
       </form>
 
+    </div>
+  </div>
+
+  <!-- ================= MODAL: دڵنیابوونەوەی کۆدی نهێنی مامۆستا بۆ سڕینەوە (Teacher Auth Modal) ================= -->
+  <div id="teacherAuthModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border-2 border-red-500 overflow-hidden transform scale-95 transition-all duration-300 flex flex-col">
+      <div class="bg-gradient-to-r from-red-700 via-rose-800 to-red-900 text-white px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center text-red-200 text-lg shadow-inner">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold">پاراستنی مافی مامۆستا</h3>
+            <p id="teacherAuthMosqueName" class="text-xs text-red-200 font-medium">مزگەوتی دیاریکراو</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeTeacherAuthModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div class="bg-rose-50 border border-rose-200 rounded-2xl p-3 text-xs text-rose-900 leading-relaxed">
+          <i class="fa-solid fa-shield-halved text-rose-700 ml-1 text-sm"></i>
+          <span id="teacherAuthActionDesc">تەنها مامۆستای بەڕێزی ئەم مزگەوتە دەتوانێت ئەم زانیارییە بسڕێتەوە.</span>
+        </div>
+
+        <div>
+          <label for="teacherAuthPinInput" class="block text-xs font-bold text-slate-800 mb-1.5">
+            <i class="fa-solid fa-key text-red-700 ml-1"></i>کۆدی نهێنی مامۆستا (PIN) بنووسە:
+          </label>
+          <input 
+            type="password" 
+            id="teacherAuthPinInput" 
+            placeholder="کۆدی نهێنی بنووسە..." 
+            class="w-full px-4 py-2.5 rounded-xl border-2 border-red-300 text-center text-lg font-bold tracking-widest focus:ring-2 focus:ring-red-500 focus:outline-none"
+            autocomplete="off"
+          >
+          <p id="teacherAuthErrorMsg" class="hidden text-xs text-red-600 font-bold mt-1.5 flex items-center gap-1">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>کۆدی نهێنی هەڵەیە! تکایە کۆدی دروستی مامۆستا بنووسە.</span>
+          </p>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5">
+          <button 
+            type="button" 
+            onclick="closeTeacherAuthModal()" 
+            class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
+          >
+            پاشگەزبوونەوە
+          </button>
+          <button 
+            type="button" 
+            id="teacherAuthConfirmBtn" 
+            class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
+          >
+            <i class="fa-solid fa-trash-can"></i>
+            <span>پشتڕاستکردنەوە و سڕینەوە</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 

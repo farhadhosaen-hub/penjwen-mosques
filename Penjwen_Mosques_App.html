@@ -1104,23 +1104,34 @@ body {
         </div>
 
 
-        <!-- دوگمەکانی خەزنکردن -->
-        <div class="pt-2 border-t border-slate-200 flex items-center justify-end gap-2.5">
+        <!-- دوگمەکانی خەزنکردن و سڕینەوە -->
+        <div class="pt-2 border-t border-slate-200 flex items-center justify-between gap-2.5">
           <button 
             type="button" 
-            onclick="closeSermonModal()" 
-            class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
+            id="sermonModalDeleteBtn"
+            onclick="handleQuickSermonDelete()"
+            class="hidden px-3.5 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs border border-red-200 transition-colors cursor-pointer"
+            title="سڕینەوەی ئەم وتارە (تەنها مامۆستای خاوەن مزگەوت)"
           >
-            پاشگەزبوونەوە
+            <i class="fa-regular fa-trash-can ml-1"></i> سڕینەوەی وتار
           </button>
-          <button 
-            type="submit" 
-            id="sermonModalSubmitBtn" 
-            class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
-          >
-            <i class="fa-solid fa-bolt"></i>
-            <span>پاشەکەوتکردن و هاوتاکردنی دەستبەجێ</span>
-          </button>
+          <div class="flex items-center gap-2 mr-auto">
+            <button 
+              type="button" 
+              onclick="closeSermonModal()" 
+              class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
+            >
+              پاشگەزبوونەوە
+            </button>
+            <button 
+              type="submit" 
+              id="sermonModalSubmitBtn" 
+              class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
+            >
+              <i class="fa-solid fa-bolt"></i>
+              <span>پاشەکەوتکردن و هاوتاکردنی دەستبەجێ</span>
+            </button>
+          </div>
         </div>
       </form>
 
@@ -2722,17 +2733,9 @@ function renderSermonContentHtml(mosque, sermon, dateValue) {
       <div class="space-y-2 animate-fade-in">
         <div class="flex items-center justify-between text-[11px] text-amber-900 font-semibold">
           <span>ناونیشانی وتاری ئەو هەفتەیە:</span>
-          <div class="flex items-center gap-1.5 flex-wrap">
-            <button type="button" onclick="openEditSermonForDate('${mosque.id}', '${sermon.date}')" class="text-[10px] bg-white hover:bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-md border border-amber-300 shadow-2xs transition-colors cursor-pointer" title="دەستکاریکردنی ئەم وتارە">
-              <i class="fa-regular fa-pen-to-square"></i> دەستکاری وتار
-            </button>
-            <button type="button" onclick="deleteSermon('${mosque.id}', '${sermon.date}')" class="text-[10px] bg-red-50 hover:bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-md border border-red-200 shadow-2xs transition-colors cursor-pointer" title="سڕینەوەی ئەم وتارە (تەنها مامۆستای خاوەن)">
-              <i class="fa-regular fa-trash-can"></i> سڕینەوەی وتار
-            </button>
-            <span class="bg-amber-200/90 text-amber-950 font-bold px-2 py-0.5 rounded-md text-[10px] shadow-2xs">
-              هەینی: ${escapeHtml(sermon.date)}
-            </span>
-          </div>
+          <span class="bg-amber-200/90 text-amber-950 font-bold px-2 py-0.5 rounded-md text-[10px] shadow-2xs">
+            هەینی: ${escapeHtml(sermon.date)}
+          </span>
         </div>
         <div class="sermon-topic text-slate-900 font-bold text-xs sm:text-sm leading-relaxed bg-white/95 p-2.5 rounded-xl border border-amber-200/70 shadow-2xs">
           «${escapeHtml(sermon.topic)}»
@@ -3172,6 +3175,15 @@ window.openSermonModal = function(mosqueId, targetDate) {
     if (removeAudioBtn) removeAudioBtn.classList.add('hidden');
   }
 
+  const deleteBtn = document.getElementById('sermonModalDeleteBtn');
+  if (deleteBtn) {
+    if (existingSermon) {
+      deleteBtn.classList.remove('hidden');
+    } else {
+      deleteBtn.classList.add('hidden');
+    }
+  }
+
   showModal(modal);
   if (topicInput) topicInput.focus();
 };
@@ -3179,6 +3191,14 @@ window.openSermonModal = function(mosqueId, targetDate) {
 window.closeSermonModal = function() {
   const modal = document.getElementById('sermonModal');
   if (modal) hideModal(modal);
+};
+
+window.handleQuickSermonDelete = function() {
+  const mosqueId = document.getElementById('sermonModalMosqueId').value;
+  const sDate = document.getElementById('sermonModalDate').value.trim();
+  if (!mosqueId || !sDate) return;
+  closeSermonModal();
+  deleteSermon(mosqueId, sDate);
 };
 
 window.openAddSermonForDate = function(mosqueId, targetDate) {

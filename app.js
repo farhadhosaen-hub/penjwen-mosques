@@ -3481,10 +3481,24 @@ function registerServiceWorker() {
       navigator.serviceWorker.register('./sw.js')
         .then((reg) => {
           console.log('[PWA] Service Worker بە سەرکەوتوویی تۆمار کرا:', reg.scope);
+          try {
+            reg.update();
+            setInterval(() => {
+              if (navigator.onLine) reg.update();
+            }, 30000); // هەموو 30 چرکە جارێک پشکنین دەکات بۆ دڵنیابوون لە وەشانی نوێ
+          } catch(e) {}
         })
         .catch((err) => {
           console.warn('[PWA] کێشە لە تۆمارکردنی Service Worker:', err);
         });
+
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
     });
   }
 }

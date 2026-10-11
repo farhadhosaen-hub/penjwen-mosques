@@ -58,7 +58,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="style.css?v=20261010_v35">
+  <link rel="stylesheet" href="style.css?v=20261011_v36">
 </head>
 <body class="font-kurdish bg-emerald-50/70 text-slate-800 min-h-screen flex flex-col selection:bg-brand-200 selection:text-brand-900">
 
@@ -558,36 +558,47 @@
                 <i class="fa-solid fa-user-shield"></i>
               </div>
               <div>
-                <span>پاراستنی مافی مامۆستا (تەنها مامۆستای تۆمارکەر بتوانێت بیسڕێتەوە)</span>
-                <p class="text-[11px] text-amber-800 font-normal mt-0.5">بە دانانی کۆدی نهێنی، هیچ کەسێک لە مۆبایل و کۆمپیوتەری تر ناتوانێت ئەم مزگەوتە و وتارەکانی بسڕێتەوە.</p>
+                <span>دەسەڵات و کۆدی نهێنی مامۆستا (PIN) تایبەت بەم مزگەوتە</span>
+                <p class="text-[11px] text-amber-800 font-normal mt-0.5">تەنها لەم ئامێرەوە دەتوانیت دەستکاری و زیادو کەم و سڕینەوە بکەیت. لە هەر ئامێرێکی ترەوە پێویستە ئەم کۆدە نهێنییە (PIN) لێبدرێت.</p>
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div>
                 <label for="mosqueTeacherPinInput" class="block text-xs font-bold text-amber-950 mb-1">
-                  <i class="fa-solid fa-key text-amber-700 ml-1"></i>کۆدی نهێنی مامۆستا (PIN):
+                  <i class="fa-solid fa-key text-amber-700 ml-1"></i>کۆدی نهێنی مامۆستا (PIN) - تایبەت:
                 </label>
-                <input 
-                  type="text" 
-                  id="mosqueTeacherPinInput" 
-                  placeholder="نموونە: 1234"
-                  maxlength="10"
-                  class="w-full px-3 py-2 rounded-xl border border-amber-300 bg-white text-slate-900 font-bold text-sm tracking-wider focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                >
-                <span class="text-[10px] text-amber-800 font-medium">کۆدێکی نهێنی دابنێ بۆ سڕینەوە و پاراستنی مزگەوت</span>
+                <div class="relative">
+                  <input 
+                    type="text" 
+                    id="mosqueTeacherPinInput" 
+                    placeholder="نموونە: 1234"
+                    maxlength="10"
+                    inputmode="numeric"
+                    class="w-full pl-20 pr-3 py-2 rounded-xl border border-amber-300 bg-white text-slate-900 font-bold text-sm tracking-wider focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                  >
+                  <button 
+                    type="button" 
+                    onclick="generateRandomTeacherPin()" 
+                    class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold bg-amber-200 hover:bg-amber-300 text-amber-950 px-2 py-0.5 rounded-lg transition-colors cursor-pointer"
+                    title="دانانی کۆدێکی نهێنی هەڕەمەکی و پارێزراو"
+                  >
+                    کۆدی نوێ
+                  </button>
+                </div>
+                <span class="text-[10px] text-amber-800 font-medium">کۆدێکی نهێنی بنووسە یان «کۆدی نوێ» دابگرە</span>
               </div>
               <div>
                 <label for="mosqueCreatorTeacherInput" class="block text-xs font-bold text-amber-950 mb-1">
-                  <i class="fa-solid fa-user text-amber-700 ml-1"></i>ناوی مامۆستای خاوەن / تۆمارکەر:
+                  <i class="fa-solid fa-user text-amber-700 ml-1"></i>ناوی مامۆستای خاوەن / وتاربێژ:
                 </label>
                 <input 
                   type="text" 
                   id="mosqueCreatorTeacherInput" 
-                  placeholder="ناوی مامۆستای وتاربێژ..."
+                  placeholder="ناوی مامۆستای بەڕێز..."
                   class="w-full px-3 py-2 rounded-xl border border-amber-300 bg-white text-slate-900 font-bold text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
                 >
-                <span class="text-[10px] text-amber-800 font-medium">ناوی ئەو مامۆستایەی ئەم مزگەوتەی تۆمارکردووە</span>
+                <span class="text-[10px] text-amber-800 font-medium">ناوی ئەو مامۆستایەی ئەم مزگەوتە بەڕێوەدەبات</span>
               </div>
             </div>
           </div>
@@ -879,8 +890,8 @@
             onclick="handleTeacherAuthConfirm()"
             class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
           >
-            <i class="fa-solid fa-trash-can"></i>
-            <span>پشتڕاستکردنەوە و سڕینەوە</span>
+            <i id="teacherAuthConfirmBtnIcon" class="fa-solid fa-lock-open"></i>
+            <span id="teacherAuthConfirmBtnText">پشتڕاستکردنەوە و دەستکاریکردن</span>
           </button>
         </div>
       </div>
@@ -1385,6 +1396,6 @@
     <span id="toastMsg">کردارەکە سەرکەوتووبوو</span>
   </div>
 
-  <script src="app.js?v=20261010_v35"></script>
+  <script src="app.js?v=20261011_v36"></script>
 </body>
 </html>

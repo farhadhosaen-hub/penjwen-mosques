@@ -50,14 +50,14 @@
     "khutbahSpeaker": "",
     "staff": [
       {
-        "id": "s_1791613343770_0",
-        "name": "مامۆستا عابد",
+        "id": "s_1791788899639_0",
+        "name": "مامۆستا ملا عباس",
         "role": "ووتاربێژ",
         "phone": ""
       },
       {
-        "id": "s_1791613343770_1",
-        "name": "مامۆستا عمر",
+        "id": "s_1791788899639_1",
+        "name": "حاجی علی",
         "role": "پێش نوێژ",
         "phone": ""
       },
@@ -81,9 +81,10 @@
       }
     ],
     "createdAt": 1791100239418,
-    "updatedAt": 1791661182898,
-    "teacherPin": "1234",
-    "creatorTeacher": "مامۆستا عابد"
+    "updatedAt": 1791788946431,
+    "teacherPin": "4444",
+    "creatorTeacher": "مامۆستا ملا عباس",
+    "creatorDeviceId": "dev_axkhb2ud_mv484xt8"
   },
   {
     "id": "mosque_1791290705595",
@@ -121,9 +122,10 @@
       }
     ],
     "createdAt": 1791290705595,
-    "updatedAt": 1791661182898,
-    "teacherPin": "1234",
-    "creatorTeacher": "مامۆستا ملا غفور"
+    "updatedAt": 1791788946431,
+    "teacherPin": "222",
+    "creatorTeacher": "مامۆستا ملا غریب",
+    "creatorDeviceId": "dev_7slmkbq1_mv48758f"
   },
   {
     "id": "mosque_1791464818247",

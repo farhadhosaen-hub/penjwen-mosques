@@ -2,5 +2,6 @@
   "deletedMosqueIds": [],
   "deletedSermons": {},
   "prayerTimes": null,
-  "updatedAt": 1791788946431
+  "globalResetAt": 1791800000000,
+  "updatedAt": 1791800000000
 }

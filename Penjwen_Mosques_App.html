@@ -1928,219 +1928,8 @@ function isSameMosque(m1, m2) {
   return n1.length > 0 && n1 === n2;
 }
 
-// داتای فەرمی و سەرەتایی مزگەوتەکانی پێنجوێن
-const DEFAULT_MOSQUES = [
-  {
-    "id": "mosque_gaylani",
-    "name": "مزگەوتی گەیلانی پێنجوێن",
-    "location": "ناوبازاڕ",
-    "notes": "مزگەوتی گەیلانی لە شارۆچکەی پێنجوێن، یەکێکە لە مزگەوتە دیار و سەرەکییەکان بۆ نوێژی هەینی، وانە و کۆڕە ئایینییەکان.",
-    "sermons": [],
-    "khutbahDate": "",
-    "khutbahTopic": "",
-    "khutbahSpeaker": "",
-    "staff": [
-      {
-        "id": "s_1791613287856_0",
-        "name": "مامۆستا ملا محي الدين",
-        "role": "ووتاربێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613287856_1",
-        "name": "مامۆستا مجيد",
-        "role": "پێش نوێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613287856_2",
-        "name": "کاک فاروق",
-        "role": "بانگ بێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613287856_3",
-        "name": "کاک فارس",
-        "role": "کارگووزار",
-        "phone": ""
-      }
-    ],
-    "createdAt": 1791099916289,
-    "updatedAt": 1791661182898,
-    "teacherPin": "1234",
-    "creatorTeacher": "مامۆستا ملا محي الدين"
-  },
-  {
-    "id": "mosque_mala_abbas",
-    "name": "مزگەوتی مەلا عباس",
-    "location": "خوار مەلعەبەکە",
-    "notes": "",
-    "sermons": [],
-    "khutbahDate": "",
-    "khutbahTopic": "",
-    "khutbahSpeaker": "",
-    "staff": [
-      {
-        "id": "s_1791788899639_0",
-        "name": "مامۆستا ملا عباس",
-        "role": "ووتاربێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791788899639_1",
-        "name": "حاجی علی",
-        "role": "پێش نوێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613343770_2",
-        "name": "حاجی مارف",
-        "role": "بانگ بێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613343770_3",
-        "name": "عماد",
-        "role": "کارگووزار",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613343770_4",
-        "name": "عزت",
-        "role": "کارگووزار",
-        "phone": ""
-      }
-    ],
-    "createdAt": 1791100239418,
-    "updatedAt": 1791788946431,
-    "teacherPin": "4444",
-    "creatorTeacher": "مامۆستا ملا عباس",
-    "creatorDeviceId": "dev_axkhb2ud_mv484xt8"
-  },
-  {
-    "id": "mosque_1791290705595",
-    "name": "بەرکێو",
-    "location": "گەڕەکی بەرکێوی پێنجوێن",
-    "notes": "",
-    "sermons": [],
-    "khutbahDate": "",
-    "khutbahTopic": "",
-    "khutbahSpeaker": "",
-    "staff": [
-      {
-        "id": "s_1791613491213_0",
-        "name": "مامۆستا ملا غفور",
-        "role": "ووتاربێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613491213_1",
-        "name": "ملا غريب",
-        "role": "پێش نوێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613491213_2",
-        "name": "حاجی هیمداد",
-        "role": "بانگ بێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613491213_3",
-        "name": "کاک حكيم",
-        "role": "کارگووزار",
-        "phone": ""
-      }
-    ],
-    "createdAt": 1791290705595,
-    "updatedAt": 1791788946431,
-    "teacherPin": "222",
-    "creatorTeacher": "مامۆستا ملا غریب",
-    "creatorDeviceId": "dev_7slmkbq1_mv48758f"
-  },
-  {
-    "id": "mosque_1791464818247",
-    "name": "مزگەوتی کێلویەکان",
-    "location": "خوار بازاڕەکەوە",
-    "notes": "",
-    "sermons": [],
-    "khutbahDate": "",
-    "khutbahTopic": "",
-    "khutbahSpeaker": "",
-    "staff": [
-      {
-        "id": "s_1791613555407_0",
-        "name": "مامۆستا بهزاد",
-        "role": "ووتاربێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613555407_1",
-        "name": "مامۆستاعلي",
-        "role": "پێش نوێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613555407_2",
-        "name": "حاجی محمد",
-        "role": "بانگ بێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791613555407_3",
-        "name": "کاک غازي",
-        "role": "کارگووزار",
-        "phone": ""
-      }
-    ],
-    "createdAt": 1791464818247,
-    "updatedAt": 1791661182898,
-    "isUserAdded": true,
-    "teacherPin": "1234",
-    "creatorTeacher": "مامۆستا بهزاد"
-  },
-  {
-    "id": "test",
-    "name": "ڕاوگان",
-    "updatedAt": 1791661182898,
-    "location": "گەڕەکی ڕاوگانەکان",
-    "notes": "",
-    "sermons": [],
-    "khutbahDate": "",
-    "khutbahTopic": "",
-    "khutbahSpeaker": "",
-    "staff": [
-      {
-        "id": "s_1791552952091_0",
-        "name": "مامۆستا عبدالقادر",
-        "role": "ووتاربێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791552952091_1",
-        "name": "مامۆستا عبدالقادر",
-        "role": "پێش نوێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791552952091_2",
-        "name": "حاجی عارف",
-        "role": "بانگ بێژ",
-        "phone": ""
-      },
-      {
-        "id": "s_1791552952091_3",
-        "name": "کاک عامر",
-        "role": "کارگووزار",
-        "phone": ""
-      }
-    ],
-    "createdAt": 1791488977396,
-    "isUserAdded": true,
-    "teacherPin": "1234",
-    "creatorTeacher": "مامۆستا عبدالقادر"
-  }
-];
+// داتای سەرەتایی مزگەوتەکانی پێنجوێن (خاوێنکراوە بەبێ هیچ مزگەوتێکی پێشوەختە)
+const DEFAULT_MOSQUES = [];
 
 // پێناسی ئامێر بە شێوەیەکی هەمیشەیی بۆ دەستنیشانکردنی ئامێری خاوەنی مزگەوت
 function getPersistentDeviceId() {
@@ -2162,27 +1951,30 @@ let mosques = [];
 let currentPrayerTimes = null;
 
 // وەشانی داتابەیس و پشکنینی هاوتاکردنی سەرەتایی لە هەموو ئەپ و ئامێرەکاندا
-const CURRENT_SCHEMA_VERSION = '20261011_sermons_v36';
+// وەشانی داتابەیس و خاوێنکردنەوەی سەرجەم داتاکان بۆ دەستپێکی خاوێن و بێ مزگەوت
+const CURRENT_SCHEMA_VERSION = '20261012_clean_slate_zero_mosques_v1';
 
 try {
   const storedVersion = localStorage.getItem('penjwen_schema_version');
-  let existingStore = localStorage.getItem('penjwen_mosques_data');
-  if (existingStore && (existingStore.includes('هادی') || existingStore.includes('هادي'))) {
+  if (storedVersion !== CURRENT_SCHEMA_VERSION) {
     localStorage.setItem('penjwen_schema_version', CURRENT_SCHEMA_VERSION);
-    const defStr = JSON.stringify(DEFAULT_MOSQUES);
-    localStorage.setItem('penjwen_mosques_data', defStr);
-    localStorage.setItem('penjwen_mosques_backup', defStr);
-    localStorage.setItem('penjwen_mosques_permanent_vault', defStr);
+    localStorage.setItem('penjwen_mosques_data', '[]');
+    localStorage.setItem('penjwen_mosques_backup', '[]');
+    localStorage.setItem('penjwen_mosques_permanent_vault', '[]');
     localStorage.removeItem('penjwen_user_mosque_vault');
-    localStorage.removeItem('penjwen_deleted_sermons_vault');
-  } else if (!existingStore) {
-    localStorage.setItem('penjwen_schema_version', CURRENT_SCHEMA_VERSION);
-    const defStr = JSON.stringify(DEFAULT_MOSQUES);
-    localStorage.setItem('penjwen_mosques_data', defStr);
-    localStorage.setItem('penjwen_mosques_backup', defStr);
-    localStorage.setItem('penjwen_mosques_permanent_vault', defStr);
-  } else {
-    localStorage.setItem('penjwen_schema_version', CURRENT_SCHEMA_VERSION);
+    localStorage.removeItem('penjwen_user_custom_mosques');
+    localStorage.removeItem('penjwen_user_staff_edits');
+    localStorage.removeItem('penjwen_deleted_ids');
+    localStorage.removeItem('penjwen_deleted_sermons');
+    localStorage.removeItem('penjwen_teacher_keys');
+    try {
+      openVaultDB().then(db => {
+        if (db) {
+          const tx = db.transaction(VAULT_STORE_NAME, 'readwrite');
+          tx.objectStore(VAULT_STORE_NAME).clear();
+        }
+      }).catch(() => {});
+    } catch(e) {}
   }
 } catch (e) {}
 

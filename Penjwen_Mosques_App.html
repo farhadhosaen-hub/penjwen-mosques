@@ -1952,7 +1952,8 @@ let currentPrayerTimes = null;
 
 // وەشانی داتابەیس و پشکنینی هاوتاکردنی سەرەتایی لە هەموو ئەپ و ئامێرەکاندا
 // وەشانی داتابەیس و خاوێنکردنەوەی سەرجەم داتاکان بۆ دەستپێکی خاوێن و بێ مزگەوت
-const CURRENT_SCHEMA_VERSION = '20261012_clean_slate_zero_mosques_v1';
+// وەشانی داتابەیس و خاوێنکردنەوەی تەواوەتی بۆ سفڕکردنەوەی سەرجەم ئامێرەکان
+const CURRENT_SCHEMA_VERSION = '20261012_zero_wipe_v6';
 
 try {
   const storedVersion = localStorage.getItem('penjwen_schema_version');
@@ -4052,14 +4053,14 @@ function loadMosquesData() {
   }
 
   // پشکنینی نوسخەی یەدەگ و کۆگای هەمیشەیی ئەگەر ستۆریجی سەرەکی بەتاڵ بوو
-  if (!Array.isArray(loaded) || loaded.length === 0) {
+  if (!Array.isArray(loaded)) {
     try {
       const backupStored = localStorage.getItem('penjwen_mosques_backup');
       if (backupStored) loaded = JSON.parse(backupStored);
     } catch(e) {}
   }
 
-  if (!Array.isArray(loaded) || loaded.length === 0) {
+  if (!Array.isArray(loaded)) {
     try {
       const vaultStored = localStorage.getItem('penjwen_mosques_permanent_vault');
       if (vaultStored) loaded = JSON.parse(vaultStored);
@@ -6036,7 +6037,24 @@ function handleRealtimeIncomingPacket(packet) {
   if (!packet || typeof packet !== 'object') return;
   if (packet.senderId === REALTIME_CLIENT_ID) return; // پاراستن لە خۆ-دەنگدانەوە
 
-  if (packet.type === 'sermon_saved' && packet.mosqueId && packet.sermon) {
+  if (packet.type === 'global_reset_zero') {
+    mosques = [];
+    try {
+      localStorage.setItem('penjwen_mosques_data', '[]');
+      localStorage.setItem('penjwen_mosques_backup', '[]');
+      localStorage.setItem('penjwen_mosques_permanent_vault', '[]');
+      localStorage.removeItem('penjwen_user_mosque_vault');
+      localStorage.removeItem('penjwen_user_custom_mosques');
+      localStorage.removeItem('penjwen_user_staff_edits');
+      localStorage.removeItem('penjwen_deleted_ids');
+      localStorage.removeItem('penjwen_deleted_sermons');
+      localStorage.removeItem('penjwen_teacher_keys');
+    } catch(e) {}
+    renderMosques();
+    updateStats();
+    updateSyncUIStatus(true, 0);
+    showToast('⚡ گشت داتای مزگەوتەکان لە هەموو ئامێرەکان بە سەرکەوتوویی سفر کرایەوە', 'info');
+  } else if (packet.type === 'sermon_saved' && packet.mosqueId && packet.sermon) {
     const success = mergeSingleSermon(packet.mosqueId, packet.sermon);
     if (success) {
       showToast(`⚡ ڕاستەوخۆ: وتاری مامۆستا (${packet.sermon.speaker || ''}) بۆ بەرواری (${packet.sermon.date}) هاوتا کرا!`, 'success');
@@ -6425,7 +6443,7 @@ async function syncFromCloud(silent = false) {
         const resp = await fetch(url, { cache: 'no-store' });
         if (resp.ok) {
           const json = await resp.json();
-          if (Array.isArray(json) && json.length > 0) {
+          if (Array.isArray(json)) {
             cloudData = json;
             break;
           }
@@ -6435,17 +6453,34 @@ async function syncFromCloud(silent = false) {
   }
 
   try {
-    if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
+    if (cloudData && Array.isArray(cloudData)) {
       if (cloudUpdatedAt) {
         lastKnownCloudUpdatedAt = cloudUpdatedAt;
       }
-      const changes = mergeIncomingMosques(cloudData);
-      localStorage.setItem('penjwen_last_sync_time', Date.now().toString());
-      updateSyncUIStatus(true, changes);
-      if (changes > 0) {
-        showToast(`هاوکاتکرا! ${changes} مزگەوت یان وتاری نوێ لە ئامێرەکانی ترەوە وەرگیرا`, 'success');
-      } else if (!silent) {
-        showToast('هەموو ئەپەکان پێکەوە هاوکات و نوێن', 'success');
+      if (cloudData.length === 0) {
+        // کاتێک لە کڵاود سفر مزگەوت هەیە، هەموو ئامێرەکانیش دەبنە سفر بەبێ مەرج
+        mosques = [];
+        try {
+          localStorage.setItem('penjwen_mosques_data', '[]');
+          localStorage.setItem('penjwen_mosques_backup', '[]');
+          localStorage.setItem('penjwen_mosques_permanent_vault', '[]');
+          localStorage.removeItem('penjwen_user_mosque_vault');
+          localStorage.removeItem('penjwen_user_custom_mosques');
+          localStorage.removeItem('penjwen_user_staff_edits');
+        } catch(e) {}
+        saveMosquesDataLocally();
+        renderMosques();
+        updateStats();
+        updateSyncUIStatus(true, 0);
+      } else {
+        const changes = mergeIncomingMosques(cloudData);
+        localStorage.setItem('penjwen_last_sync_time', Date.now().toString());
+        updateSyncUIStatus(true, changes);
+        if (changes > 0) {
+          showToast(`هاوکاتکرا! ${changes} مزگەوت یان وتاری نوێ لە ئامێرەکانی ترەوە وەرگیرا`, 'success');
+        } else if (!silent) {
+          showToast('هەموو ئەپەکان پێکەوە هاوکات و نوێن', 'success');
+        }
       }
     } else {
       updateSyncUIStatus(false);

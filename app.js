@@ -2761,16 +2761,17 @@ function createMosqueCard(mosque) {
 // ٧. فۆڕمی زیادکردن و دەستکاریکردنی مزگەوت
 // ==============================================================
 function openCreateModal() {
-  editMosqueId.value = '';
-  modalTitle.textContent = 'تۆمارکردنی مزگەوتی نوێ';
-  saveBtnText.textContent = 'تۆمارکردنی مزگەوت';
-  mosqueNameInput.value = '';
-  mosqueLocationInput.value = '';
-  mosqueNotesInput.value = '';
+  if (editMosqueId) editMosqueId.value = '';
+  if (modalTitle) modalTitle.textContent = 'تۆمارکردنی مزگەوتی نوێ';
+  if (saveBtnText) saveBtnText.textContent = 'تۆمارکردنی مزگەوت';
+  if (mosqueNameInput) mosqueNameInput.value = '';
+  if (mosqueLocationInput) mosqueLocationInput.value = '';
+  if (mosqueNotesInput) mosqueNotesInput.value = '';
   
-  if (khutbahDateInput) khutbahDateInput.value = '2026-10-02';
-  khutbahTopicInput.value = '';
-  khutbahSpeakerInput.value = '';
+  const today = new Date().toISOString().split('T')[0];
+  if (khutbahDateInput) khutbahDateInput.value = today;
+  if (khutbahTopicInput) khutbahTopicInput.value = '';
+  if (khutbahSpeakerInput) khutbahSpeakerInput.value = '';
 
   const pinInput = document.getElementById('mosqueTeacherPinInput');
   if (pinInput) pinInput.value = '';
@@ -2784,14 +2785,17 @@ function openCreateModal() {
   if (khutbahAudioBtnText) khutbahAudioBtnText.textContent = 'هەڵبژاردنی فایلی MP3';
   if (removeKhutbahAudioBtn) removeKhutbahAudioBtn.classList.add('hidden');
 
-  staffListContainer.innerHTML = '';
-  addStaffRow({ name: '', role: 'ووتاربێژ', phone: '' });
-  addStaffRow({ name: '', role: 'پێش نوێژ', phone: '' });
-  addStaffRow({ name: '', role: 'بانگ بێژ', phone: '' });
-  addStaffRow({ name: '', role: 'کارگووزار', phone: '' });
+  if (staffListContainer) {
+    staffListContainer.innerHTML = '';
+    addStaffRow({ name: '', role: 'ووتاربێژ', phone: '' });
+    addStaffRow({ name: '', role: 'پێش نوێژ', phone: '' });
+    addStaffRow({ name: '', role: 'بانگ بێژ', phone: '' });
+    addStaffRow({ name: '', role: 'کارگووزار', phone: '' });
+  }
 
   showModal(mosqueModal);
 }
+window.openCreateModal = openCreateModal;
 
 function addStaffRow(initial = { name: '', role: 'ووتاربێژ', phone: '' }) {
   const rowId = 'staff_' + Math.random().toString(36).substring(2, 9);
@@ -2852,19 +2856,20 @@ function addStaffRow(initial = { name: '', role: 'ووتاربێژ', phone: '' }
 }
 
 async function handleFormSubmit(e) {
-  e.preventDefault();
+  if (e && e.preventDefault) e.preventDefault();
   
-  const name = mosqueNameInput.value.trim();
-  const location = mosqueLocationInput.value.trim();
-  const notes = mosqueNotesInput.value.trim();
-  const sDate = (khutbahDateInput && khutbahDateInput.value) ? khutbahDateInput.value : '2026-10-02';
-  const sTopic = khutbahTopicInput.value.trim();
-  const sSpeaker = khutbahSpeakerInput.value.trim();
-  const idToEdit = editMosqueId.value;
+  const name = (document.getElementById('mosqueName')?.value || (mosqueNameInput ? mosqueNameInput.value : '')).trim();
+  const location = (document.getElementById('mosqueLocation')?.value || (mosqueLocationInput ? mosqueLocationInput.value : '')).trim();
+  const notes = (document.getElementById('mosqueNotes')?.value || (mosqueNotesInput ? mosqueNotesInput.value : '')).trim();
+  const dateInputEl = document.getElementById('khutbahDate') || khutbahDateInput;
+  const sDate = (dateInputEl && dateInputEl.value) ? dateInputEl.value : new Date().toISOString().split('T')[0];
+  const sTopic = (document.getElementById('khutbahTopic')?.value || (khutbahTopicInput ? khutbahTopicInput.value : '')).trim();
+  const sSpeaker = (document.getElementById('khutbahSpeaker')?.value || (khutbahSpeakerInput ? khutbahSpeakerInput.value : '')).trim();
+  const idToEdit = (document.getElementById('editMosqueId')?.value || (editMosqueId ? editMosqueId.value : '')).trim();
 
   if (!name) {
     showToast('تکایە ناوی مزگەوت بنووسە', 'error');
-    return;
+    return false;
   }
 
   // Collect staff rows (خاڵی ٤: بە ژمارەی ئینگلیزی)
@@ -3053,6 +3058,15 @@ async function handleFormSubmit(e) {
     mosques.push(newMosque);
     saveTeacherKey(targetId, finalPin);
 
+    // دڵنیابوونەوە لەوەی ئەم مزگەوتە هەرگیز لە لیستی سڕاوەکاندا نەبێت
+    try {
+      const delSet = getDeletedMosqueIds();
+      if (delSet.has(targetId)) {
+        delSet.delete(targetId);
+        localStorage.setItem('penjwen_deleted_ids', JSON.stringify([...delSet]));
+      }
+    } catch(e) {}
+
     // پاراستنی هەمیشەیی مزگەوتی نوێ لە هەموو کۆگاکان
     saveMosqueToVault(newMosque);
     broadcastRealtimeEvent({
@@ -3073,7 +3087,6 @@ async function handleFormSubmit(e) {
   }
 
   saveMosquesData();
-  pushToCloud();
   hideModal(mosqueModal);
 
   // Auto-expand the mosque details
@@ -3084,7 +3097,9 @@ async function handleFormSubmit(e) {
       if (targetElem) targetElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 200);
   }
+  return false;
 }
+window.handleFormSubmit = handleFormSubmit;
 
 window.editMosque = async function(id) {
   const mosque = mosques.find(m => m.id === id);
@@ -4567,7 +4582,7 @@ window.pushToCloud = pushToCloud;
 // کێشانی خودکار و هاوکاتکردنی داتاکان لە کڵاود (Fetch & Merge from Cloud)
 let isSyncingFromCloud = false;
 async function syncFromCloud(silent = false) {
-  if (isSyncingFromCloud) return;
+  if (isSyncingFromCloud || isPushingToCloud) return;
   isSyncingFromCloud = true;
 
   const icon = document.getElementById('cloudSyncIcon');
@@ -4679,20 +4694,20 @@ async function syncFromCloud(silent = false) {
         lastKnownCloudUpdatedAt = cloudUpdatedAt;
       }
       if (cloudData.length === 0) {
-        // کاتێک لە کڵاود سفر مزگەوت هەیە، هەموو ئامێرەکانیش دەبنە سفر بەبێ مەرج
-        mosques = [];
-        try {
-          localStorage.setItem('penjwen_mosques_data', '[]');
-          localStorage.setItem('penjwen_mosques_backup', '[]');
-          localStorage.setItem('penjwen_mosques_permanent_vault', '[]');
-          localStorage.removeItem('penjwen_user_mosque_vault');
-          localStorage.removeItem('penjwen_user_custom_mosques');
-          localStorage.removeItem('penjwen_user_staff_edits');
-        } catch(e) {}
-        saveMosquesDataLocally();
-        renderMosques();
-        updateStats();
-        updateSyncUIStatus(true, 0);
+        // ئەگەر کڵاود بەتاڵ بێت بەڵام لۆکاڵ مزگەوتی تێدابێت:
+        if (mosques && mosques.length > 0) {
+          // داتای لۆکاڵ دەپارێزرێت و کڵاود پڕ دەکرێتەوە، بەهیچ جۆرێک لۆکاڵ ناسڕدرێتەوە!
+          if (!isPushingToCloud) {
+            pushToCloud();
+          }
+        } else {
+          // تەنها ئەگەر لۆکاڵیش بەتاڵ بێت، دۆخی سفر دەپارێزرێت
+          mosques = [];
+          saveMosquesDataLocally();
+          renderMosques();
+          updateStats();
+          updateSyncUIStatus(true, 0);
+        }
       } else {
         const changes = mergeIncomingMosques(cloudData);
         localStorage.setItem('penjwen_last_sync_time', Date.now().toString());

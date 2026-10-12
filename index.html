@@ -237,7 +237,7 @@
       
       <div class="flex flex-wrap items-center justify-center gap-2.5 relative z-10 w-full">
         <!-- دووگمەی سەرەکی داواکراو: مزگەوتەکانی پێنجوێن -->
-        <button id="openMosqueModalBtn" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold px-5 py-3.5 rounded-2xl shadow-lg shadow-emerald-600/25 transition-all transform hover:-translate-y-0.5 cursor-pointer text-sm sm:text-base">
+        <button id="openMosqueModalBtn" onclick="if(window.openCreateModal) window.openCreateModal();" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold px-5 py-3.5 rounded-2xl shadow-lg shadow-emerald-600/25 transition-all transform hover:-translate-y-0.5 cursor-pointer text-sm sm:text-base">
           <span class="text-base sm:text-lg"><i class="fa-solid fa-kaaba"></i></span>
           <span>مزگەوتەکانی پێنجوێن</span>
           <i class="fa-solid fa-plus text-xs bg-emerald-500/50 p-1.5 rounded-full mr-1"></i>
@@ -347,7 +347,7 @@
       </div>
       <h3 class="text-lg font-bold text-slate-800 mb-1">هیچ مزگەوتێک نەدۆزرایەوە</h3>
       <p class="text-sm text-slate-500 mb-4 max-w-sm mx-auto">هیچ تۆمارێک هاوتای ئەم گەڕانە نییە یان هێشتا مزگەوتت تۆمار نەکردووە.</p>
-      <button onclick="document.getElementById('openMosqueModalBtn').click()" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition-all shadow-xs">
+      <button onclick="if(window.openCreateModal) window.openCreateModal(); else if(document.getElementById('openMosqueModalBtn')) document.getElementById('openMosqueModalBtn').click();" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-xs cursor-pointer">
         <i class="fa-solid fa-plus"></i>
         <span>تۆمارکردنی یەکەم مزگەوت</span>
       </button>
@@ -400,13 +400,13 @@
             <p class="text-xs text-emerald-100">زانیارییەکانی مزگەوت، مامۆستایان و وتاری هەینی</p>
           </div>
         </div>
-        <button id="closeModalBtn" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
+        <button id="closeModalBtn" onclick="if(window.hideModal) window.hideModal(document.getElementById('mosqueModal')); else document.getElementById('mosqueModal').classList.remove('modal-active');" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
       <!-- Modal Body (Scrollable Form) -->
-      <form id="mosqueForm" class="p-6 overflow-y-auto space-y-5 flex-1">
+      <form id="mosqueForm" onsubmit="return window.handleFormSubmit ? window.handleFormSubmit(event) : false;" class="p-6 overflow-y-auto space-y-5 flex-1">
         <input type="hidden" id="editMosqueId" value="">
 
         <!-- Basic Mosque Info -->
@@ -609,6 +609,7 @@
           <button 
             type="button" 
             id="cancelModalBtn" 
+            onclick="if(window.hideModal) window.hideModal(document.getElementById('mosqueModal')); else document.getElementById('mosqueModal').classList.remove('modal-active');"
             class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold transition-colors cursor-pointer"
           >
             پەشیمانبوونەوە

@@ -173,33 +173,10 @@ const DEVICE_ID = getPersistentDeviceId();
 let mosques = [];
 let currentPrayerTimes = null;
 
-// وەشانی داتابەیس و پشکنینی هاوتاکردنی سەرەتایی لە هەموو ئەپ و ئامێرەکاندا
-// وەشانی داتابەیس و خاوێنکردنەوەی سەرجەم داتاکان بۆ دەستپێکی خاوێن و بێ مزگەوت
-// وەشانی داتابەیس و خاوێنکردنەوەی تەواوەتی بۆ سفڕکردنەوەی سەرجەم ئامێرەکان
-const CURRENT_SCHEMA_VERSION = '20261012_clean_zero_v8';
-
+// وەشانی داتابەیس و پاراستنی هەمیشەیی سەرجەم داتاکان بەبێ سڕینەوە (خاڵی ٣: پارێزراوی تەواو تەنانەت دوای ماوەیەکی زۆریش)
+const CURRENT_SCHEMA_VERSION = '20261012_permanent_v1';
 try {
-  const storedVersion = localStorage.getItem('penjwen_schema_version');
-  if (storedVersion !== CURRENT_SCHEMA_VERSION) {
-    localStorage.setItem('penjwen_schema_version', CURRENT_SCHEMA_VERSION);
-    localStorage.setItem('penjwen_mosques_data', '[]');
-    localStorage.setItem('penjwen_mosques_backup', '[]');
-    localStorage.setItem('penjwen_mosques_permanent_vault', '[]');
-    localStorage.removeItem('penjwen_user_mosque_vault');
-    localStorage.removeItem('penjwen_user_custom_mosques');
-    localStorage.removeItem('penjwen_user_staff_edits');
-    localStorage.removeItem('penjwen_deleted_ids');
-    localStorage.removeItem('penjwen_deleted_sermons');
-    localStorage.removeItem('penjwen_teacher_keys');
-    try {
-      openVaultDB().then(db => {
-        if (db) {
-          const tx = db.transaction(VAULT_STORE_NAME, 'readwrite');
-          tx.objectStore(VAULT_STORE_NAME).clear();
-        }
-      }).catch(() => {});
-    } catch(e) {}
-  }
+  localStorage.setItem('penjwen_schema_version', CURRENT_SCHEMA_VERSION);
 } catch (e) {}
 
 // ==============================================================

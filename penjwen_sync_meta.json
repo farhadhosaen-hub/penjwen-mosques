@@ -1,5 +1,14 @@
 {
-  "deletedMosqueIds": [],
+  "deletedMosqueIds": [
+    "mosque_1791788944128_1c4cx",
+    "mosque_rawgan",
+    "test",
+    "mosque_mala_abbas",
+    "mosque_1791290705595",
+    "mosque_1791464818247",
+    "mosque_gaylani",
+    "mosque_1791788944128"
+  ],
   "deletedSermons": {},
   "prayerTimes": null,
   "globalResetAt": 1793444000000,

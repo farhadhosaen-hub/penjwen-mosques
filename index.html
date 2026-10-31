@@ -4,6 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
   <title>ئەپی مزگەوتەکانی پێنجوێن | Penjwen Mosques</title>
+  <script>
+    // Global Hard Reset to Zero for all devices & browsers
+    (function() {
+      try {
+        var EPOCH = '1793444000000';
+        if (localStorage.getItem('penjwen_clean_epoch_v50') !== EPOCH) {
+          var toRemove = [
+            'penjwen_mosques_data', 'penjwen_mosques_backup', 'penjwen_mosques_permanent_vault',
+            'penjwen_user_mosque_vault', 'penjwen_user_custom_mosques', 'penjwen_user_staff_edits',
+            'penjwen_deleted_ids', 'penjwen_deleted_sermons', 'penjwen_teacher_keys',
+            'penjwen_cloud_sync_cache', 'penjwen_local_edits_queue', 'penjwen_last_sync_time'
+          ];
+          for (var i = 0; i < toRemove.length; i++) {
+            try { localStorage.removeItem(toRemove[i]); } catch(e) {}
+          }
+          localStorage.setItem('penjwen_mosques_data', '[]');
+          localStorage.setItem('penjwen_mosques_backup', '[]');
+          localStorage.setItem('penjwen_mosques_permanent_vault', '[]');
+          localStorage.setItem('penjwen_clean_epoch_v50', EPOCH);
+          if (window.indexedDB) {
+            try { indexedDB.deleteDatabase('PenjwenPermanentVaultDB'); } catch(e) {}
+          }
+        }
+      } catch(e) {}
+    })();
+  </script>
   <!-- PWA & Mobile Meta Tags (کارکردن بە ئۆفلاین و ئۆنلاین ڕاستەوخۆ وەک ئەپ) -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#15803d">
@@ -1404,6 +1430,6 @@
     <span id="toastMsg">کردارەکە سەرکەوتووبوو</span>
   </div>
 
-  <script src="app.js?v=20261031_v50"></script>
+  <script src="app.js?v=20261031_v51"></script>
 </body>
 </html>

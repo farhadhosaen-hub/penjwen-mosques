@@ -5064,3 +5064,79 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, { passive: true });
 });
+
+
+// ================= OFFICIAL DOWNLOAD CENTER HELPERS =================
+window.openOfficialDownloadModal = function() {
+  const modal = document.getElementById('officialDownloadModal');
+  if (!modal) return;
+  
+  const ua = navigator.userAgent || '';
+  const isAndroid = /Android/i.test(ua);
+  const isIOS = /iPhone|iPad|iPod/i.test(ua) && !window.MSStream;
+  const isWindows = /Windows/i.test(ua);
+  
+  const badge = document.getElementById('detectedPlatformBadge');
+  const cardAndroid = document.getElementById('cardDownloadAndroid');
+  const cardWindows = document.getElementById('cardDownloadWindows');
+  const cardIos = document.getElementById('cardDownloadIos');
+  
+  // Clear styles
+  if (cardAndroid) cardAndroid.className = cardAndroid.className.replace(/ring-[^ ]+|bg-emerald-50\/50/g, '').trim();
+  if (cardWindows) cardWindows.className = cardWindows.className.replace(/ring-[^ ]+|bg-blue-50\/50/g, '').trim();
+  if (cardIos) cardIos.className = cardIos.className.replace(/ring-[^ ]+|bg-amber-50\/50/g, '').trim();
+  
+  if (isAndroid) {
+    if (badge) badge.innerHTML = '<span class="inline-flex items-center gap-1.5 text-emerald-900 font-bold bg-emerald-100 border border-emerald-300 px-3.5 py-1 rounded-full"><i class="fa-brands fa-android text-base text-emerald-600"></i> ئامێری ئێستات: مۆبایلی ئەندرۆید (فایلی APK لە خوارەوە بۆ تۆ گونجاوە)</span>';
+    if (cardAndroid) cardAndroid.classList.add('ring-4', 'ring-emerald-500', 'bg-emerald-50/50');
+  } else if (isIOS) {
+    if (badge) badge.innerHTML = '<span class="inline-flex items-center gap-1.5 text-amber-900 font-bold bg-amber-100 border border-amber-300 px-3.5 py-1 rounded-full"><i class="fa-brands fa-apple text-base text-slate-800"></i> ئامێری ئێستات: ئایفۆن (ڕێنمایی Safari لە خوارەوە بۆ تۆ گونجاوە)</span>';
+    if (cardIos) cardIos.classList.add('ring-4', 'ring-amber-500', 'bg-amber-50/50');
+  } else if (isWindows) {
+    if (badge) badge.innerHTML = '<span class="inline-flex items-center gap-1.5 text-blue-900 font-bold bg-blue-100 border border-blue-300 px-3.5 py-1 rounded-full"><i class="fa-brands fa-windows text-base text-blue-600"></i> ئامێری ئێستات: کۆمپیوتەری ویندۆز (فایلی ئەپی ویندۆز لە خوارەوە بۆ تۆ گونجاوە)</span>';
+    if (cardWindows) cardWindows.classList.add('ring-4', 'ring-blue-500', 'bg-blue-50/50');
+  } else {
+    if (badge) badge.innerHTML = '<span class="inline-flex items-center gap-1.5 text-slate-700 font-bold bg-slate-100 border border-slate-300 px-3.5 py-1 rounded-full"><i class="fa-solid fa-laptop-code text-slate-600"></i> تکایە بژاردەی گونجاو بەپێی ئامێرەکەت هەڵبژێرە</span>';
+  }
+  
+  showModal(modal);
+};
+
+window.closeOfficialDownloadModal = function() {
+  const modal = document.getElementById('officialDownloadModal');
+  if (modal) hideModal(modal);
+};
+
+// Aliases for compatibility
+window.openMobileDownloadModal = window.openOfficialDownloadModal;
+window.closeMobileDownloadModal = window.closeOfficialDownloadModal;
+
+window.downloadOfficialApk = function() {
+  const link = document.createElement('a');
+  link.href = 'Penjwen_Mosques.apk';
+  link.download = 'Penjwen_Mosques.apk';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast('داگرتنی فایلی APK دەستیپێکرد... تکایە سەیری پەڕگەی داونلۆدی مۆبایلەکەت بکە', 'success');
+};
+
+window.downloadOfficialWindowsApp = function() {
+  const link = document.createElement('a');
+  link.href = 'Penjwen_Mosques_App.html';
+  link.download = 'Penjwen_Mosques_App.html';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast('فایلی پڕۆگرامی ویندۆز دابەزییە ناو فۆڵدەری داونلۆدی کۆمپیوتەرەکەت (Downloads)', 'success');
+};
+
+window.downloadOfficialWindowsZip = function() {
+  const link = document.createElement('a');
+  link.href = 'Penjwen_Mosques_App.zip';
+  link.download = 'Penjwen_Mosques_App.zip';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast('پاکێجی زیپ بە تەواوی فایلەکانەوە دادەبەزێتە ناو کۆمپیوتەرەکەت', 'success');
+};

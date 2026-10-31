@@ -4079,6 +4079,20 @@ window.closePwaGuideModal = function() {
   if (modal) hideModal(modal);
 };
 
+window.openMobileDownloadModal = function() {
+  const modal = document.getElementById('mobileDownloadModal');
+  if (modal) showModal(modal);
+};
+
+window.closeMobileDownloadModal = function() {
+  const modal = document.getElementById('mobileDownloadModal');
+  if (modal) hideModal(modal);
+};
+
+window.handleWindowsAppDownload = function(e) {
+  showToast('داگرتنی ئەپی ویندۆز دەستیپێکرد... فایلەکە لە فۆڵدەری داونلۆد (Downloads) خەزن دەبێت', 'success');
+};
+
 function initPwaInstallPrompt() {
   const isStandalone = checkStandaloneMode();
 

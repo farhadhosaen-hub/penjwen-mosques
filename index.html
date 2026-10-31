@@ -239,15 +239,17 @@
           <p class="text-[11px] text-emerald-100/80 mt-0.5">بە یەک کرتە ئەپەکە بخەرە سەر شاشەی مۆبایل یان کۆمپیوتەرەکەت بۆ بەکارهێنانی هەمیشەیی.</p>
         </div>
       </div>
-      <div class="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
-        <a href="Penjwen_Mosques.apk" download="Penjwen_Mosques.apk" class="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow-xs transition-all cursor-pointer" title="داگرتنی فایلی APK بۆ ئەندرۆید">
-          <i class="fa-brands fa-android text-sm"></i>
-          <span>داگرتنی APK</span>
-        </a>
-        <button onclick="triggerPwaInstall()" class="inline-flex items-center justify-center gap-1.5 bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-xs px-3 py-1.5 rounded-xl shadow-xs transition-all cursor-pointer">
-          <i class="fa-solid fa-download"></i>
-          <span>داگرتنی ئەپ</span>
+      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end shrink-0">
+        <!-- دوگمەی ١: داگرتنی ئەپ بۆ مۆبایل (ئایفۆن و ئەندرۆید) -->
+        <button onclick="openMobileDownloadModal()" class="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs transition-all cursor-pointer" title="داگرتنی ئەپ بۆ مۆبایل (ئایفۆن و ئەندرۆید)">
+          <i class="fa-solid fa-mobile-screen text-amber-300 text-sm"></i>
+          <span>داگرتنی ئەپ بۆ مۆبایل (ئایفۆن و ئەندرۆید)</span>
         </button>
+        <!-- دوگمەی ٢: داگرتنی ئەپ بۆ ویندۆز -->
+        <a href="Penjwen_Mosques_App.html" download="Penjwen_Mosques_App.html" onclick="handleWindowsAppDownload(event)" class="inline-flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs transition-all cursor-pointer" title="داگرتنی ئەپ بۆ ویندۆز (دابەزین بۆ ناو ئامێر)">
+          <i class="fa-brands fa-windows text-blue-200 text-sm"></i>
+          <span>داگرتنی ئەپ بۆ ویندۆز</span>
+        </a>
         <button onclick="dismissPwaTopBanner()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer" title="داخستن">
           <i class="fa-solid fa-xmark text-xs"></i>
         </button>
@@ -301,17 +303,17 @@
           <span>ناردن بۆ مامۆستایان</span>
         </button>
 
-        <!-- داگرتنی APK بۆ مۆبایلەکانی ئەندرۆید -->
-        <a id="downloadApkBtn" href="Penjwen_Mosques.apk" download="Penjwen_Mosques.apk" class="inline-flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-900 font-bold px-3 py-2 rounded-xl border border-emerald-300 transition-all cursor-pointer text-xs sm:text-sm shadow-2xs" title="داگرتنی فایلی APK بۆ ئەندرۆید">
-          <i class="fa-brands fa-android text-emerald-700"></i>
-          <span>فایلی APK</span>
-        </a>
-
-        <!-- داگرتنی ئەپ لەسەر مۆبایل و کۆمپیوتەر -->
-        <button id="pwaInstallBtn" onclick="triggerPwaInstall()" class="inline-flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-950 font-bold px-3 py-2 rounded-xl border border-amber-300 transition-all cursor-pointer text-xs sm:text-sm shadow-2xs" title="داگرتنی بەرنامەکە وەک ئەپ">
-          <i class="fa-solid fa-cloud-arrow-down text-amber-700"></i>
-          <span>داگرتنی ئەپ</span>
+        <!-- دوگمەی ١: داگرتنی ئەپ بۆ مۆبایل (ئایفۆن و ئەندرۆید) -->
+        <button id="mobileDownloadBtn" onclick="openMobileDownloadModal()" class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-700 to-green-700 hover:from-emerald-600 hover:to-green-600 active:scale-95 text-white font-bold px-3.5 py-2 rounded-xl border border-emerald-500 transition-all cursor-pointer text-xs sm:text-sm shadow-xs" title="داگرتنی ئەپ بۆ مۆبایل (ئایفۆن و ئەندرۆید)">
+          <i class="fa-solid fa-mobile-screen-button text-amber-300"></i>
+          <span>داگرتنی ئەپ بۆ مۆبایل (ئایفۆن و ئەندرۆید)</span>
         </button>
+
+        <!-- دوگمەی ٢: داگرتنی ئەپ بۆ ویندۆز -->
+        <a id="windowsDownloadBtn" href="Penjwen_Mosques_App.html" download="Penjwen_Mosques_App.html" onclick="handleWindowsAppDownload(event)" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 active:scale-95 text-white font-bold px-3.5 py-2 rounded-xl border border-blue-500 transition-all cursor-pointer text-xs sm:text-sm shadow-xs" title="داگرتنی ئەپ بۆ ویندۆز (دابەزین بۆ ناو ئامێر)">
+          <i class="fa-brands fa-windows text-blue-200"></i>
+          <span>داگرتنی ئەپ بۆ ویندۆز</span>
+        </a>
       </div>
 
       <!-- Quick Summary Badges (ئامارەکان بە دیزاینێکی ڕێک و وردبین) -->
@@ -1085,18 +1087,17 @@
           <p class="text-xs text-blue-900/90 leading-relaxed">
             دەتوانیت فایلی تەواوی ئەپەکە بە یەک کلیک دابەزێنیت و لە تێلێگرام یان واتسئاپ وەک دۆکیومێنت (Document) بینێریت بۆ مامۆستایان؛ لای هەموویان دەکرێتەوە و کاردەکات:
           </p>
-          <div class="flex flex-wrap gap-2.5 pt-1">
-            <a href="Penjwen_Mosques.apk" download="Penjwen_Mosques.apk" class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 active:bg-green-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-md transition-colors cursor-pointer" title="داگرتنی فایلی APK بۆ ئەندرۆید">
-              <i class="fa-brands fa-android text-base text-amber-300"></i>
-              <span>داگرتنی ئەپی فەرمی ئەندرۆید (APK)</span>
-            </a>
-            <a href="Penjwen_Mosques_App.html" download="ئەپی_مزگەوتەکانی_پێنجوێن.html" class="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-sm transition-colors cursor-pointer">
-              <i class="fa-solid fa-file-arrow-down text-base text-blue-200"></i>
-              <span>داگرتنی فایلی تەواوی ئەپ (HTML) بە یەک کلیک</span>
-            </a>
-            <a href="Penjwen_Mosques_App.zip" download="Penjwen_Mosques_App.zip" class="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-800 active:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-sm transition-colors cursor-pointer">
-              <i class="fa-solid fa-file-zipper text-base text-slate-300"></i>
-              <span>داگرتنی فایلی زیپ (ZIP)</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <!-- ١- داگرتنی ئەپ بۆ مۆبایل (ئایفۆن و ئەندرۆید) -->
+            <button onclick="openMobileDownloadModal()" class="w-full inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 active:scale-98 text-white font-black py-3 px-4 rounded-xl text-xs sm:text-sm shadow-md transition-all cursor-pointer">
+              <i class="fa-solid fa-mobile-screen-button text-amber-300 text-base"></i>
+              <span>١- داگرتنی ئەپ بۆ مۆبایل (ئایفۆن و ئەندرۆید)</span>
+            </button>
+            
+            <!-- ٢- داگرتنی ئەپ بۆ ویندۆز -->
+            <a href="Penjwen_Mosques_App.html" download="Penjwen_Mosques_App.html" onclick="handleWindowsAppDownload(event)" class="w-full inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 active:scale-98 text-white font-black py-3 px-4 rounded-xl text-xs sm:text-sm shadow-md transition-all cursor-pointer">
+              <i class="fa-brands fa-windows text-blue-200 text-base"></i>
+              <span>٢- داگرتنی ئەپ بۆ ویندۆز</span>
             </a>
           </div>
           <div class="bg-white/80 p-3.5 rounded-xl border border-blue-200 text-xs text-slate-700 space-y-2">
@@ -1404,6 +1405,88 @@
         <i class="fa-solid fa-shield-halved text-emerald-600"></i>
         <span>ئەپێکی پارێزراوە و هیچ ڕیکلام و تێچوویەکی نییە</span>
       </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: داگرتنی ئەپ بۆ مۆبایل (ئایفۆن و ئەندرۆید) ================= -->
+  <div id="mobileDownloadModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300 no-print">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-emerald-600 overflow-hidden transform scale-95 transition-all duration-300 max-h-[92vh] flex flex-col text-right">
+      
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white px-5 sm:px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center text-xl text-amber-300 shrink-0">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-black">داگرتنی ئەپ بۆ مۆبایل</h3>
+            <p class="text-xs text-emerald-100/90 font-medium">بۆ ئامێرەکانی ئایفۆن و ئەندرۆید (100% ئۆفلاین)</p>
+          </div>
+        </div>
+        <button onclick="closeMobileDownloadModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer" title="داخستن">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1 text-slate-700">
+        
+        <!-- هەڵبژاردنی یەکەم: ئەندرۆید (Android) -->
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 sm:p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 font-black text-emerald-950 text-sm sm:text-base">
+              <i class="fa-brands fa-android text-xl text-emerald-600"></i>
+              <span>١. بۆ مۆبایلی ئەندرۆید (Samsung, Xiaomi, Huawei, ...)</span>
+            </div>
+            <span class="text-[10px] bg-emerald-200/80 text-emerald-900 font-bold px-2 py-0.5 rounded-full">APK فەرمی</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            دەتوانیت فایلی ئەپ (APK) دابەزێنیت و ڕاستەوخۆ لەسەر مۆبایلەکەت ئینستۆڵی بکەیت، یاخود بە یەک کلیک بیخەیتە سەر شاشەی سەرەکی:
+          </p>
+          <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+            <a href="Penjwen_Mosques.apk" download="Penjwen_Mosques.apk" class="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 active:scale-98 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-sm transition-all cursor-pointer">
+              <i class="fa-brands fa-android text-base text-amber-300"></i>
+              <span>داگرتنی فایلی APK</span>
+            </a>
+            <button onclick="triggerPwaInstall()" class="flex-1 inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 active:scale-98 text-amber-950 font-black py-2.5 px-4 rounded-xl text-xs shadow-sm transition-all cursor-pointer">
+              <i class="fa-solid fa-cloud-arrow-down text-base"></i>
+              <span>دانان لەسەر شاشە (PWA)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- هەڵبژاردنی دووەم: ئایفۆن (Apple iPhone) -->
+        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 sm:p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 font-black text-amber-950 text-sm sm:text-base">
+              <i class="fa-brands fa-apple text-xl text-slate-800"></i>
+              <span>٢. بۆ مۆبایلی ئایفۆن (iPhone - Safari)</span>
+            </div>
+            <span class="text-[10px] bg-amber-200/80 text-amber-950 font-bold px-2 py-0.5 rounded-full">بەبێ ئەپستۆر</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            لە وێبگەڕی Safari بە ٣ هەنگاوی زۆر سادە ئەپەکە دەچێتە سەر شاشەی سەرەکی مۆبایلەکەت وەک ئەپی ئاسایی:
+          </p>
+          <ol class="space-y-2 text-xs text-slate-700 list-decimal list-inside pr-1 bg-white p-3.5 rounded-xl border border-amber-200/80 leading-relaxed">
+            <li>لە وێبگەڕی <strong>سەفاری (Safari)</strong> لە خوارەوەی شاشە کرتە لە دوگمەی <strong>هاوبەشکردن (Share <i class="fa-solid fa-arrow-up-from-bracket text-blue-600"></i>)</strong> بکە.</li>
+            <li>بڕۆ خوارەوە و هەڵبژاردنی <strong>«Add to Home Screen / خستنەسەر شاشە ⊞»</strong> هەڵبژێرە.</li>
+            <li>لە سەرەوە لای ڕاست کرتە لە دوگمەی <strong>Add</strong> بکە؛ دەستبەجێ بە لۆگۆی فەرمی دەچێتە سەر شاشە و بێ ئینتەرنێت کاردەکات.</li>
+          </ol>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="border-t border-slate-100 p-4 bg-slate-50 flex items-center justify-between">
+        <span class="text-[11px] text-emerald-800 font-bold">
+          <i class="fa-solid fa-circle-check text-emerald-600 ml-1"></i>
+          هەردوو جۆر بێ ئینتەرنێت ١٠٠٪ کاردەکەن
+        </span>
+        <button onclick="closeMobileDownloadModal()" class="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold transition-colors cursor-pointer">
+          داخستن
+        </button>
+      </div>
+
     </div>
   </div>
 

@@ -5140,3 +5140,8 @@ window.downloadOfficialWindowsZip = function() {
   document.body.removeChild(link);
   showToast('پاکێجی زیپ بە تەواوی فایلەکانەوە دادەبەزێتە ناو کۆمپیوتەرەکەت', 'success');
 };
+
+
+window.handleDownloadToast = function(platformName) {
+  showToast(`داگرتنی فایلی ${platformName} دەستیپێکرد... دەتوانیت لە بەشی داونلۆدی ئامێرەکەت بیکەیتەوە و هەمیشە بێ ئینتەرنێت کاری پێبکەیت.`, 'success');
+};
